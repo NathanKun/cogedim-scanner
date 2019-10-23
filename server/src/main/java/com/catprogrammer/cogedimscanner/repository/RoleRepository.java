@@ -1,6 +1,6 @@
-package com.gf.repository;
+package com.catprogrammer.cogedimscanner.repository;
 
-import com.gf.entity.Role;
+import com.catprogrammer.cogedimscanner.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {

@@ -1,7 +1,5 @@
-package com.gf.service;
+package com.catprogrammer.cogedimscanner.service;
 
-
-import com.gf.entity.User;
 
 public interface AuthService {
 

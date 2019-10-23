@@ -1,4 +1,4 @@
-package com.gf;
+package com.catprogrammer.cogedimscanner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

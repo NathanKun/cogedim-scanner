@@ -1,8 +1,8 @@
-package com.gf.service.impl;
+package com.catprogrammer.cogedimscanner.service.impl;
 
 
-import com.gf.service.AuthService;
-import com.gf.utils.JwtTokenUtil;
+import com.catprogrammer.cogedimscanner.service.AuthService;
+import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

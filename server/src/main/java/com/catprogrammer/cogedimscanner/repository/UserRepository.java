@@ -1,6 +1,6 @@
-package com.gf.repository;
+package com.catprogrammer.cogedimscanner.repository;
 
-import com.gf.entity.User;
+import com.catprogrammer.cogedimscanner.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

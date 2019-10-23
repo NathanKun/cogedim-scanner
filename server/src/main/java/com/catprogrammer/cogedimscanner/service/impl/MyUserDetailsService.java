@@ -1,4 +1,4 @@
-package com.gf.service.impl;
+package com.catprogrammer.cogedimscanner.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.gf.entity.Privilege;
-import com.gf.entity.Role;
-import com.gf.entity.User;
-import com.gf.repository.UserRepository;
+import com.catprogrammer.cogedimscanner.entity.Privilege;
+import com.catprogrammer.cogedimscanner.entity.Role;
+import com.catprogrammer.cogedimscanner.entity.User;
+import com.catprogrammer.cogedimscanner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -77,14 +77,6 @@ public class MyUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(privilege));
         }
         return authorities;
-    }
-
-    private final String getClientIP() {
-        final String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0];
     }
 
 }

@@ -1,4 +1,4 @@
-package com.gf.entity;
+package com.catprogrammer.cogedimscanner.entity;
 
 
 import javax.persistence.*;

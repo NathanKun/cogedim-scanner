@@ -1,11 +1,11 @@
-package com.gf.config;
+package com.catprogrammer.cogedimscanner.config;
 
-import com.gf.entity.Privilege;
-import com.gf.entity.Role;
-import com.gf.entity.User;
-import com.gf.repository.PrivilegeRepository;
-import com.gf.repository.RoleRepository;
-import com.gf.repository.UserRepository;
+import com.catprogrammer.cogedimscanner.entity.Privilege;
+import com.catprogrammer.cogedimscanner.entity.Role;
+import com.catprogrammer.cogedimscanner.entity.User;
+import com.catprogrammer.cogedimscanner.repository.PrivilegeRepository;
+import com.catprogrammer.cogedimscanner.repository.RoleRepository;
+import com.catprogrammer.cogedimscanner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

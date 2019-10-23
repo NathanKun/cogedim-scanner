@@ -1,7 +1,7 @@
-package com.gf.filter;
+package com.catprogrammer.cogedimscanner.filter;
 
 
-import com.gf.utils.JwtTokenUtil;
+import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

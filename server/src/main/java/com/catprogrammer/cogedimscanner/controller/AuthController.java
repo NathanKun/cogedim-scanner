@@ -1,8 +1,7 @@
-package com.gf.controller;
+package com.catprogrammer.cogedimscanner.controller;
 
-import com.gf.service.AuthService;
+import com.catprogrammer.cogedimscanner.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
