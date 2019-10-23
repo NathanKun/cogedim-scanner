@@ -8,11 +8,11 @@
         <version>2.2.0.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.gf</groupId>
-    <artifactId>springboot-jwt</artifactId>
+    <groupId>com.catprogrammer</groupId>
+    <artifactId>cogedimscanner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot-jwt</name>
-    <description>Demo project for Spring Boot</description>
+    <name>cogedim-scanner</name>
+    <description>cogedim scanner backend</description>
 
     <properties>
         <java.version>1.8</java.version>
