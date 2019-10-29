@@ -25,14 +25,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private PasswordEncoder passwordEncoder;
 
-    @Bean
-    PasswordEncoder getEncoder() {
-        if (passwordEncoder == null) {
-            passwordEncoder = new BCryptPasswordEncoder();
-        }
-        return passwordEncoder;
-    }
-
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -56,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 //登录接口放行
                 .antMatchers("/auth/login").permitAll()
+                // allow /test
+                .antMatchers("/test").permitAll()
                 //其他接口全部接受验证
                 .anyRequest().authenticated();
 
@@ -70,10 +64,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public PasswordEncoder getEncoder() {
+        if (passwordEncoder == null) {
+            passwordEncoder = new BCryptPasswordEncoder();
+        }
+        return passwordEncoder;
+    }
+
+    @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-
 }

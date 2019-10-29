@@ -32,3 +32,4 @@ build/
 
 src/main/java/com/catprogrammer/cogedimscanner/config/Credentials.kt
 src/main/resources/application-prd.yml
+src/main/resources/rebel.xml
