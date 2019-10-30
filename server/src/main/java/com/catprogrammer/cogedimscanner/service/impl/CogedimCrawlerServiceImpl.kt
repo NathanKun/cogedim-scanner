@@ -5,6 +5,7 @@ import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.FormGetResult
 import com.catprogrammer.cogedimscanner.model.NearbyProgram
 import com.catprogrammer.cogedimscanner.model.SearchResult
+import com.catprogrammer.cogedimscanner.repository.LotRepository
 import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.CogedimCrawlerService
 import com.google.gson.Gson
@@ -13,7 +14,6 @@ import org.apache.commons.io.IOUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.OutputStreamWriter
 import java.lang.reflect.Type
@@ -26,76 +26,68 @@ import java.util.zip.GZIPInputStream
 @Service
 class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
-    // @Value("\${catprogrammer.article}")
-    // lateinit var mokeArticle: String
-
     private val gson = Gson()
     private val type: Type = object : TypeToken<List<NearbyProgram>>() {}.type
     private val baseurl = "https://www.cogedim.com"
-    // private val contactinfo = "contact_info_known=true&contact_info%5BformCivility%5D=02&contact_info%5BformFirstName%5D=Not&contact_info%5BformLastName%5D=APerson&contact_info%5BformPhone%5D=0660600660&contact_info%5BformEmail%5D=notanemail%40gmail.com&contact_info%5BformLocation%5D=Paris&contact_info%5BformCity%5D=Paris&contact_info%5BformPostalCode%5D=75000&contact_info%5BformRegion%5D=%C3%8Ele-de-France&contact_info%5BformCountry%5D=France&contact_info%5BformDestination%5D=habiter"
-    private val contactinfo = "contact_info_known=true"
+    private val contactinfo = "contact_info_known=true&contact_info%5BformCivility%5D=02&contact_info%5BformFirstName%5D=Not&contact_info%5BformLastName%5D=APerson&contact_info%5BformPhone%5D=0660600660&contact_info%5BformEmail%5D=notanemail%40gmail.com&contact_info%5BformLocation%5D=Paris&contact_info%5BformCity%5D=Paris&contact_info%5BformPostalCode%5D=75000&contact_info%5BformRegion%5D=%C3%8Ele-de-France&contact_info%5BformCountry%5D=France&contact_info%5BformDestination%5D=habiter"
 
     @Autowired
     private lateinit var programRepository: ProgramRepository
+    @Autowired
+    private lateinit var lotRepository: LotRepository
 
     /**
      * Send one or multiple requests to fetch all program from Cogedim.
      * Return a list of SearchResult object.
      */
-    // TODO: remove @Suppress after test
-    @Suppress("CanBeVal")
     override fun requestSearchResults(): List<SearchResult> {
         val results = mutableListOf<SearchResult>()
         var page = 0
         var res: SearchResult?
 
-        // TODO: remove @Suppress after test
-        @Suppress("UNREACHABLE_CODE")
-        @Suppress("UNUSED_CHANGED_VALUE")
         do {
             res = fetchSearchResult(page++)
             if (res != null) {
                 results.add(res)
             }
-            // TODO: remove next line after test
-            break
         } while (res?.hasMore != null && res.hasMore!!)
 
         return results
+        // return mutableListOf(gson.fromJson<SearchResult>(mokeSearchResult, SearchResult::class.javaObjectType))
     }
 
     /**
      * Parse a list of SearchResult object.
      * Find and save all programs and lots.
      */
-    override fun parseSearchResuls(results: List<SearchResult>) {
+    override fun parseSearchResuls(results: List<SearchResult>, onlyRequestMissingBlueprintPdf: Boolean) {
         results.filter { it.results != null && it.results.size() > 0 }.forEach { searchResult ->
             val drupalSettings = searchResult.drupalSettings
             val nearbyPrograms: List<NearbyProgram> =
                     if (drupalSettings != null && drupalSettings.has("nearbyPrograms")) {
                         val nearbyProgramsJsonObject = drupalSettings.get("nearbyPrograms")
                         gson.fromJson<List<NearbyProgram>>(nearbyProgramsJsonObject, type)
-                    } else
+                    } else {
                         emptyList()
-
+                    }
 
             searchResult.results?.forEach { result ->
                 val article = Jsoup.parse(result.asString)
                 // val article = Jsoup.parse(mokeArticle)
                 val program = parseSearchResultProgram(article, nearbyPrograms)
+                parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
                 programRepository.save(program)
-                parseSearchResultLot(article, program)
-                programRepository.save(program)
+                println("saved program ${program.programName} ${program.programNumber}")
             }
         }
 
     }
 
     /**
-     * Parse the <article> dom object, find all lot and link to the given Program object
+     * Parse the <article> dom object, find all lot and link to the given Program object and save
      */
-    private fun parseSearchResultLot(article: Document, program: Program) {
-        article.select("v-expansion-panel.regulation-4 > *").forEach { programTypeTag ->
+    private fun parseSearchResultLot(article: Document, program: Program, onlyRequestMissingBlueprintPdf: Boolean) {
+        article.select("v-expansion-panel[class^=regulation-] > *").forEach { programTypeTag ->
             // for each lot type. eg: 3 pièces, 4 pièces, etc
             programTypeTag.select("v-expansion-panel v-expansion-panel-content[ripple]").forEach { lotTag ->
                 // for each lot
@@ -104,17 +96,52 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val floor = lotTag.select("span.lot-floor").text()
                 val price = lotTag.select("span.lot-price").text()
 
-                val blueprintUrl = fetchFormBlueprint(program.programNumber, lotNumber)
-                val pdfUrl = if (blueprintUrl != null) (baseurl + parseFormGetResultGetPdfUrl(blueprintUrl)) else null
+                val blueprintDownloadButton = lotTag.select("div.lot-details div.buttons v-btn[@click.native*=blueprint]")
+                val blueprintDownloadButtonAttr = blueprintDownloadButton.attr("@click.native")
+                val blueprintId = Regex("event, ?[0-9]{4}, ?([0-9]{5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
 
-                val lot = Lot(null, lotNumber, surface, floor, price, pdfUrl, null, null)
+                // no need to request blueprint pdf if no blueprint id
+                var requestPdf = blueprintId != null
+                var oldPdfUrl: String? = null
+                // check if already request pdf of this blueprint
+                if (requestPdf) {
+                    val sameLots = lotRepository.findByBlueprintIdOrderByIdDesc(blueprintId!!)
+                    if (sameLots.isNotEmpty()) {
+                        val sameLot = sameLots.first()
+                        if (sameLot.blueprintId != null) {
+                            // if already have the pdf url, not requesting it again if onlyRequestMissingBlueprintPdf is true
+                            requestPdf = !onlyRequestMissingBlueprintPdf
+                            oldPdfUrl = sameLot.pdfUrl
+                        }
+                    }
+                }
+
+                val pdfUrl =
+                        if (requestPdf) {
+                            if (blueprintId != null && blueprintId.length == 5) {
+                                // pause 1 sec to reduce request per sec
+                                // avoid being banned
+                                Thread.sleep(1000)
+
+                                val blueprintUrl = fetchFormBlueprint(program.programNumber, blueprintId)
+                                if (blueprintUrl != null) {
+                                    baseurl + parseFormGetResultGetPdfUrl(blueprintUrl)
+                                } else null
+                            } else null
+                        } else {
+                            oldPdfUrl
+                        }
+
+                val lot = Lot(null, lotNumber, surface, floor, price, blueprintId, pdfUrl, null, null)
                 program.lots.add(lot)
+                lotRepository.save(lot)
+                println("saved lot ${lot.lotNumber}")
             }
         }
     }
 
     /**
-     * Parse the <article> dom object, find it's program, instantiate and return the Program object
+     * Parse the <article> dom object, find it's program, instantiate, save and return the Program object
      */
     private fun parseSearchResultProgram(article: Document, nearbyPrograms: List<NearbyProgram>): Program {
         val programName = article.select("div.info-box h2 span").text()
@@ -138,19 +165,18 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 .replace("/styles/visual_327x188/public", "") // remove resize
                 .replace(Regex("\\?itok.*"), "") // remove param
 
-        // TODO: next 2 lines comments after test
-        // val leafletForm = fetchFormLeaflet(programId)
-        // val pdfUrl = if (leafletForm != null) (baseurl + parseFormGetResultGetPdfUrl(leafletForm)) else null
-        // TODO: remove next line after test
-        val pdfUrl = null
-        val lots = mutableListOf<Lot>()
+        val leafletForm = fetchFormLeaflet(programId)
+        val pdfUrl = if (leafletForm != null) (baseurl + parseFormGetResultGetPdfUrl(leafletForm)) else null
 
         val nearbyProgram = nearbyPrograms.first { p -> p.nid == programId }
         val latitude = nearbyProgram.lat
         val longitude = nearbyProgram.lng
 
-        return Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
-                latitude, longitude, lots, null, null)
+        val program = Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
+                latitude, longitude, mutableListOf<Lot>(), null, null)
+        programRepository.save(program)
+
+        return program
     }
 
     private fun parseFormGetResultGetPdfUrl(result: FormGetResult): String {
@@ -210,10 +236,19 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         return try {
             conn.inputStream.use {
                 val result = IOUtils.toString(GZIPInputStream(it), StandardCharsets.UTF_8)
-                gson.fromJson(result, gsonType)
+                try {
+                    gson.fromJson(result, gsonType)
+                } catch (e: java.lang.IllegalStateException) {
+                    e.printStackTrace()
+                    null
+                }
             }
         } catch (e: java.io.IOException) {
-            println("Request error. Url = $url, data = $writeData")
+            // if pdf not found it response 500, so skip the error 500
+            if (conn.responseCode != 500) {
+                println("Request error. Url = $url, data = $writeData")
+                println(IOUtils.toString(GZIPInputStream(conn.errorStream), StandardCharsets.UTF_8))
+            }
             null
         }
     }

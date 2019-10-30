@@ -13,8 +13,11 @@ class TestController {
 
     @GetMapping("/test")
     fun test(): String {
-        val res = cogedimCrawlerService?.requestSearchResults()
-        cogedimCrawlerService?.parseSearchResuls(res!!)
-        return "télécharger"
+        Thread {
+            val res = cogedimCrawlerService?.requestSearchResults()
+            cogedimCrawlerService?.parseSearchResuls(res!!, true)
+        }.start()
+
+        return "OK"
     }
 }
