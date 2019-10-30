@@ -6,7 +6,6 @@ import com.catprogrammer.cogedimscanner.entity.User;
 import com.catprogrammer.cogedimscanner.repository.PrivilegeRepository;
 import com.catprogrammer.cogedimscanner.repository.RoleRepository;
 import com.catprogrammer.cogedimscanner.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,19 +19,20 @@ import java.util.Collections;
 @Component
 public class InitialDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
-    boolean alreadySetup = false;
+    private boolean alreadySetup = false;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PrivilegeRepository privilegeRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public InitialDataLoader(UserRepository userRepository, RoleRepository roleRepository,
+                             PrivilegeRepository privilegeRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.privilegeRepository = privilegeRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     @Transactional
@@ -52,24 +52,26 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
         createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         createRoleIfNotFound("ROLE_USER", Collections.singletonList(readPrivilege));
 
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-        User user = new User();
-        user.setUsername(Credentials.username);
-        user.setPassword(passwordEncoder.encode(Credentials.password));
-        user.setRoles(Collections.singletonList(adminRole));
-        userRepository.save(user);
+        if (userRepository.findByUsername(Credentials.username) == null) {
+            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+            User user = new User();
+            user.setUsername(Credentials.username);
+            user.setPassword(passwordEncoder.encode(Credentials.password));
+            user.setRoles(Collections.singletonList(adminRole));
+            userRepository.save(user);
+        }
 
-        User user2 = new User();
+        /*User user2 = new User();
         user2.setUsername("user");
         user2.setPassword(passwordEncoder.encode("user"));
         user2.setRoles(Collections.singletonList(roleRepository.findByName("ROLE_USER")));
-        userRepository.save(user2);
+        userRepository.save(user2);*/
 
         alreadySetup = true;
     }
 
     @Transactional
-    private Privilege createPrivilegeIfNotFound(String name) {
+    Privilege createPrivilegeIfNotFound(String name) {
 
         Privilege privilege = privilegeRepository.findByName(name);
         if (privilege == null) {
@@ -80,7 +82,7 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
     }
 
     @Transactional
-    private Role createRoleIfNotFound(
+    void createRoleIfNotFound(
             String name, Collection<Privilege> privileges) {
 
         Role role = roleRepository.findByName(name);
@@ -89,6 +91,5 @@ public class InitialDataLoader implements ApplicationListener<ContextRefreshedEv
             role.setPrivileges(privileges);
             roleRepository.save(role);
         }
-        return role;
     }
 }
