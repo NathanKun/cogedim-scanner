@@ -1,28 +1,22 @@
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { OktaCallbackComponent } from '@okta/okta-angular';
-import { HomeComponent } from './home/home.component';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { OKTA_CONFIG, OktaAuthModule } from '@okta/okta-angular';
-import { AuthInterceptor } from './shared/okta/auth.interceptor';
-import { MatButtonModule, MatCardModule } from '@angular/material';
+import {CommonModule} from '@angular/common';
+import {Component, NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {MatButtonModule, MatCardModule} from '@angular/material';
 
-const oktaConfig = {
-  issuer: 'https://dev-133320.okta.com/oauth2/default',
-  redirectUri: window.location.origin + '/implicit/callback',
-  clientId: '0oaogvf2chxVK1IOK356'
-};
+import {HomeComponent} from './home/home.component';
+import {LoginComponent} from './login/login.component';
+import {AuthInterceptor} from './interceptor/auth.interceptor';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  {path: '', redirectTo: '/home', pathMatch: 'full'},
   {
     path: 'home',
     component: HomeComponent
   },
   {
-    path: 'implicit/callback',
-    component: OktaCallbackComponent
+    path: 'login',
+    component: LoginComponent
   }
 ];
 
@@ -33,15 +27,14 @@ const routes: Routes = [
   imports: [
     CommonModule,
     HttpClientModule,
-    OktaAuthModule,
     RouterModule.forRoot(routes),
     MatButtonModule,
     MatCardModule
   ],
   providers: [
-    { provide: OKTA_CONFIG, useValue: oktaConfig },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
   ],
   exports: [RouterModule]
 })
-export class AuthRoutingModule { }
+export class AuthRoutingModule {
+}

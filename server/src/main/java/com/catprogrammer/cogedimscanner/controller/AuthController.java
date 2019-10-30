@@ -12,8 +12,11 @@ import java.security.Principal;
 @RestController
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
 
     /**
