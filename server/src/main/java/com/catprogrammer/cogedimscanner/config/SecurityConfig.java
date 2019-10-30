@@ -50,6 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/login").permitAll()
                 // allow /test
                 .antMatchers("/test").permitAll()
+                // allow /
+                .antMatchers("/").permitAll()
                 //其他接口全部接受验证
                 .anyRequest().authenticated();
 
