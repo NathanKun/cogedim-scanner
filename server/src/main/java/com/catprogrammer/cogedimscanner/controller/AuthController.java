@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -23,7 +24,7 @@ public class AuthController {
      * 登录
      */
     @PostMapping(value = "/auth/login")
-    public String login(String username, String password) throws AuthenticationException {
+    public String login(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
         // 登录成功会返回Token给用户
         return authService.login(username, password);
     }

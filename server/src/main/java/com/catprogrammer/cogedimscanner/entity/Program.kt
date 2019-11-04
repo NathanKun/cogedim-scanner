@@ -19,7 +19,7 @@ data class Program(
         val pdfUrl: String?,
         val latitude: String,
         val longitude: String,
-        @OneToMany
+        @OneToMany(fetch = FetchType.EAGER)
         val lots: MutableList<Lot>,
         @CreationTimestamp
         val createdAt: LocalDateTime?,

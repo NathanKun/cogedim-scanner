@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class IndexController {
+open class IndexController {
 
     @GetMapping("/")
-    fun index() = "Cogedim Scanner Api"
+    open fun index() = "Cogedim Scanner Api"
 }
