@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../service/auth.service';
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -13,10 +13,22 @@ export class HomeComponent implements OnInit {
   constructor(private router: Router, private authService: AuthService) {
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.isAuthenticated = this.authService.isAuthenticated();
+    this.authGuard();
+
+    // Subscribe to authentication state changes
+    this.authService.$authenticationState.subscribe(
+      (isAuthenticated: boolean) => {
+        this.isAuthenticated = isAuthenticated;
+        this.authGuard();
+      }
+    );
+  }
+
+  private authGuard() {
     if (!this.isAuthenticated) {
-      await this.router.navigate(['/login']);
+      this.router.navigate(['/login']);
     }
   }
 }

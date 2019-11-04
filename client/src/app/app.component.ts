@@ -7,13 +7,16 @@ import {AuthService} from './service/auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'client';
   isAuthenticated: boolean;
 
   constructor(public authService: AuthService) {
   }
 
   async ngOnInit() {
-    this.isAuthenticated = await this.authService.isAuthenticated();
+    this.isAuthenticated = this.authService.isAuthenticated();
+    // Subscribe to authentication state changes
+    this.authService.$authenticationState.subscribe(
+      (isAuthenticated: boolean) => this.isAuthenticated = isAuthenticated
+    );
   }
 }
