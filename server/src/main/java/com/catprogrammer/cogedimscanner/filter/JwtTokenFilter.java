@@ -29,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     /**
      * 存放Token的Header Key
      */
-    public static final String HEADER_STRING = "Authorization";
+    private static final String HEADER_STRING = "Authorization";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

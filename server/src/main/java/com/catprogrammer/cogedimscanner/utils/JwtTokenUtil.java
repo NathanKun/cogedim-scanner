@@ -1,5 +1,6 @@
 package com.catprogrammer.cogedimscanner.utils;
 
+import com.catprogrammer.cogedimscanner.config.Credentials;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,7 +29,7 @@ public class JwtTokenUtil implements Serializable {
     /**
      * JWT密码
      */
-    private static final String SECRET = "secret";
+    private static final String SECRET = Credentials.jwtSecret;
 
 
 
