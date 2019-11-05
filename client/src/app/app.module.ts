@@ -5,21 +5,19 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
-import {CarListComponent} from './car-list/car-list.component';
 import {MatButtonModule, MatCardModule, MatInputModule, MatListModule, MatToolbarModule} from '@angular/material';
-import {CarEditComponent} from './car-edit/car-edit.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AuthRoutingModule} from './auth-routing.module';
 import {LoginComponent} from './login/login.component';
 import {AlertComponent} from './component/alert.component';
+import {ProgramComponent} from './program/program.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CarListComponent,
-    CarEditComponent,
     LoginComponent,
-    AlertComponent
+    AlertComponent,
+    ProgramComponent
   ],
   imports: [
     BrowserModule,
