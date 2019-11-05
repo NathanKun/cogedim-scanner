@@ -1,5 +1,20 @@
-<mat-card>
-  <mat-card-content>
-    lol
-  </mat-card-content>
-</mat-card>
+<ng-container *ngFor="let p of programDateLots">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{p.program.programName}}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{p.program.address}} {{p.program.postalCode}}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
+    <mat-card-content>
+      <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <a [href]="p.program.pdfUrl" target="_blank" mat-button><i class="material-icons">picture_as_pdf</i></a>
+      <button mat-button [routerLink]="['/programs/' + p.program.programNumber]"><i class="material-icons">more_horiz</i></button>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>

@@ -11,6 +11,7 @@ import {ProgramDateLot} from '../model/program-date-lot';
 })
 export class HomeComponent implements OnInit {
   isAuthenticated: boolean;
+  programDateLots: ProgramDateLot[];
 
   constructor(private router: Router,
               private authService: AuthService,
@@ -29,11 +30,17 @@ export class HomeComponent implements OnInit {
       }
     );
 
-    this.programService.fetchPrograms().subscribe(
+    if (!this.isAuthenticated) {
+      return;
+    }
+
+    this.programService.getPrograms().subscribe(
       programDateLots => {
+        this.programDateLots = programDateLots;
         programDateLots.forEach(
           programDateLot => {
-            console.log(programDateLot.program.programName);
+            const values = Array.from(programDateLot.dateMap.values());
+            programDateLot.lastDayLotCount = values[values.length - 1].length;
           }
         );
       }
