@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -41,7 +42,13 @@ open class MvcConfig : WebMvcConfigurer {
     @Bean
     @Primary
     open fun objectMapper(): ObjectMapper {
+        // register json object mapper
         val objectMapper = ObjectMapper()
+
+        // jackson kotlin module
+        objectMapper.registerModule(KotlinModule())
+
+        // custom date time module
         // 对于空的对象转json的时候不抛出错误
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
         // 禁用遇到未知属性抛出异常
@@ -57,6 +64,7 @@ open class MvcConfig : WebMvcConfigurer {
         javaTimeModule.addDeserializer(LocalDate::class.java, LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
         javaTimeModule.addDeserializer(LocalTime::class.java, LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")))
         objectMapper.registerModule(javaTimeModule)
+
         return objectMapper
     }
 }

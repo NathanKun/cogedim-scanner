@@ -1,5 +1,6 @@
 package com.catprogrammer.cogedimscanner.entity
 
+import com.fasterxml.jackson.annotation.JsonView
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -19,6 +20,7 @@ data class Program(
         val pdfUrl: String?,
         val latitude: String,
         val longitude: String,
+        @JsonView(LotsView::class)
         @OneToMany(fetch = FetchType.EAGER)
         val lots: MutableList<Lot>,
         @CreationTimestamp
@@ -26,7 +28,6 @@ data class Program(
         @UpdateTimestamp
         val modifiedAt: LocalDateTime?
 ) {
-    override fun toString(): String {
-        return "Program(id=$id, programName='$programName', programNumber='$programNumber', postalCode='$postalCode', address='$address', url='$url', imgUrl='$imgUrl', pdfUrl=$pdfUrl, latitude='$latitude', longitude='$longitude', lots=$lots, createdAt=$createdAt, modifiedAt=$modifiedAt)"
-    }
+    interface SimpleView
+    interface LotsView: SimpleView
 }
