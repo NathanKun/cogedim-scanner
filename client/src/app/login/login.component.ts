@@ -10,6 +10,8 @@ import {AlertService} from '../service/alert.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+
+  isAuthenticated: boolean;
   loginForm: FormGroup;
   loading = false;
   submitted = false;
@@ -26,8 +28,10 @@ export class LoginComponent implements OnInit {
 
   async ngOnInit() {
     // redirect to home if already logged in
-    if (this.authService.isAuthenticated()) {
+    this.isAuthenticated = this.authService.isAuthenticated()
+    if (this.isAuthenticated) {
       await this.router.navigate(['/']);
+      return;
     }
 
     this.loginForm = this.formBuilder.group({

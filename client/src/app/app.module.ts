@@ -11,6 +11,7 @@ import {LoginComponent} from './login/login.component';
 import {AlertComponent} from './component/alert.component';
 import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
+import {CookieService} from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,7 @@ import {AuthGuard} from './service/authguard';
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [AuthGuard],
+  providers: [AuthGuard, CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

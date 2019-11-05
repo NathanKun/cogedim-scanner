@@ -16,22 +16,27 @@ export class ProgramService extends BaseService {
     super();
   }
 
-  public getPrograms(): Observable<ProgramDateLot[]> {
+  public getProgramDateLots(): Observable<ProgramDateLot[]> {
     if (this.cache) {
       return of(this.cache);
     } else {
-      return this.fetchPrograms();
+      return this.fetchProgramDateLots();
     }
   }
 
-  private fetchPrograms(): Observable<ProgramDateLot[]> {
+  private fetchProgramDateLots(): Observable<ProgramDateLot[]> {
     return this.http.get<ProgramDateLot[]>(
       this.baseurl + '/programs')
       .pipe(
         tap(res => this.cache = res),
         map(res => {
           res.forEach(p => {
+            // convert the object to a map
             p.dateMap = new Map(Object.entries(p.dateMap));
+
+            // set the last day lot count prop
+            const values = Array.from(p.dateMap.values());
+            p.lastDayLotCount = values[values.length - 1].length;
           });
           return res;
         })

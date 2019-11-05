@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './service/auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -9,14 +10,25 @@ import {AuthService} from './service/auth.service';
 export class AppComponent implements OnInit {
   isAuthenticated: boolean;
 
-  constructor(public authService: AuthService) {
+  constructor(public authService: AuthService,
+              private router: Router) {
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.isAuthenticated = this.authService.isAuthenticated();
+
     // Subscribe to authentication state changes
     this.authService.$authenticationState.subscribe(
-      (isAuthenticated: boolean) => this.isAuthenticated = isAuthenticated
+      async (isAuthenticated: boolean) => {
+        this.isAuthenticated = isAuthenticated;
+        await this.authGuard();
+      }
     );
+  }
+
+  private async authGuard() {
+    if (!this.isAuthenticated) {
+      await this.router.navigate(['/login']);
+    }
   }
 }

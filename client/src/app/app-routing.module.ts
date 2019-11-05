@@ -13,15 +13,16 @@ import {AuthGuard} from './service/authguard';
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {
-    path: 'home',
-    component: HomeComponent,
-  },
-  {
     path: 'login',
     component: LoginComponent
   },
   {
-    path: 'programs/:id',
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'programs/:programNumber',
     component: ProgramComponent,
     canActivate: [AuthGuard]
   }

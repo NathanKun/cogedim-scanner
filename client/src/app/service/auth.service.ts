@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {Observable, Observer} from 'rxjs';
 import {BaseService} from './base.service';
+import {CookieService} from 'ngx-cookie-service';
 
 
 @Injectable({
@@ -10,16 +11,22 @@ import {BaseService} from './base.service';
 })
 export class AuthService extends BaseService {
 
+  private cookieName = 'auth_token';
   private accessToken: string = null;
   private observers: Observer<boolean>[];
   $authenticationState: Observable<boolean>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private cookieService: CookieService) {
     super();
     this.observers = [];
     this.$authenticationState = new Observable((observer: Observer<boolean>) => {
       this.observers.push(observer);
     });
+
+    if (cookieService.check(this.cookieName)) {
+      this.accessToken = cookieService.get(this.cookieName);
+    }
   }
 
   public isAuthenticated(): boolean {
@@ -44,6 +51,7 @@ export class AuthService extends BaseService {
         tap(res => {
           this.accessToken = res as string;
           if (this.isAuthenticated()) {
+            this.cookieService.set(this.cookieName, this.accessToken, 5, '/');
             this.emitAuthenticationState(true);
           }
         })
@@ -52,6 +60,7 @@ export class AuthService extends BaseService {
 
   public logout() {
     this.accessToken = null;
+    this.cookieService.delete(this.cookieName, '/');
     this.emitAuthenticationState(false);
   }
 

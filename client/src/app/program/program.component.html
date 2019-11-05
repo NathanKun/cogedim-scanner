@@ -1,1 +1,15 @@
-<p>program works!</p>
+<mat-card *ngIf="programDateLot$ | async as programDateLot">
+  <img class="hero-image" mat-card-image [src]="programDateLot.program.imgUrl" [alt]="programDateLot.program.programName">
+  <mat-card-header>
+    <mat-card-title>
+      <span class="vertical-align">{{programDateLot.program.programName}}</span>
+      <a class="vertical-align" [href]="programDateLot.program.pdfUrl" target="_blank" mat-button><i class="material-icons">picture_as_pdf</i></a>
+    </mat-card-title>
+    <mat-card-subtitle>
+      {{programDateLot.program.address}} {{programDateLot.program.postalCode}}
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p>{{programDateLot.lastDayLotCount + ' lot' + (programDateLot.lastDayLotCount > 1 ? 's' : '')}}</p>
+  </mat-card-content>
+</mat-card>

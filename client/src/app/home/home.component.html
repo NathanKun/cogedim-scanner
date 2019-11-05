@@ -14,7 +14,7 @@
     </mat-card-content>
     <mat-card-actions>
       <a [href]="p.program.pdfUrl" target="_blank" mat-button><i class="material-icons">picture_as_pdf</i></a>
-      <button mat-button [routerLink]="['/programs/' + p.program.programNumber]"><i class="material-icons">more_horiz</i></button>
+      <button mat-button [routerLink]="['/programs', p.program.programNumber]"><i class="material-icons">more_horiz</i></button>
     </mat-card-actions>
   </mat-card>
 </ng-container>
