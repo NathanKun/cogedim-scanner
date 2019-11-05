@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../service/auth.service';
 import {Router} from '@angular/router';
+import {ProgramService} from '../service/program.service';
+import {ProgramDateLot} from '../model/program-date-lot';
 
 @Component({
   selector: 'app-home',
@@ -10,25 +12,37 @@ import {Router} from '@angular/router';
 export class HomeComponent implements OnInit {
   isAuthenticated: boolean;
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router,
+              private authService: AuthService,
+              private programService: ProgramService) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.isAuthenticated = this.authService.isAuthenticated();
-    this.authGuard();
+    await this.authGuard();
 
     // Subscribe to authentication state changes
     this.authService.$authenticationState.subscribe(
-      (isAuthenticated: boolean) => {
+      async (isAuthenticated: boolean) => {
         this.isAuthenticated = isAuthenticated;
-        this.authGuard();
+        await this.authGuard();
+      }
+    );
+
+    this.programService.fetchPrograms().subscribe(
+      programDateLots => {
+        programDateLots.forEach(
+          programDateLot => {
+            console.log(programDateLot.program.programName);
+          }
+        );
       }
     );
   }
 
-  private authGuard() {
+  private async authGuard() {
     if (!this.isAuthenticated) {
-      this.router.navigate(['/login']);
+      await this.router.navigate(['/login']);
     }
   }
 }

@@ -2,21 +2,21 @@ import {Injectable, isDevMode} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {Observable, Observer} from 'rxjs';
+import {BaseService} from './base.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService extends BaseService {
 
   private accessToken: string = null;
-  private baseurl: string;
   private observers: Observer<boolean>[];
   $authenticationState: Observable<boolean>;
 
   constructor(private http: HttpClient) {
+    super();
     this.observers = [];
-    this.baseurl = isDevMode() ? 'http://localhost:8080' : 'https://cogedimscannerapi.catprogrammer.com';
     this.$authenticationState = new Observable((observer: Observer<boolean>) => {
       this.observers.push(observer);
     });

@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handleAccess(request: HttpRequest<any>, next: HttpHandler): Promise<HttpEvent<any>> {
     // Only add to known domains since we don't want to send your tokens to just anyone
-    if (request.urlWithParams.indexOf('cogedimscannerapi') > -1) {
+    if (request.urlWithParams.indexOf('cogedimscannerapi') > -1 || request.urlWithParams.indexOf('localhost:8080') > -1) {
       const accessToken = this.authService.getAccessToken();
       if (accessToken != null) {
         request = request.clone({
