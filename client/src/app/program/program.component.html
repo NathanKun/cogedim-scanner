@@ -4,9 +4,14 @@
   <mat-card-header>
     <mat-card-title>
       <span class="vertical-align">{{programDateLot.program.programName}}</span>
-      <a [href]="programDateLot.program.url" target="_blank" mat-button><i class="material-icons">web</i></a>
-      <a class="vertical-align" [href]="programDateLot.program.pdfUrl" target="_blank" mat-button><i
-        class="material-icons">picture_as_pdf</i></a>
+      <div>
+        <a [href]="programDateLot.program.url" target="_blank" mat-icon-button>
+          <i class="material-icons">web</i>
+        </a>
+        <a class="vertical-align" [href]="programDateLot.program.pdfUrl" target="_blank" mat-icon-button>
+          <i class="material-icons">picture_as_pdf</i>
+        </a>
+      </div>
     </mat-card-title>
     <mat-card-subtitle>
       {{programDateLot.program.address}} {{programDateLot.program.postalCode}}

@@ -91,8 +91,6 @@ export class ProgramComponent implements OnInit {
 
     this.hasPreviousDate = index > 0;
     this.hasNextDate = index < (this.dates.length - 1);
-    console.log('this.hasPreviousDate = ' + this.hasPreviousDate);
-    console.log('this.hasNextDate = ' + this.hasNextDate);
   }
 }
 

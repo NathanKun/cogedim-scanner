@@ -1,19 +1,21 @@
 <mat-toolbar color="primary">
   <span>Cogedim Scanner</span>
   <span class="toolbar-spacer"></span>
-  <button mat-button (click)="router.navigate(['/home'])"><i class="material-icons">home</i></button>
-  <button mat-raised-button color="accent" *ngIf="isAuthenticated" (click)="authService.logout()">Logout</button>
+  <button mat-icon-button (click)="router.navigate(['/home'])">
+    <i class="material-icons">home</i>
+  </button>
+  <button mat-icon-button *ngIf="isAuthenticated" (click)="authService.logout()">
+    <i class="material-icons">exit_to_app</i>
+  </button>
 </mat-toolbar>
 
 
 <!-- main app container -->
-<div class="jumbotron">
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-10 offset-sm-1">
-        <app-alert></app-alert>
-        <router-outlet></router-outlet>
-      </div>
+<div class="main-container container">
+  <div class="row">
+    <div class="col-sm-10 offset-sm-1">
+      <app-alert></app-alert>
+      <router-outlet></router-outlet>
     </div>
   </div>
 </div>
