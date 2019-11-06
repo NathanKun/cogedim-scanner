@@ -1,10 +1,9 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/program-date-lot';
-import {Observable} from 'rxjs';
-import {MatSort, MatTableDataSource, Sort} from '@angular/material';
+import {Sort} from '@angular/material';
 import {Lot} from '../model/lot';
 
 @Component({
@@ -25,6 +24,8 @@ export class ProgramComponent implements OnInit {
   hasNextDate: boolean;
   hasPreviousDate: boolean;
 
+  injectSalesInfo: string;
+
   constructor(
     private route: ActivatedRoute,
     private programService: ProgramService) {
@@ -43,6 +44,7 @@ export class ProgramComponent implements OnInit {
         ))
       .subscribe(
         res => {
+          // program data
           this.programDateLot = res;
           this.dates = Array.from(res.dateMap.keys());
           this.selectedDate = this.dates[this.dates.length - 1];
@@ -51,6 +53,13 @@ export class ProgramComponent implements OnInit {
 
           this.hasPreviousDate = true;
           this.hasNextDate = false;
+
+          // inject sales info from origin program page
+          this.programService.fetchProgramPageSalesInfo(this.programDateLot.program.url).subscribe(
+            ele => {
+              this.injectSalesInfo = ele;
+            }
+          );
         }
       );
   }
@@ -70,7 +79,6 @@ export class ProgramComponent implements OnInit {
         case 'surface':
           return compare(surfaceToNumber(a.surface), surfaceToNumber(b.surface), isAsc);
         case 'floor':
-          const aVal = 0;
           return compare(floorToNumber(a.floor), floorToNumber(b.floor), isAsc);
         case 'price':
           return compare(priceToNumber(a.price), priceToNumber(b.price), isAsc);

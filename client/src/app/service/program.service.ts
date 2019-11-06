@@ -42,4 +42,28 @@ export class ProgramService extends BaseService {
         })
       );
   }
+
+  public fetchProgramPageSalesInfo(url: string): Observable<string> {
+    return this.http.get<string>(
+      this.baseurl + '/program?url=' + url,
+      {responseType: 'text' as 'json'})
+      .pipe(
+        map(
+          str => {
+            const doc = new DOMParser().parseFromString(str, 'text/html');
+            const div = doc.querySelector('.paragraphs-sales_office');
+
+            // update images src, add cogedim's domain
+            div.querySelectorAll('img[src^="/"]').forEach(
+              e => e.setAttribute('src', 'https://www.cogedim.com/' + e.getAttribute('src'))
+            );
+
+            // remove sales office section
+            div.querySelector('.sales-office').remove();
+
+            return div.innerHTML;
+          }
+        )
+      );
+  }
 }
