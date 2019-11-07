@@ -9,6 +9,10 @@
   vertical-align: middle;
 }
 
+.text-align-center {
+  text-align: center;
+}
+
 mat-card {
   margin-bottom: 2vh;
 }
@@ -36,6 +40,10 @@ mat-card-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+#program-inject {
+  
 }
 
 #program-inject >>> h2 {
@@ -73,4 +81,42 @@ mat-card-title {
 
 #program-inject >>> .features li span {
   width: 100%;
+}
+
+#program-inject >>> .strate-title {
+  display: none;
+}
+
+#program-inject >>> .norms li {
+  display: inline-block;
+  height: 50px;
+  overflow: hidden;
+  text-indent: 100px;
+  white-space: nowrap;
+  width: 50px
+}
+
+#program-inject >>> .norms li.bbc {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-bbc.png) no-repeat 0 0
+}
+
+#program-inject >>> .norms li.hqe {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-nfhqe.png) no-repeat 0 0
+}
+
+#program-inject >>> .norms li.nf {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf.png) no-repeat 0 0
+}
+
+#program-inject >>> .norms li.nf_habitat {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf-habitat.png) no-repeat 0 0
+}
+
+#program-inject >>> .norms li.rt_2012 {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-rt2012.png) no-repeat 0 0
+}
+
+#program-inject >>> .norms li.nf_habitat_hqe {
+  background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf-habitat-hqe.png) no-repeat 0 0;
+  width: 85px
 }

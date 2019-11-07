@@ -22,7 +22,10 @@
       <button [disabled]="!hasPreviousDate" mat-button>
         <i class="material-icons" (click)="changeDate(false)">arrow_back_ios</i>
       </button>
-      <span>{{selectedDate}}</span>
+      <div class="row">
+        <div class="col-12 text-align-center"><span>{{selectedDate}}</span></div>
+        <div class="col-12 text-align-center"><span>{{selectedDateLotCount}}</span></div>
+      </div>
       <button [disabled]="!hasNextDate" mat-button>
         <i class="material-icons" (click)="changeDate(true)">arrow_forward_ios</i>
       </button>
@@ -56,6 +59,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <div id="program-inject" [innerHtml]="injectSalesInfo"></div>
+    <div id="program-inject" class="mt-5" [innerHtml]="injectSalesInfo"></div>
+
   </mat-card-content>
 </mat-card>
