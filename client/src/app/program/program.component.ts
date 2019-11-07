@@ -5,6 +5,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/program-date-lot';
 import {Sort} from '@angular/material';
 import {Lot} from '../model/lot';
+import {SafeHtml} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-program',
@@ -21,10 +22,11 @@ export class ProgramComponent implements OnInit {
 
   dates: string[];
   selectedDate: string;
+  selectedDateLotCount: string;
   hasNextDate: boolean;
   hasPreviousDate: boolean;
 
-  injectSalesInfo: string;
+  injectSalesInfo: SafeHtml;
 
   constructor(
     private route: ActivatedRoute,
@@ -50,12 +52,13 @@ export class ProgramComponent implements OnInit {
           this.selectedDate = this.dates[this.dates.length - 1];
           this.originalData = res.dateMap.get(this.selectedDate).slice();
           this.dataSource = this.originalData.slice();
+          this.selectedDateLotCount = this.dataSource.length + ' lot' + (this.dataSource.length > 1 ? 's' : '');
 
           this.hasPreviousDate = true;
           this.hasNextDate = false;
 
           // inject sales info from origin program page
-          this.programService.fetchProgramPageSalesInfo(this.programDateLot.program.url).subscribe(
+          this.programService.getProgramPageSalesInfo(this.programDateLot.program.url).subscribe(
             ele => {
               this.injectSalesInfo = ele;
             }
@@ -95,6 +98,7 @@ export class ProgramComponent implements OnInit {
       this.selectedDate = this.dates[index];
       this.originalData = this.programDateLot.dateMap.get(this.selectedDate).slice();
       this.dataSource = this.originalData.slice();
+      this.selectedDateLotCount = this.dataSource.length + ' lot' + (this.dataSource.length > 1 ? 's' : '');
     }
 
     this.hasPreviousDate = index > 0;

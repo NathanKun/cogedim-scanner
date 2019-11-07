@@ -4,21 +4,25 @@ import {map, tap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/program-date-lot';
 import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProgramService extends BaseService {
 
-  private cache: ProgramDateLot[];
+  private programDateLotCache: ProgramDateLot[];
+  private programPageCache: Map<string, SafeHtml>; // program url  => html
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private sanitizer: DomSanitizer) {
     super();
+    this.programPageCache = new Map<string, string>()
   }
 
   public getProgramDateLots(): Observable<ProgramDateLot[]> {
-    if (this.cache) {
-      return of(this.cache);
+    if (this.programDateLotCache) {
+      return of(this.programDateLotCache);
     } else {
       return this.fetchProgramDateLots();
     }
@@ -28,7 +32,7 @@ export class ProgramService extends BaseService {
     return this.http.get<ProgramDateLot[]>(
       this.baseurl + '/programs')
       .pipe(
-        tap(res => this.cache = res),
+        tap(res => this.programDateLotCache = res),
         map(res => {
           res.forEach(p => {
             // convert the object to a map
@@ -43,7 +47,15 @@ export class ProgramService extends BaseService {
       );
   }
 
-  public fetchProgramPageSalesInfo(url: string): Observable<string> {
+  public getProgramPageSalesInfo(url: string): Observable<SafeHtml> {
+    if (this.programPageCache.has(url)) {
+      return of(this.programPageCache.get(url));
+    } else {
+      return this.fetchProgramPageSalesInfo(url);
+    }
+  }
+
+  private fetchProgramPageSalesInfo(url: string): Observable<SafeHtml> {
     return this.http.get<string>(
       this.baseurl + '/program?url=' + url,
       {responseType: 'text' as 'json'})
@@ -61,7 +73,13 @@ export class ProgramService extends BaseService {
             // remove sales office section
             div.querySelector('.sales-office').remove();
 
-            return div.innerHTML;
+            // sanitize html
+            const res = this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
+
+            // cache result
+            //this.programPageCache.set(url, res);
+
+            return res;
           }
         )
       );
