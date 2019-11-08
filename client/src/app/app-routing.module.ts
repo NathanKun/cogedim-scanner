@@ -9,6 +9,7 @@ import {LoginComponent} from './login/login.component';
 import {AuthInterceptor} from './interceptor/auth.interceptor';
 import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -38,7 +39,8 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     MatButtonModule,
     MatCardModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}

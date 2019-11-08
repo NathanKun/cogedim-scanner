@@ -1,7 +1,4 @@
 import {Injectable, isDevMode} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {tap} from 'rxjs/operators';
-import {Observable, Observer} from 'rxjs';
 
 
 @Injectable({
@@ -10,8 +7,20 @@ import {Observable, Observer} from 'rxjs';
 export class BaseService {
 
   protected baseurl: string;
+  protected googleMapApiKey: string;
 
   constructor() {
     this.baseurl = isDevMode() ? 'http://localhost:8080' : 'https://cogedimscannerapi.catprogrammer.com';
+    if (isDevMode()) {
+      // @ts-ignore
+      import('./googlemaplocalhostkey').then(
+        a => {
+          this.googleMapApiKey = a.KEY;
+        }
+      )
+    } else {
+      this.googleMapApiKey = 'AIzaSyCRU_27Qpu6WznzmpbeRGGZ5zm5Ju74T8c';
+    }
+
   }
 }

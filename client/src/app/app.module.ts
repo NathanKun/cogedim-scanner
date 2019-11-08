@@ -20,6 +20,7 @@ import {AlertComponent} from './component/alert.component';
 import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
 import {CookieService} from 'ngx-cookie-service';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import {CookieService} from 'ngx-cookie-service';
     FormsModule,
     ReactiveFormsModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatProgressSpinnerModule
   ],
   providers: [AuthGuard, CookieService],
   bootstrap: [AppComponent]

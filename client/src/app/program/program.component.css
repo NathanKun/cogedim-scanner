@@ -13,10 +13,6 @@
   text-align: center;
 }
 
-mat-card {
-  margin-bottom: 2vh;
-}
-
 mat-card > * {
   position: relative;
 }
@@ -43,7 +39,7 @@ mat-card-title {
 }
 
 #program-inject {
-  
+
 }
 
 #program-inject >>> h2 {

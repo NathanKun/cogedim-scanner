@@ -1,5 +1,6 @@
+<mat-spinner *ngIf="!programDateLots" class="my-5 mx-auto"></mat-spinner>
 <ng-container *ngFor="let p of programDateLots">
-  <mat-card>
+  <mat-card class="my-3">
     <mat-card-header>
       <mat-card-title>
         {{p.program.programName}}
@@ -13,7 +14,7 @@
     </a>
     <mat-card-content>
       <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
-      <p *ngIf="p.lastDayMinPrice">Start from {{p.lastDayMinPrice}}</p>
+      <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
     </mat-card-content>
     <mat-card-actions>
       <a [href]="p.program.url" target="_blank" mat-icon-button><i class="material-icons">web</i></a>
