@@ -14,7 +14,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/client",
-            "index": "src/index.html",
+            "index": "src/index.dev.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
@@ -30,7 +30,11 @@
             "scripts": []
           },
           "configurations": {
+            "dev": {
+              "index": "src/index.dev.html"
+            },
             "production": {
+              "index": "src/index.html",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -58,10 +62,14 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "index": "src/index.dev.html",
           "options": {
             "browserTarget": "client:build"
           },
           "configurations": {
+            "dev": {
+              "browserTarget": "client:build",
+            },
             "production": {
               "browserTarget": "client:build:production"
             }

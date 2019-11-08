@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve -c dev",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -17,6 +17,7 @@
     "@angular/compiler": "~8.2.11",
     "@angular/core": "~8.2.11",
     "@angular/forms": "~8.2.11",
+    "@angular/google-maps": "^9.0.0-rc.0",
     "@angular/material": "^8.0.1",
     "@angular/platform-browser": "~8.2.11",
     "@angular/platform-browser-dynamic": "~8.2.11",

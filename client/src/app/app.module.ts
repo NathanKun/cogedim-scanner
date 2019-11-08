@@ -21,6 +21,7 @@ import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
 import {CookieService} from 'ngx-cookie-service';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import { GoogleMapsModule } from '@angular/google-maps'
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     ReactiveFormsModule,
     MatTableModule,
     MatSortModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    GoogleMapsModule
   ],
   providers: [AuthGuard, CookieService],
   bootstrap: [AppComponent]
