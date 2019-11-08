@@ -41,6 +41,17 @@ export class ProgramService extends BaseService {
             // set the last day lot count prop
             const values = Array.from(p.dateMap.values());
             p.lastDayLotCount = values[values.length - 1].length;
+            const lastDaySortedLots = values[values.length - 1].sort(
+              (a, b) =>
+                +a.price.replace(' ', '').replace('€', '')
+                <
+                +b.price.replace(' ', '').replace('€', '')
+                  ?
+                  -1 : 1
+            );
+            if (lastDaySortedLots.length) {
+              p.lastDayMinPrice = lastDaySortedLots[0].price;
+            }
           });
           return res;
         })
@@ -77,7 +88,7 @@ export class ProgramService extends BaseService {
             const res = this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
 
             // cache result
-            //this.programPageCache.set(url, res);
+            this.programPageCache.set(url, res);
 
             return res;
           }

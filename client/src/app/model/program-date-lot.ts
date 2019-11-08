@@ -5,4 +5,5 @@ export interface ProgramDateLot {
   program: Program;
   dateMap: Map<string, Lot[]>;
   lastDayLotCount: number;
+  lastDayMinPrice: string;
 }

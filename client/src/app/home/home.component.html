@@ -13,6 +13,7 @@
     </a>
     <mat-card-content>
       <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
+      <p *ngIf="p.lastDayMinPrice">Start from {{p.lastDayMinPrice}}</p>
     </mat-card-content>
     <mat-card-actions>
       <a [href]="p.program.url" target="_blank" mat-icon-button><i class="material-icons">web</i></a>
