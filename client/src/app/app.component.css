@@ -5,3 +5,14 @@
 .main-container {
 
 }
+
+:host {
+  height: 100%
+}
+
+mat-toolbar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
+}

@@ -10,6 +10,7 @@ import {AuthInterceptor} from './interceptor/auth.interceptor';
 import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {GoogleMapsModule} from "@angular/google-maps";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -40,7 +41,8 @@ const routes: Routes = [
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    GoogleMapsModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}

@@ -1,0 +1,35 @@
+@media (min-width: 800px) {
+  #left {
+    display: block;
+    position: fixed;
+    height: calc(100% - 64px);
+    left: 0;
+    right: 600px;
+    top: 64px;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+  }
+  #right {
+    display: block;
+    float: right;
+    max-width: 600px;
+    height: calc(100% - 64px);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+#left {
+  display: none;
+}
+
+#right {
+  position: relative;
+  top: 64px;
+}
+
+:host {
+  height: 100%
+}

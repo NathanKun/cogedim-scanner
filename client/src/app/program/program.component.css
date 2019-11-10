@@ -13,8 +13,19 @@
   text-align: center;
 }
 
+mat-card {
+  top: 64px;
+  margin-top: 0;
+}
+
 mat-card > * {
   position: relative;
+}
+
+mat-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 table {
@@ -30,16 +41,6 @@ table {
 
 >>> .mat-card-header-text, .mat-card-title {
   width: 100%;
-}
-
-mat-card-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#program-inject {
-
 }
 
 #program-inject >>> h2 {
