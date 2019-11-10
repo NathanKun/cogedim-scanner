@@ -8,18 +8,20 @@
       [options]="options"
       [zoom]="zoom">
       <map-marker
-        *ngFor="let marker of markers"
-        [position]="marker.position"
-        [label]="marker.label"
-        [title]="marker.title"
-        [options]="marker.options">
+          #markerElem
+          *ngFor="let marker of markers"
+          [position]="marker.position"
+          [label]="marker.label"
+          [title]="marker.title"
+          [options]="marker.options"
+          (mapClick)="markerClick(markerElem)">
       </map-marker>
     </google-map>
   </div>
-  <div id="right" class="pl-3">
+  <div id="right" class="px-3">
     <ng-container *ngIf="programDateLots">
-      <ng-container *ngFor="let p of programDateLots">
-        <mat-card class="my-3">
+      <div #programcard class="my-3" *ngFor="let p of programDateLots; let i = index">
+        <mat-card>
           <mat-card-header>
             <mat-card-title>
               {{p.program.programName}}
@@ -42,7 +44,7 @@
               class="material-icons">picture_as_pdf</i></a>
           </mat-card-actions>
         </mat-card>
-      </ng-container>
+      </div>
     </ng-container>
   </div>
 </div>

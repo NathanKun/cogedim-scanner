@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/program-date-lot';
 import {GoogleMap, MapInfoWindow, MapMarker} from "@angular/google-maps";
@@ -9,6 +9,7 @@ import {GoogleMap, MapInfoWindow, MapMarker} from "@angular/google-maps";
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   programDateLots: ProgramDateLot[];
 
   zoom = 12;
@@ -22,11 +23,12 @@ export class HomeComponent implements OnInit {
     minZoom: 8,
   };
 
-  @ViewChild(GoogleMap, { static: false }) map: GoogleMap;
-  @ViewChild(MapInfoWindow, { static: false }) info: MapInfoWindow;
+  @ViewChild(GoogleMap, {static: false}) map: GoogleMap;
+  @ViewChild(MapInfoWindow, {static: false}) info: MapInfoWindow;
   markers: MapMarker[] = [];
 
-  constructor(private programService: ProgramService) {
+  constructor(private renderer: Renderer2,
+              private programService: ProgramService) {
   }
 
   async ngOnInit() {
@@ -61,8 +63,23 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  ngAfterViewInit(){
+  // noinspection JSUnusedGlobalSymbols
+  ngAfterViewInit() {
     const transitLayer = new google.maps.TransitLayer();
     transitLayer.setMap(this.map._googleMap);
+
+    this.programcards.changes.subscribe(
+      res => this.programcards = res
+    );
+  }
+
+  markerClick(marker: MapMarker) {
+    const index = this.programDateLots.findIndex((pdl) => pdl.program.programName === marker.getTitle());
+    this.programcards.filter((item, i) => i === index)[0].nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+    marker._marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(() => marker._marker.setAnimation(null), 1500);
   }
 }
