@@ -10,6 +10,7 @@
     margin: 0;
     padding: 0;
   }
+
   #right {
     display: block;
     float: right;
@@ -18,11 +19,11 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    box-shadow: -2px 0 4px -1px rgba(0, 0, 0, .2), -4px 0 5px 0 rgba(0, 0, 0, .14), -1px 0 10px 0 rgba(0, 0, 0, .12);
   }
 }
 
 #left {
-  display: none;
 }
 
 #right {
@@ -32,4 +33,13 @@
 
 :host {
   height: 100%
+}
+
+#delivery-info ::ng-deep .icons {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+mat-card-subtitle {
+  margin-bottom: 24px;
 }

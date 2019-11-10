@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/program-date-lot';
-import {MapMarker} from "@angular/google-maps";
+import {GoogleMap, MapInfoWindow, MapMarker} from "@angular/google-maps";
 
 @Component({
   selector: 'app-home',
@@ -22,6 +22,8 @@ export class HomeComponent implements OnInit {
     minZoom: 8,
   };
 
+  @ViewChild(GoogleMap, { static: false }) map: GoogleMap;
+  @ViewChild(MapInfoWindow, { static: false }) info: MapInfoWindow;
   markers: MapMarker[] = [];
 
   constructor(private programService: ProgramService) {
@@ -29,21 +31,25 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit() {
     this.programService.getProgramDateLots().subscribe(
-      programDateLots => {
+      async programDateLots => {
         this.programDateLots = programDateLots;
 
-        this.programDateLots.forEach(
-          p => this.markers.push({
+        for (const p of this.programDateLots) {
+          // delivery info
+          p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
+
+          // google map marker
+          this.markers.push({
             position: {
               lat: parseFloat(p.program.latitude),
               lng: parseFloat(p.program.longitude)
             },
             title: p.program.programName,
             options: {
-              animation: google.maps.Animation.DROP
+              animation: google.maps.Animation.DROP,
             },
-          } as MapMarker)
-        )
+          } as MapMarker);
+        }
       }
     );
 
@@ -51,15 +57,12 @@ export class HomeComponent implements OnInit {
       this.center = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
-      }
-    })
+      };
+    });
   }
 
-  zoomIn() {
-    if (this.zoom < this.options.maxZoom) this.zoom++
-  }
-
-  zoomOut() {
-    if (this.zoom > this.options.minZoom) this.zoom--
+  ngAfterViewInit(){
+    const transitLayer = new google.maps.TransitLayer();
+    transitLayer.setMap(this.map._googleMap);
   }
 }

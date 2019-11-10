@@ -1,5 +1,5 @@
 <mat-spinner *ngIf="!programDateLots" class="my-5 mx-auto"></mat-spinner>
-<div *ngIf="programDateLots">
+<div>
   <div id="left">
     <google-map
       height="100%"
@@ -16,29 +16,33 @@
       </map-marker>
     </google-map>
   </div>
-  <div id="right">
-    <ng-container *ngFor="let p of programDateLots">
-      <mat-card class="my-3">
-        <mat-card-header>
-          <mat-card-title>
-            {{p.program.programName}}
-          </mat-card-title>
-          <mat-card-subtitle>
-            {{p.program.address}} {{p.program.postalCode}}
-          </mat-card-subtitle>
-        </mat-card-header>
-        <a [routerLink]="['/programs', p.program.programNumber]">
-          <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
-        </a>
-        <mat-card-content>
-          <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
-          <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <a [href]="p.program.url" target="_blank" mat-icon-button><i class="material-icons">web</i></a>
-          <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button><i class="material-icons">picture_as_pdf</i></a>
-        </mat-card-actions>
-      </mat-card>
+  <div id="right" class="pl-3">
+    <ng-container *ngIf="programDateLots">
+      <ng-container *ngFor="let p of programDateLots">
+        <mat-card class="my-3">
+          <mat-card-header>
+            <mat-card-title>
+              {{p.program.programName}}
+            </mat-card-title>
+            <mat-card-subtitle>
+              <!-- {{p.program.address}} {{p.program.postalCode}} -->
+              <div id="delivery-info" [innerHTML]="p.deliveryInfoHtml"></div>
+            </mat-card-subtitle>
+          </mat-card-header>
+          <a [routerLink]="['/programs', p.program.programNumber]">
+            <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
+          </a>
+          <mat-card-content>
+            <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
+            <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <a [href]="p.program.url" target="_blank" mat-icon-button><i class="material-icons">web</i></a>
+            <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button><i
+              class="material-icons">picture_as_pdf</i></a>
+          </mat-card-actions>
+        </mat-card>
+      </ng-container>
     </ng-container>
   </div>
 </div>
