@@ -39,15 +39,44 @@ table {
   margin-bottom: 2vh;
 }
 
->>> .mat-card-header-text, .mat-card-title {
+mat-card-header ::ng-deep .mat-card-header-text, .mat-card-title {
   width: 100%;
 }
 
-#program-inject >>> h2 {
+/*
+  #main-info injected div for program's main info
+ */
+#main-info {
+  margin-top: 1vh;
+}
+
+#main-info ::ng-deep .icons {
+  display: inline-block;
+  vertical-align: middle;
+  color: #a1217d;
+  margin: 0 8px 0 0;
+}
+
+#main-info ::ng-deep .event-title {
+  color: #a1217d;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#main-info ::ng-deep .informations-strengths,
+#main-info ::ng-deep .event,
+#main-info ::ng-deep .catchline-strengths-group {
+  margin-top: 1vh;
+}
+
+/*
+  #program-inject injected div for program's sales info
+ */
+#program-inject ::ng-deep h2 {
   font-size: 1.5rem;
 }
 
-#program-inject >>> .features {
+#program-inject ::ng-deep .features {
   align-items: flex-start;
   display: flex;
   flex-flow: row wrap;
@@ -57,7 +86,7 @@ table {
   padding: 0 0 36px;
 }
 
-#program-inject >>> .features li {
+#program-inject ::ng-deep .features li {
   color: #666;
   display: inline-flex;
   flex-flow: row wrap;
@@ -69,22 +98,22 @@ table {
   width: 84px;
 }
 
-#program-inject >>> .features li img {
+#program-inject ::ng-deep .features li img {
   display: block;
   height: 48px;
   margin: 0 auto 5px;
   width: 48px;
 }
 
-#program-inject >>> .features li span {
+#program-inject ::ng-deep .features li span {
   width: 100%;
 }
 
-#program-inject >>> .strate-title {
+#program-inject ::ng-deep .strate-title {
   display: none;
 }
 
-#program-inject >>> .norms li {
+#program-inject ::ng-deep .norms li {
   display: inline-block;
   height: 50px;
   overflow: hidden;
@@ -93,27 +122,27 @@ table {
   width: 50px
 }
 
-#program-inject >>> .norms li.bbc {
+#program-inject ::ng-deep .norms li.bbc {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-bbc.png) no-repeat 0 0
 }
 
-#program-inject >>> .norms li.hqe {
+#program-inject ::ng-deep .norms li.hqe {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-nfhqe.png) no-repeat 0 0
 }
 
-#program-inject >>> .norms li.nf {
+#program-inject ::ng-deep .norms li.nf {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf.png) no-repeat 0 0
 }
 
-#program-inject >>> .norms li.nf_habitat {
+#program-inject ::ng-deep .norms li.nf_habitat {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf-habitat.png) no-repeat 0 0
 }
 
-#program-inject >>> .norms li.rt_2012 {
+#program-inject ::ng-deep .norms li.rt_2012 {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-rt2012.png) no-repeat 0 0
 }
 
-#program-inject >>> .norms li.nf_habitat_hqe {
+#program-inject ::ng-deep .norms li.nf_habitat_hqe {
   background: url(https://www.cogedim.com/themes/cogedim/images/picto-nf-habitat-hqe.png) no-repeat 0 0;
   width: 85px
 }

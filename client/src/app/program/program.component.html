@@ -21,6 +21,7 @@
           </mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
+          <div id="main-info" [innerHTML]="injectMainInfo"></div>
           <div class="date-bar">
             <button [disabled]="!hasPreviousDate" mat-button>
               <i class="material-icons" (click)="changeDate(false)">arrow_back_ios</i>

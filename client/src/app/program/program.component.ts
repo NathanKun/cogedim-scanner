@@ -5,7 +5,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/program-date-lot';
 import {Sort} from '@angular/material';
 import {Lot} from '../model/lot';
-import {SafeHtml} from "@angular/platform-browser";
+import {SafeHtml, Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-program',
@@ -27,9 +27,11 @@ export class ProgramComponent implements OnInit {
   hasPreviousDate: boolean;
 
   injectSalesInfo: SafeHtml;
+  injectMainInfo: SafeHtml;
 
   constructor(
     private route: ActivatedRoute,
+    private titleService: Title,
     private programService: ProgramService) {
   }
 
@@ -45,7 +47,7 @@ export class ProgramComponent implements OnInit {
               ))
         ))
       .subscribe(
-        res => {
+        async res => {
           // program data
           this.programDateLot = res;
           this.dates = Array.from(res.dateMap.keys());
@@ -57,12 +59,14 @@ export class ProgramComponent implements OnInit {
           this.hasPreviousDate = true;
           this.hasNextDate = false;
 
-          // inject sales info from origin program page
-          this.programService.getProgramPageSalesInfo(this.programDateLot.program.url).subscribe(
-            ele => {
-              this.injectSalesInfo = ele;
-            }
-          );
+          // page title
+          this.titleService.setTitle(this.programDateLot.program.programName);
+
+          // inject main info
+          this.injectMainInfo = await this.programService.getProgramPageMainInfo(this.programDateLot.program.url).toPromise();
+
+          // inject sales info
+          this.injectSalesInfo = await this.programService.getProgramPageSalesInfo(this.programDateLot.program.url).toPromise();
         }
       );
   }
