@@ -16,9 +16,9 @@ class ProgramServiceImpl : ProgramService {
     override fun findProgramsGroupByProgramNumber(): List<ProgramDateLotDto> {
         val res = mutableListOf<ProgramDateLotDto>()
         // a map of programName => same program of different date
-        val programNameToProgramMap = programRepository.findAll().groupBy({ it.programName }, { it })
-        programNameToProgramMap.values.forEach { list -> // list of same program of different day
-            val program = list[0]
+        val programNumberToProgramMap = programRepository.findAll().groupBy({ it.programNumber }, { it })
+        programNumberToProgramMap.values.forEach { list -> // list of same program of different day
+            val program = list.last()
             val map = mutableMapOf<LocalDate, List<Lot>>()
             list.forEach {
                 // assuming only one program in one date
