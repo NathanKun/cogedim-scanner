@@ -9,7 +9,7 @@
       [zoom]="zoom">
       <map-marker
           #markerElem
-          *ngFor="let marker of markers"
+          *ngFor="let marker of markerConfigs"
           [position]="marker.position"
           [label]="marker.label"
           [title]="marker.title"
@@ -39,9 +39,15 @@
             <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
           </mat-card-content>
           <mat-card-actions>
-            <a [href]="p.program.url" target="_blank" mat-icon-button><i class="material-icons">web</i></a>
-            <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button><i
-              class="material-icons">picture_as_pdf</i></a>
+            <a [href]="p.program.url" target="_blank" mat-icon-button>
+              <i class="material-icons">web</i>
+            </a>
+            <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button>
+              <i class="material-icons">picture_as_pdf</i>
+            </a>
+            <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
+              <i class="material-icons">my_location</i>
+            </button>
           </mat-card-actions>
         </mat-card>
       </div>

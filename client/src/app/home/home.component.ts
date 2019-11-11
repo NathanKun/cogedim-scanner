@@ -12,7 +12,7 @@ export class HomeComponent implements OnInit {
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   programDateLots: ProgramDateLot[];
 
-  zoom = 12;
+  zoom = 13;
   center: google.maps.LatLngLiteral;
   options: google.maps.MapOptions = {
     mapTypeId: 'roadmap',
@@ -25,7 +25,8 @@ export class HomeComponent implements OnInit {
 
   @ViewChild(GoogleMap, {static: false}) map: GoogleMap;
   @ViewChild(MapInfoWindow, {static: false}) info: MapInfoWindow;
-  markers: MapMarker[] = [];
+  @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
+  markerConfigs: MapMarker[] = [];
 
   constructor(private renderer: Renderer2,
               private programService: ProgramService) {
@@ -41,7 +42,7 @@ export class HomeComponent implements OnInit {
           p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
 
           // google map marker
-          this.markers.push({
+          this.markerConfigs.push({
             position: {
               lat: parseFloat(p.program.latitude),
               lng: parseFloat(p.program.longitude)
@@ -79,6 +80,16 @@ export class HomeComponent implements OnInit {
       behavior: 'smooth',
       block: 'center'
     });
+    this.animateMarker(marker);
+  }
+
+  programCardLocationClick(programName) {
+    this.animateMarker(this.markerElements.find(m => m.getTitle() === programName));
+  }
+
+  private animateMarker(marker: MapMarker) {
+    this.map.panTo(marker.getPosition());
+    this.map._googleMap.setZoom(13);
     marker._marker.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(() => marker._marker.setAnimation(null), 1500);
   }
