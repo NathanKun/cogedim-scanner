@@ -5,6 +5,7 @@ import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
 import com.catprogrammer.cogedimscanner.service.ProgramService
 import com.fasterxml.jackson.annotation.JsonView
 import org.apache.commons.io.IOUtils
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
@@ -23,6 +24,8 @@ import java.nio.charset.StandardCharsets
 @EnableScheduling
 open class ProgramController {
 
+    private val logger = LoggerFactory.getLogger(ProgramController::class.java)
+
     @Autowired
     lateinit var programService: ProgramService
 
@@ -37,7 +40,7 @@ open class ProgramController {
     @GetMapping("/program")
     @Cacheable(key = "#url")
     open fun fetchProgramPageHtml(url: String): String {
-        return internalFetchProgramPageHtml(url);
+        return internalFetchProgramPageHtml(url)
     }
 
     @CachePut(key = "#url")
@@ -54,6 +57,6 @@ open class ProgramController {
     @CacheEvict(allEntries = true)
     @Scheduled(fixedDelay = (60 * 60 * 1000).toLong(), initialDelay = 1000)
     open fun reportCacheEvict() {
-        println("Flush Cache")
+        logger.info("Flush Cache")
     }
 }

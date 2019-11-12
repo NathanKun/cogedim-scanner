@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import org.apache.commons.io.IOUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.OutputStreamWriter
@@ -25,6 +26,8 @@ import java.util.zip.GZIPInputStream
 
 @Service
 class CogedimCrawlerServiceImpl : CogedimCrawlerService {
+
+    private val logger = LoggerFactory.getLogger(CogedimCrawlerServiceImpl::class.java)
 
     private val gson = Gson()
     private val type: Type = object : TypeToken<List<NearbyProgram>>() {}.type
@@ -77,7 +80,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val program = parseSearchResultProgram(article, nearbyPrograms)
                 parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
                 programRepository.save(program)
-                println("saved program ${program.programName} ${program.programNumber}")
+                logger.info("saved program ${program.programName} ${program.programNumber}")
             }
         }
 
@@ -135,7 +138,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val lot = Lot(null, lotNumber, surface, floor, price, blueprintId, pdfUrl, null, null)
                 program.lots.add(lot)
                 lotRepository.save(lot)
-                println("saved lot ${lot.lotNumber}")
+                logger.info("saved lot ${lot.lotNumber}")
             }
         }
     }
@@ -239,15 +242,17 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 try {
                     gson.fromJson(result, gsonType)
                 } catch (e: java.lang.IllegalStateException) {
-                    e.printStackTrace()
+                    logger.error("Error converting response to json. " +
+                            "Url = $url, writeData = $writeData, gsonType = ${gsonType.toGenericString()}",
+                            e)
                     null
                 }
             }
         } catch (e: java.io.IOException) {
             // if pdf not found it response 500, so skip the error 500
             if (conn.responseCode != 500) {
-                println("Request error. Url = $url, data = $writeData")
-                println(IOUtils.toString(GZIPInputStream(conn.errorStream), StandardCharsets.UTF_8))
+                logger.info("Request error. Url = $url, data = $writeData")
+                logger.info(IOUtils.toString(GZIPInputStream(conn.errorStream), StandardCharsets.UTF_8))
             }
             null
         }
