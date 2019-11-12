@@ -23,8 +23,8 @@ export class HomeComponent implements OnInit {
     minZoom: 8,
   };
 
-  @ViewChild(GoogleMap, {static: false}) map: GoogleMap;
-  @ViewChild(MapInfoWindow, {static: false}) info: MapInfoWindow;
+  @ViewChild(GoogleMap) map: GoogleMap;
+  @ViewChild(MapInfoWindow) info: MapInfoWindow;
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
 

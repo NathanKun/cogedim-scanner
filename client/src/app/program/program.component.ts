@@ -3,9 +3,9 @@ import {ProgramService} from '../service/program.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/program-date-lot';
-import {Sort} from '@angular/material';
 import {Lot} from '../model/lot';
-import {SafeHtml, Title} from "@angular/platform-browser";
+import {SafeHtml, Title} from '@angular/platform-browser';
+import {Sort} from '@angular/material/sort';
 
 @Component({
   selector: 'app-program',
