@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../service/auth.service';
 import {AlertService} from '../service/alert.service';
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
 
   async ngOnInit() {
     // redirect to home if already logged in
-    this.isAuthenticated = this.authService.isAuthenticated()
+    this.isAuthenticated = this.authService.isAuthenticated();
     if (this.isAuthenticated) {
       await this.router.navigate(['/']);
       return;

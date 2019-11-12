@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
-import {ProgramDateLot} from '../model/program-date-lot';
+import {ProgramDateLot} from '../model/programdatelot';
 import {Lot} from '../model/lot';
 import {SafeHtml, Title} from '@angular/platform-browser';
 import {Sort} from '@angular/material/sort';

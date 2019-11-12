@@ -1,14 +1,14 @@
-import {Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {ProgramService} from '../service/program.service';
-import {ProgramDateLot} from '../model/program-date-lot';
-import {GoogleMap, MapInfoWindow, MapMarker} from "@angular/google-maps";
+import {ProgramDateLot} from '../model/programdatelot';
+import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   programDateLots: ProgramDateLot[];
 
@@ -64,7 +64,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // noinspection JSUnusedGlobalSymbols
   ngAfterViewInit() {
     const transitLayer = new google.maps.TransitLayer();
     transitLayer.setMap(this.map._googleMap);

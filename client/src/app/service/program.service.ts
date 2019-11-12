@@ -1,26 +1,26 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {map, tap} from 'rxjs/operators';
-import {ProgramDateLot} from '../model/program-date-lot';
+import {Programdatelot} from '../model/programdatelot';
 import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
-import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProgramService extends BaseService {
 
-  private programDateLotCache: ProgramDateLot[];
+  private programDateLotCache: Programdatelot[];
   private programPageCache: Map<string, string>; // program url  => html str
 
   constructor(private http: HttpClient,
               private sanitizer: DomSanitizer) {
     super();
-    this.programPageCache = new Map<string, string>()
+    this.programPageCache = new Map<string, string>();
   }
 
-  public getProgramDateLots(): Observable<ProgramDateLot[]> {
+  public getProgramDateLots(): Observable<Programdatelot[]> {
     if (this.programDateLotCache) {
       return of(this.programDateLotCache);
     } else {
@@ -28,8 +28,8 @@ export class ProgramService extends BaseService {
     }
   }
 
-  private fetchProgramDateLots(): Observable<ProgramDateLot[]> {
-    return this.http.get<ProgramDateLot[]>(
+  private fetchProgramDateLots(): Observable<Programdatelot[]> {
+    return this.http.get<Programdatelot[]>(
       this.baseurl + '/programs')
       .pipe(
         tap(res => this.programDateLotCache = res),
@@ -134,7 +134,7 @@ export class ProgramService extends BaseService {
           return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
         }
       )
-    )
+    );
   }
 
   private fetchProgramPage(url: string): Observable<string> {

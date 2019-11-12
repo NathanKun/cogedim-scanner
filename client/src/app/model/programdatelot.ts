@@ -1,6 +1,6 @@
 import {Program} from './program';
 import {Lot} from './lot';
-import {SafeHtml} from "@angular/platform-browser";
+import {SafeHtml} from '@angular/platform-browser';
 
 export interface ProgramDateLot {
   program: Program;
