@@ -65,7 +65,8 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns; //noinspection UnusedGlobalSymbols"></tr>
+            <!--suppress JSUnusedGlobalSymbols -->
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>
 
           <div id="program-inject" class="mt-5" [innerHtml]="injectSalesInfo"></div>
