@@ -18,7 +18,7 @@ export class ProgramComponent implements OnInit {
 
   dataSource: Lot[];
   originalData: Lot[];
-  displayedColumns: string[] = ['lotNumber', 'surface', 'floor', 'price', 'pdf'];
+  displayedColumns: string[] = ['lotNumber', 'surface', 'floor', 'price', 'price_per_m2', 'pdf'];
 
   dates: string[];
   selectedDate: string;
@@ -89,6 +89,11 @@ export class ProgramComponent implements OnInit {
           return compare(floorToNumber(a.floor), floorToNumber(b.floor), isAsc);
         case 'price':
           return compare(priceToNumber(a.price), priceToNumber(b.price), isAsc);
+        case 'price_per_m2':
+          return compare(
+            priceToNumber(a.price) / surfaceToNumber(a.surface),
+            priceToNumber(b.price) / surfaceToNumber(b.surface),
+            isAsc);
         default:
           return 0;
       }
@@ -107,6 +112,10 @@ export class ProgramComponent implements OnInit {
 
     this.hasPreviousDate = index > 0;
     this.hasNextDate = index < (this.dates.length - 1);
+  }
+
+  calculatePricePerM2(lot: Lot): string {
+    return Math.ceil(priceToNumber(lot.price) / surfaceToNumber(lot.surface)) + ' €';
   }
 }
 
