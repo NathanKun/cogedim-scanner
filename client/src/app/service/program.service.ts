@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {map, tap} from 'rxjs/operators';
-import {Programdatelot} from '../model/programdatelot';
+import {ProgramDateLot} from '../model/programdatelot';
 import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
@@ -11,7 +11,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 })
 export class ProgramService extends BaseService {
 
-  private programDateLotCache: Programdatelot[];
+  private programDateLotCache: ProgramDateLot[];
   private programPageCache: Map<string, string>; // program url  => html str
 
   constructor(private http: HttpClient,
@@ -20,7 +20,7 @@ export class ProgramService extends BaseService {
     this.programPageCache = new Map<string, string>();
   }
 
-  public getProgramDateLots(): Observable<Programdatelot[]> {
+  public getProgramDateLots(): Observable<ProgramDateLot[]> {
     if (this.programDateLotCache) {
       return of(this.programDateLotCache);
     } else {
@@ -28,8 +28,8 @@ export class ProgramService extends BaseService {
     }
   }
 
-  private fetchProgramDateLots(): Observable<Programdatelot[]> {
-    return this.http.get<Programdatelot[]>(
+  private fetchProgramDateLots(): Observable<ProgramDateLot[]> {
+    return this.http.get<ProgramDateLot[]>(
       this.baseurl + '/programs')
       .pipe(
         tap(res => this.programDateLotCache = res),

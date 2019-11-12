@@ -78,7 +78,7 @@
           },
           "configurations": {
             "dev": {
-              "browserTarget": "client:build",
+              "browserTarget": "client:build"
             },
             "production": {
               "browserTarget": "client:build:production"
@@ -137,5 +137,8 @@
       }
     }
   },
-  "defaultProject": "client"
+  "defaultProject": "client",
+  "cli": {
+    "analytics": false
+  }
 }
