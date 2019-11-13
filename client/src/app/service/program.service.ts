@@ -5,6 +5,7 @@ import {ProgramDateLot} from '../model/programdatelot';
 import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {AuthService} from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class ProgramService extends BaseService {
   private programPageCache: Map<string, string>; // program url  => html str
 
   constructor(private http: HttpClient,
-              private sanitizer: DomSanitizer) {
+              private sanitizer: DomSanitizer,
+              private authServce: AuthService) {
     super();
     this.programPageCache = new Map<string, string>();
   }
@@ -37,6 +39,9 @@ export class ProgramService extends BaseService {
           res.forEach(p => {
             // convert the object to a map
             p.dateMap = new Map(Object.entries(p.dateMap));
+
+            // convert the image url to /resource
+            p.program.imgUrl = this.baseurl + '/resource?resourceUrl=' + p.program.imgUrl + '&token=' + this.authServce.getAccessToken();
 
             // set the last day lot count prop
             const values = Array.from(p.dateMap.values());
@@ -124,7 +129,8 @@ export class ProgramService extends BaseService {
 
           // update images src, add cogedim's domain
           div.querySelectorAll('img[src^="/"]').forEach(
-            e => e.setAttribute('src', 'https://www.cogedim.com' + e.getAttribute('src'))
+            e => e.setAttribute('src', this.baseurl +
+              '/resource?resourceUrl=https://www.cogedim.com' + e.getAttribute('src') + '&token=' + this.authServce.getAccessToken())
           );
 
           // remove sales office section

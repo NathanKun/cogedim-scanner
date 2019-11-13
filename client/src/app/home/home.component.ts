@@ -63,8 +63,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         let iTo = this.programDateLots.length;
         for (let i = 0; i < iTo; i++) {
           const pdl = this.programDateLots[i];
-          console.log(i)
-          console.log(pdl)
           if (pdl.hided) {
             iTo--;
             this.programDateLots.splice(i, 1);

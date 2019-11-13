@@ -38,7 +38,8 @@
                   "maximumWarning": "6kb"
                 }
               ],
-              "index": "src/index.dev.html"
+              "index": "src/index.dev.html",
+              "serviceWorker": true
             },
             "production": {
               "index": "src/index.html",
