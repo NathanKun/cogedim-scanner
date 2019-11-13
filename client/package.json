@@ -22,7 +22,9 @@
     "@angular/material": "^9.0.0-rc.0",
     "@angular/platform-browser": "~9.0.0-rc.1",
     "@angular/platform-browser-dynamic": "~9.0.0-rc.1",
+    "@angular/pwa": "^0.803.18",
     "@angular/router": "~9.0.0-rc.1",
+    "@angular/service-worker": "~9.0.0-rc.1",
     "hammerjs": "^2.0.8",
     "material-design-icons": "^3.0.1",
     "ngx-cookie-service": "^2.2.0",
@@ -32,7 +34,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.0-rc.1",
-    "@angular/cli": "~9.0.0-rc.1",
+    "@angular/cli": "https://github.com/angular/cli-builds.git",
     "@angular/compiler-cli": "~9.0.0-rc.1",
     "@angular/language-service": "~9.0.0-rc.1",
     "@types/node": "^12.11.1",
