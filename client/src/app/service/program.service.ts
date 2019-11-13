@@ -124,7 +124,7 @@ export class ProgramService extends BaseService {
 
           // update images src, add cogedim's domain
           div.querySelectorAll('img[src^="/"]').forEach(
-            e => e.setAttribute('src', 'https://www.cogedim.com/' + e.getAttribute('src'))
+            e => e.setAttribute('src', 'https://www.cogedim.com' + e.getAttribute('src'))
           );
 
           // remove sales office section
