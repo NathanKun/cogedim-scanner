@@ -45,17 +45,27 @@ open class ProgramController {
 
     @CachePut(key = "#url")
     open fun internalFetchProgramPageHtml(url: String): String {
-        if (url.startsWith("https://www.cogedim.com/")) {
-            return IOUtils.toString(
-                    URL(url).openConnection().getInputStream(),
-                    StandardCharsets.UTF_8
-            )
+        return if (url.startsWith("https://www.cogedim.com/")) {
+            // avoid requesting cogedim's server concurrently
+            synchronized(this) {
+                Thread.sleep(2000)
+                logger.info("requesting $url")
+                IOUtils.toString(
+                        URL(url).openConnection().getInputStream(),
+                        StandardCharsets.UTF_8
+                )
+            }
+
+        } else {
+            "URL must starts with https://www.cogedim.com/"
         }
-        return "URL must starts with https://www.cogedim.com/"
     }
 
+    /**
+     * evict cache schedule
+     */
     @CacheEvict(allEntries = true)
-    @Scheduled(fixedDelay = (60 * 60 * 1000).toLong(), initialDelay = 1000)
+    @Scheduled(fixedDelay = (12 * 60 * 60 * 1000).toLong(), initialDelay = 1000)
     open fun reportCacheEvict() {
         logger.info("Flush Cache")
     }
