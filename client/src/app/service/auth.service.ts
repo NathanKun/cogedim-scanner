@@ -11,7 +11,7 @@ import {CookieService} from 'ngx-cookie-service';
 })
 export class AuthService extends BaseService {
 
-  private cookieName = 'auth_token';
+  private authTokenCookieName = 'auth_token';
   private accessToken: string = null;
   private observers: Observer<boolean>[];
   $authenticationState: Observable<boolean>;
@@ -24,8 +24,8 @@ export class AuthService extends BaseService {
       this.observers.push(observer);
     });
 
-    if (cookieService.check(this.cookieName)) {
-      this.accessToken = cookieService.get(this.cookieName);
+    if (cookieService.check(this.authTokenCookieName)) {
+      this.accessToken = cookieService.get(this.authTokenCookieName);
     }
   }
 
@@ -51,7 +51,7 @@ export class AuthService extends BaseService {
         tap(res => {
           this.accessToken = res as string;
           if (this.isAuthenticated()) {
-            this.cookieService.set(this.cookieName, this.accessToken, 5, '/');
+            this.cookieService.set(this.authTokenCookieName, this.accessToken, 5, '/');
             this.emitAuthenticationState(true);
           }
         })
@@ -60,7 +60,7 @@ export class AuthService extends BaseService {
 
   public logout() {
     this.accessToken = null;
-    this.cookieService.delete(this.cookieName, '/');
+    this.cookieService.delete(this.authTokenCookieName, '/');
     this.emitAuthenticationState(false);
   }
 

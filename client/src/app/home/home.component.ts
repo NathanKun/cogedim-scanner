@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, View
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {CookieService} from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-home',
@@ -9,6 +10,9 @@ import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
+  private hidedProgramsCookieName = 'hided_programs';
+  hideHidedPrograms = true;
+
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   programDateLots: ProgramDateLot[];
 
@@ -29,6 +33,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   markerConfigs: MapMarker[] = [];
 
   constructor(private renderer: Renderer2,
+              private cookieService: CookieService,
               private programService: ProgramService) {
   }
 
@@ -38,8 +43,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.programDateLots = programDateLots;
 
         for (const p of this.programDateLots) {
-          // delivery info
-          p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
+          // hided program
+          p.hided = this.cookieIsProgramHided(p.program.programNumber);
 
           // google map marker
           this.markerConfigs.push({
@@ -52,6 +57,26 @@ export class HomeComponent implements OnInit, AfterViewInit {
               animation: google.maps.Animation.DROP,
             },
           } as MapMarker);
+        }
+
+        // move all hided program to bottom
+        let iTo = this.programDateLots.length;
+        for (let i = 0; i < iTo; i++) {
+          const pdl = this.programDateLots[i];
+          console.log(i)
+          console.log(pdl)
+          if (pdl.hided) {
+            iTo--;
+            this.programDateLots.splice(i, 1);
+            this.programDateLots.push(pdl);
+          }
+        }
+
+        // request delivery info may take lots of time if the backend has no cache
+        // so do this at the end of subscribe()
+        for (const p of this.programDateLots) {
+          // delivery info
+          p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
         }
       }
     );
@@ -86,10 +111,61 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.animateMarker(this.markerElements.find(m => m.getTitle() === programName));
   }
 
+  hideProgramClick(pdl: ProgramDateLot) {
+    pdl.hided = true;
+    this.cookieSetProgramHided(pdl.program.programNumber, true);
+  }
+
+  unhideProgramClick(pdl: ProgramDateLot) {
+    pdl.hided = false;
+    this.cookieSetProgramHided(pdl.program.programNumber, false);
+  }
+
+  showAllHidedPrograms(show: boolean) {
+    this.hideHidedPrograms = !show;
+  }
+
   private animateMarker(marker: MapMarker) {
     this.map.panTo(marker.getPosition());
     this.map._googleMap.setZoom(13);
     marker._marker.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(() => marker._marker.setAnimation(null), 1500);
+  }
+
+  private cookieIsProgramHided(programNumber: string) {
+    if (this.cookieService.check(this.hidedProgramsCookieName)) {
+      const cookieStr = this.cookieService.get(this.hidedProgramsCookieName);
+      const hidePrograms = JSON.parse(cookieStr) as string[];
+      return hidePrograms.indexOf(programNumber) >= 0;
+    } else {
+      return false;
+    }
+  }
+
+  private cookieSetProgramHided(programNumber: string, setHided: boolean) {
+    // read cookie
+    let hidedPrograms: string[];
+    if (this.cookieService.check(this.hidedProgramsCookieName)) {
+      const cookieStr = this.cookieService.get(this.hidedProgramsCookieName);
+      hidedPrograms = JSON.parse(cookieStr) as string[];
+    } else {
+      hidedPrograms = [];
+    }
+
+    if (setHided) {
+      // hide program
+      if (hidedPrograms.indexOf(programNumber) === -1) {
+        hidedPrograms.push(programNumber);
+      }
+    } else {
+      // unhide program
+      const index = hidedPrograms.indexOf(programNumber);
+      if (index >= 0) {
+        hidedPrograms.splice(index, 1);
+      }
+    }
+
+    // save
+    this.cookieService.set(this.hidedProgramsCookieName, JSON.stringify(hidedPrograms), 10 * 365, '/');
   }
 }

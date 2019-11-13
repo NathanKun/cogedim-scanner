@@ -1,4 +1,3 @@
-<mat-spinner *ngIf="!programDateLots" class="my-5 mx-auto"></mat-spinner>
 <div>
   <div id="left">
     <google-map
@@ -19,38 +18,59 @@
     </google-map>
   </div>
   <div id="right" class="px-3">
+    <mat-spinner *ngIf="!programDateLots" class="my-5 mx-auto"></mat-spinner>
     <ng-container *ngIf="programDateLots">
-      <!--suppress JSUnusedGlobalSymbols -->
-      <div #programcard class="my-3" *ngFor="let p of programDateLots">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>
-              {{p.program.programName}}
-            </mat-card-title>
-            <mat-card-subtitle>
-              <!-- {{p.program.address}} {{p.program.postalCode}} -->
-              <div id="delivery-info" [innerHTML]="p.deliveryInfoHtml"></div>
-            </mat-card-subtitle>
-          </mat-card-header>
-          <a [routerLink]="['/programs', p.program.programNumber]">
-            <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
-          </a>
-          <mat-card-content>
-            <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
-            <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
-          </mat-card-content>
-          <mat-card-actions>
-            <a [href]="p.program.url" target="_blank" mat-icon-button>
-              <i class="material-icons">web</i>
+      <ng-container *ngFor="let p of programDateLots">
+        <!--suppress JSUnusedGlobalSymbols -->
+        <div #programcard class="my-3" *ngIf="!p.hided || !hideHidedPrograms">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>
+                {{p.program.programName}}
+              </mat-card-title>
+              <mat-card-subtitle>
+                <!-- {{p.program.address}} {{p.program.postalCode}} -->
+                <div id="delivery-info" [innerHTML]="p.deliveryInfoHtml"></div>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <a [routerLink]="['/programs', p.program.programNumber]">
+              <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
             </a>
-            <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button>
-              <i class="material-icons">picture_as_pdf</i>
-            </a>
-            <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
-              <i class="material-icons">my_location</i>
-            </button>
-          </mat-card-actions>
-        </mat-card>
+            <mat-card-content>
+              <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
+              <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <a [href]="p.program.url" target="_blank" mat-icon-button>
+                <i class="material-icons">web</i>
+              </a>
+              <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button>
+                <i class="material-icons">picture_as_pdf</i>
+              </a>
+              <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
+                <i class="material-icons">pin_drop</i>
+              </button>
+              <button *ngIf="!p.hided" (click)="hideProgramClick(p)" mat-icon-button>
+                <i class="material-icons-outlined">remove_red_eye</i>
+              </button>
+              <button *ngIf="p.hided" (click)="unhideProgramClick(p)" mat-icon-button>
+                <i class="material-icons">remove_red_eye</i>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </ng-container>
+      <div class="mb-3">
+        <button (click)="showAllHidedPrograms(hideHidedPrograms)" class="full-width" mat-button color="primary">
+          <ng-container *ngIf="hideHidedPrograms; else hideUnhidPrograms">
+            <i class="material-icons">remove_red_eye</i>
+            Show hidden programs
+          </ng-container>
+          <ng-template #hideUnhidPrograms>
+            <i class="material-icons-outlined">remove_red_eye</i>
+            Hide unhidden programs
+          </ng-template>
+        </button>
       </div>
     </ng-container>
   </div>

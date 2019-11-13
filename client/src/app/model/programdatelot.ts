@@ -8,4 +8,5 @@ export interface ProgramDateLot {
   lastDayLotCount: number;
   lastDayMinPrice: string;
   deliveryInfoHtml: SafeHtml;
+  hided: boolean;
 }
