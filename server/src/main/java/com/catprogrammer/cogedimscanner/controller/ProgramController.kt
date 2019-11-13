@@ -3,6 +3,7 @@ package com.catprogrammer.cogedimscanner.controller
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
 import com.catprogrammer.cogedimscanner.service.ProgramService
+import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil
 import com.fasterxml.jackson.annotation.JsonView
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
@@ -11,13 +12,23 @@ import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.core.io.InputStreamResource
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import javax.servlet.http.HttpServletRequest
+
 
 @RestController
 @CacheConfig(cacheNames = ["programCache"])
@@ -27,7 +38,13 @@ open class ProgramController {
     private val logger = LoggerFactory.getLogger(ProgramController::class.java)
 
     @Autowired
-    lateinit var programService: ProgramService
+    private lateinit var programService: ProgramService
+
+    @Autowired
+    private lateinit var userDetailsService: UserDetailsService
+
+    @Autowired
+    private lateinit var jwtTokenUtil: JwtTokenUtil
 
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @GetMapping("/programs")
@@ -41,6 +58,31 @@ open class ProgramController {
     @Cacheable(key = "#url")
     open fun fetchProgramPageHtml(url: String): String {
         return internalFetchProgramPageHtml(url)
+    }
+
+    @GetMapping("/resource")
+    open fun fetchResource(resourceUrl: String?, token: String?, request: HttpServletRequest): ResponseEntity<InputStreamResource> {
+        if (token != null) {
+            val username = jwtTokenUtil.getUsernameFromToken(token)
+            if (username != null) {
+                val userDetails = this.userDetailsService.loadUserByUsername(username)
+                if (jwtTokenUtil.validateToken(token, userDetails)!!) {
+                    val authentication = UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.authorities)
+                    authentication.details = WebAuthenticationDetailsSource().buildDetails(
+                            request)
+                    SecurityContextHolder.getContext().authentication = authentication
+                }
+            }
+
+            if (resourceUrl != null && (SecurityContextHolder.getContext().authentication.authorities.toTypedArray()).any { it ->
+                        it.authority == "WRITE_PRIVILEGE"
+                    }) {
+                return internalFetchResource(resourceUrl)
+            }
+        }
+
+        return ResponseEntity(HttpStatus.FORBIDDEN)
     }
 
     @CachePut(key = "#url")
@@ -59,6 +101,13 @@ open class ProgramController {
         } else {
             "URL must starts with https://www.cogedim.com/"
         }
+    }
+
+    @CachePut(key = "#resourceUrl")
+    open fun internalFetchResource(resourceUrl: String): ResponseEntity<InputStreamResource> {
+        val conn = URL(resourceUrl).openConnection()
+        val inputStreamResource = InputStreamResource(conn.getInputStream())
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(conn.contentType)).body(inputStreamResource)
     }
 
     /**
