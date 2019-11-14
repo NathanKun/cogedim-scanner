@@ -25,7 +25,7 @@
         ],
         "urls": [
           "http://localhost:8080/resource**",
-          "https://cogedimscanner.catprogrammer.com/resource**"
+          "https://cogedimscannerapi.catprogrammer.com/resource**"
         ]
       }
     }
