@@ -10,7 +10,7 @@ import {Sort} from '@angular/material/sort';
 @Component({
   selector: 'app-program',
   templateUrl: './program.component.html',
-  styleUrls: ['./program.component.css']
+  styleUrls: ['./program.component.scss']
 })
 export class ProgramComponent implements OnInit {
 
