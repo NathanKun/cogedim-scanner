@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
-import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {GoogleMap, MapMarker} from '@angular/google-maps';
 import {CookieService} from 'ngx-cookie-service';
 import {Title} from '@angular/platform-browser';
 import {environment} from '../../environments/environment';
@@ -30,7 +30,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   };
 
   @ViewChild(GoogleMap) map: GoogleMap;
-  @ViewChild(MapInfoWindow) info: MapInfoWindow;
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
 

@@ -6,6 +6,7 @@ import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AuthService} from './auth.service';
+import {BigMapPin} from '../model/bigmappin';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,39 @@ export class ProgramService extends BaseService {
 
   private programDateLotCache: ProgramDateLot[];
   private programPageCache: Map<string, string>; // program url  => html str
+  private bigMapPinsCache: BigMapPin[];
 
   constructor(private http: HttpClient,
               private sanitizer: DomSanitizer,
               private authServce: AuthService) {
     super();
     this.programPageCache = new Map<string, string>();
+  }
+
+  public getBigmapPins(): Observable<BigMapPin[]> {
+    if (this.bigMapPinsCache) {
+      return of(this.bigMapPinsCache);
+    } else {
+      return this.fetchBigmapPins();
+    }
+  }
+
+  private fetchBigmapPins(): Observable<BigMapPin[]> {
+    const url = 'https://www.cogedim.com/programme-immobilier-neuf/PgX6/';
+    return this.http.get<string>(
+      this.baseurl + '/program?url=' + url,
+      {responseType: 'text' as 'json'})
+      .pipe(
+        map(
+          str => {
+            const doc = new DOMParser().parseFromString(str, 'text/html');
+            const script = doc.querySelector('script[data-drupal-selector="drupal-settings-json"]');
+            const json: any = JSON.parse(script.innerHTML);
+            this.bigMapPinsCache =  json.nearbyPrograms;
+            return this.bigMapPinsCache;
+          }
+        )
+      );
   }
 
   public getProgramDateLots(): Observable<ProgramDateLot[]> {

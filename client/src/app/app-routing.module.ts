@@ -12,6 +12,7 @@ import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GoogleMapsModule} from '@angular/google-maps';
+import {BigmapComponent} from './bigmap/bigmap.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -27,6 +28,11 @@ const routes: Routes = [
   {
     path: 'programs/:programNumber',
     component: ProgramComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'bigmap',
+    component: BigmapComponent,
     canActivate: [AuthGuard]
   }
 ];

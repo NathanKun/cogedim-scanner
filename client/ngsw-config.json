@@ -25,7 +25,8 @@
         ],
         "urls": [
           "http://localhost:8080/resource**",
-          "https://cogedimscannerapi.catprogrammer.com/resource**"
+          "https://cogedimscannerapi.catprogrammer.com/resource**",
+          "https://maps.googleapis.com/maps/vt**"
         ]
       }
     }

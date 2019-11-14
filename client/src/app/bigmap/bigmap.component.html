@@ -1,0 +1,19 @@
+<div id="bigmap">
+  <google-map
+    height="100%"
+    width="100%"
+    [center]="center"
+    [options]="options"
+    [zoom]="zoom">
+    <map-marker
+        #markerElem
+        *ngFor="let marker of markerConfigs"
+        [position]="marker.position"
+        [label]="marker.label"
+        [title]="marker.title"
+        [options]="marker.options"
+        (mapClick)="markerClick(markerElem)">
+    </map-marker>
+    <map-info-window>{{ infoContent }}</map-info-window>
+  </google-map>
+</div>

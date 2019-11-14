@@ -1,0 +1,6 @@
+#bigmap {
+  height: calc(100% - 64px);
+  width: 100%;
+  position: absolute;
+  top: 64px;
+}

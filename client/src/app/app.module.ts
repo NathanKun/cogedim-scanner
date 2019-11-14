@@ -21,13 +21,15 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {ServiceWorkerModule} from '@angular/service-worker';
+import { BigmapComponent } from './bigmap/bigmap.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     AlertComponent,
-    ProgramComponent
+    ProgramComponent,
+    BigmapComponent
   ],
   imports: [
     BrowserModule,
