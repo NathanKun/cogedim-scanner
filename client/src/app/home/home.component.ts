@@ -3,6 +3,8 @@ import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {CookieService} from 'ngx-cookie-service';
+import {Title} from '@angular/platform-browser';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -34,10 +36,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   constructor(private renderer: Renderer2,
               private cookieService: CookieService,
+              private titleService: Title,
               private programService: ProgramService) {
   }
 
   async ngOnInit() {
+    this.titleService.setTitle(environment.title);
+
     this.programService.getProgramDateLots().subscribe(
       async programDateLots => {
         this.programDateLots = programDateLots;

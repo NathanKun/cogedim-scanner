@@ -3,6 +3,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../service/auth.service';
 import {AlertService} from '../service/alert.service';
+import {Title} from '@angular/platform-browser';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +24,7 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
+    private titleService: Title,
     private alertService: AlertService
   ) {
   }
@@ -33,6 +36,8 @@ export class LoginComponent implements OnInit {
       await this.router.navigate(['/']);
       return;
     }
+
+    this.titleService.setTitle(environment.title);
 
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
