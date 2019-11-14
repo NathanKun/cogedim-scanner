@@ -62,6 +62,8 @@ open class ProgramController {
 
     @GetMapping("/resource")
     open fun fetchResource(resourceUrl: String?, token: String?, request: HttpServletRequest): ResponseEntity<InputStreamResource> {
+        var auth = false
+
         if (token != null) {
             val username = jwtTokenUtil.getUsernameFromToken(token)
             if (username != null) {
@@ -75,12 +77,22 @@ open class ProgramController {
                 }
             }
 
-            if (resourceUrl != null && (SecurityContextHolder.getContext().authentication.authorities.toTypedArray()).any { it ->
+            if (SecurityContextHolder.getContext().authentication.authorities.toTypedArray().any { it ->
                         it.authority == "WRITE_PRIVILEGE"
                     }) {
+                auth = true
+            }
+        }
+
+        if (resourceUrl != null) {
+            if ((resourceUrl.startsWith("https://www.cogedim.com/sites/") && auth) ||
+                    (resourceUrl.startsWith("https://www.cogedim.com/themes/") &&
+                            (resourceUrl.endsWith(".png") || resourceUrl.endsWith("jpg") || resourceUrl.endsWith("jpeg")))
+            ) {
                 return internalFetchResource(resourceUrl)
             }
         }
+
 
         return ResponseEntity(HttpStatus.FORBIDDEN)
     }
@@ -97,7 +109,6 @@ open class ProgramController {
                         StandardCharsets.UTF_8
                 )
             }
-
         } else {
             "URL must starts with https://www.cogedim.com/"
         }
