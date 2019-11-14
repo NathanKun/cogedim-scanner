@@ -14,12 +14,13 @@ data class Program(
         val programName: String,
         val programNumber: String,
         val postalCode: String,
-        val address: String,
+        val address: String,// city
         val url: String,
         val imgUrl: String,
         val pdfUrl: String?,
         val latitude: String,
         val longitude: String,
+        val addressGeoDecoded: String?,
         @JsonView(LotsView::class)
         @OneToMany(fetch = FetchType.EAGER)
         val lots: MutableList<Lot>,

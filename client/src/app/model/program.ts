@@ -8,6 +8,7 @@ export interface Program {
   imgUrl: string;
   pdfUrl: string;
   latitude: string;
+  addressGeoDecoded: string;
   longitude: string;
   createdAt: string;
   modifiedAt: string;

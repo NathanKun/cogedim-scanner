@@ -30,6 +30,7 @@
               </mat-card-title>
               <mat-card-subtitle>
                 <!-- {{p.program.address}} {{p.program.postalCode}} -->
+                {{p.program.addressGeoDecoded}}
                 <div id="delivery-info" [innerHTML]="p.deliveryInfoHtml"></div>
               </mat-card-subtitle>
             </mat-card-header>

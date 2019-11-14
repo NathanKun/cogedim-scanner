@@ -1,5 +1,6 @@
 package com.catprogrammer.cogedimscanner.service.impl
 
+import com.catprogrammer.cogedimscanner.config.Credentials
 import com.catprogrammer.cogedimscanner.entity.Lot
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.FormGetResult
@@ -10,6 +11,9 @@ import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.CogedimCrawlerService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.maps.GeoApiContext
+import com.google.maps.GeocodingApi
+import com.google.maps.model.LatLng
 import org.apache.commons.io.IOUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -176,7 +180,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val longitude = nearbyProgram.lng
 
         val program = Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
-                latitude, longitude, mutableListOf<Lot>(), null, null)
+                latitude, longitude, reverseGeocoding(latitude, longitude), mutableListOf(), null, null)
         programRepository.save(program)
 
         return program
@@ -256,5 +260,18 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             }
             null
         }
+    }
+
+    private fun reverseGeocoding(lat: String, lng: String): String {
+        val context = GeoApiContext.Builder()
+                .apiKey(Credentials.geocodingKey)
+                .build()
+
+        val results = GeocodingApi.reverseGeocode(context, LatLng(lat.toDouble(), lng.toDouble())).await()
+        if (results.isNotEmpty()) {
+            return results[0].formattedAddress
+        }
+
+        return ""
     }
 }
