@@ -32,7 +32,10 @@
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/environments/scss-dev"]
+            }
           },
           "configurations": {
             "dev": {
@@ -43,7 +46,11 @@
                 }
               ],
               "index": "src/index.dev.html",
-              "serviceWorker": true
+              "serviceWorker": true,
+              "ngswConfigPath": "ngsw-config.json",
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/environments/scss-dev"]
+              }
             },
             "production": {
               "index": "src/index.html",
@@ -51,12 +58,11 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/environments/environment.scss",
-                  "with": "src/environments/environment.prod.scss"
                 }
               ],
+              "stylePreprocessorOptions": {
+                "includePaths": ["src/environments/scss-prod"]
+              },
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

@@ -2,6 +2,7 @@ import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/com
 import {from, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {AuthService} from '../service/auth.service';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -15,7 +16,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private handleAccess(request: HttpRequest<any>, next: HttpHandler): Promise<HttpEvent<any>> {
     // Only add to known domains since we don't want to send your tokens to just anyone
-    if (request.urlWithParams.indexOf('cogedimscannerapi') > -1 || request.urlWithParams.indexOf('localhost:8080') > -1) {
+    if (request.urlWithParams.indexOf(environment.baseUrl) > -1) {
       const accessToken = this.authService.getAccessToken();
       if (accessToken != null) {
         request = request.clone({
