@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter
 import java.lang.reflect.Type
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLConnection
 import java.nio.charset.StandardCharsets
 import java.util.zip.GZIPInputStream
 
@@ -176,7 +177,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val longitude = nearbyProgram.lng
 
         val program = Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
-                latitude, longitude, mutableListOf<Lot>(), null, null)
+                latitude, longitude, mutableListOf(), null, null)
         programRepository.save(program)
 
         return program
@@ -214,19 +215,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val conn = (URL(url).openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             doOutput = true
-            setRequestProperty("Pragma", "no-cache")
-            setRequestProperty("Sec-Fetch-Site", "same-origin")
-            setRequestProperty("Origin", "https://www.cogedim.com")
-            setRequestProperty("Accept-Encoding", "gzip, deflate, br")
-            setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,zh-TW;q=0.5")
-            setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36")
-            setRequestProperty("Sec-Fetch-Mode", "cors")
-            setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-            setRequestProperty("Accept", "application/json, text/plain, */*")
-            setRequestProperty("Cache-Control", "no-cache")
-            setRequestProperty("Referer", "https://www.cogedim.com/programme-immobilier-neuf/m8j9/")
-            setRequestProperty("Cookie", "BACKENDID=COGEDIM-WEB-01; _gcl_au=1.1.25026551.1571652669; _ga=GA1.2.952906528.1571652669; _gid=GA1.2.1470064266.1571652669; __sonar=198838560166151756; _fbp=fb.1.1571652669541.1487313776; gwcc=%7B%22fallback%22%3A%220970255255%22%2C%22clabel%22%3A%22gO6yCLyn9ooBEN_DucMD%22%2C%22backoff%22%3A86400%2C%22backoff_expires%22%3A1571739069%7D; CookieConsent={stamp:\\'QVcpBClEOrYbHJsETUMHoiUDAGjhCNRwq538sc/7iFVZZ0pFv/CWGw==\\'%2Cnecessary:true%2Cpreferences:true%2Cstatistics:true%2Cmarketing:true%2Cver:1%2Cutc:1571652681875}; _gat_UA-57280140-1=1")
-            setRequestProperty("Connection", "keep-alive")
+            applyRequestHeaders(this)
         }
 
         conn.outputStream.use { os ->
@@ -255,6 +244,24 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 logger.info(IOUtils.toString(GZIPInputStream(conn.errorStream), StandardCharsets.UTF_8))
             }
             null
+        }
+    }
+
+    companion object {
+        fun applyRequestHeaders(conn: URLConnection): URLConnection = conn.apply {
+            setRequestProperty("Pragma", "no-cache")
+            setRequestProperty("Sec-Fetch-Site", "same-origin")
+            setRequestProperty("Origin", "https://www.cogedim.com")
+            setRequestProperty("Accept-Encoding", "gzip, deflate, br")
+            setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,zh-TW;q=0.5")
+            setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36")
+            setRequestProperty("Sec-Fetch-Mode", "cors")
+            setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+            setRequestProperty("Accept", "application/json, text/plain, */*")
+            setRequestProperty("Cache-Control", "no-cache")
+            setRequestProperty("Referer", "https://www.cogedim.com/programme-immobilier-neuf/m8j9/")
+            setRequestProperty("Cookie", "BACKENDID=COGEDIM-WEB-01; _gcl_au=1.1.25026551.1571652669; _ga=GA1.2.952906528.1571652669; _gid=GA1.2.1470064266.1571652669; __sonar=198838560166151756; _fbp=fb.1.1571652669541.1487313776; gwcc=%7B%22fallback%22%3A%220970255255%22%2C%22clabel%22%3A%22gO6yCLyn9ooBEN_DucMD%22%2C%22backoff%22%3A86400%2C%22backoff_expires%22%3A1571739069%7D; CookieConsent={stamp:\\'QVcpBClEOrYbHJsETUMHoiUDAGjhCNRwq538sc/7iFVZZ0pFv/CWGw==\\'%2Cnecessary:true%2Cpreferences:true%2Cstatistics:true%2Cmarketing:true%2Cver:1%2Cutc:1571652681875}; _gat_UA-57280140-1=1")
+            setRequestProperty("Connection", "keep-alive")
         }
     }
 }

@@ -3,6 +3,7 @@ package com.catprogrammer.cogedimscanner.controller
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
 import com.catprogrammer.cogedimscanner.service.ProgramService
+import com.catprogrammer.cogedimscanner.service.impl.CogedimCrawlerServiceImpl.Companion.applyRequestHeaders
 import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil
 import com.fasterxml.jackson.annotation.JsonView
 import org.apache.commons.io.IOUtils
@@ -12,7 +13,6 @@ import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -24,9 +24,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.util.zip.GZIPInputStream
 import javax.servlet.http.HttpServletRequest
 
 
@@ -55,13 +57,15 @@ open class ProgramController {
 
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @GetMapping("/program")
+    @ResponseBody
     @Cacheable(key = "#url")
-    open fun fetchProgramPageHtml(url: String): String {
+    open fun fetchProgramPageHtml(url: String): ResponseEntity<String> {
         return internalFetchProgramPageHtml(url)
     }
 
     @GetMapping("/resource")
-    open fun fetchResource(resourceUrl: String?, token: String?, request: HttpServletRequest): ResponseEntity<InputStreamResource> {
+    @Cacheable(key = "#resourceUrl")
+    open fun fetchResource(resourceUrl: String?, token: String?, request: HttpServletRequest): ResponseEntity<ByteArray> {
         var auth = false
 
         if (token != null) {
@@ -77,48 +81,61 @@ open class ProgramController {
                 }
             }
 
-            if (SecurityContextHolder.getContext().authentication.authorities.toTypedArray().any { it ->
+            if (SecurityContextHolder.getContext().authentication.authorities.toTypedArray().any {
                         it.authority == "WRITE_PRIVILEGE"
                     }) {
                 auth = true
             }
         }
 
-        if (resourceUrl != null) {
-            if ((resourceUrl.startsWith("https://www.cogedim.com/sites/") && auth) ||
+        return if (resourceUrl != null) {
+            if ((resourceUrl.startsWith("https://www.cogedim.com/marker/") && auth) || // big map pin detail
+                    (resourceUrl.startsWith("https://www.cogedim.com/sites/") && auth) || // program image
                     (resourceUrl.startsWith("https://www.cogedim.com/themes/") &&
-                            (resourceUrl.endsWith(".png") || resourceUrl.endsWith("jpg") || resourceUrl.endsWith("jpeg")))
+                            (resourceUrl.endsWith(".png") ||
+                                    resourceUrl.endsWith("jpg") ||
+                                    resourceUrl.endsWith("jpeg"))) // images for css
             ) {
-                return internalFetchResource(resourceUrl)
+                internalFetchResource(resourceUrl)
+            } else {
+                ResponseEntity(HttpStatus.FORBIDDEN)
             }
+        } else {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-
-
-        return ResponseEntity(HttpStatus.FORBIDDEN)
     }
 
     @CachePut(key = "#url")
-    open fun internalFetchProgramPageHtml(url: String): String {
+    open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
             synchronized(this) {
                 Thread.sleep(2000)
                 logger.info("requesting $url")
-                IOUtils.toString(
-                        URL(url).openConnection().getInputStream(),
-                        StandardCharsets.UTF_8
-                )
+                val conn = applyRequestHeaders(URL(url).openConnection())
+                val str = IOUtils.toString(GZIPInputStream(conn.getInputStream()), StandardCharsets.UTF_8)
+                ResponseEntity
+                        .ok()
+                        .contentType(MediaType.parseMediaType(conn.contentType))
+                        .body(str)
             }
         } else {
-            "URL must starts with https://www.cogedim.com/"
+            ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
 
     @CachePut(key = "#resourceUrl")
-    open fun internalFetchResource(resourceUrl: String): ResponseEntity<InputStreamResource> {
-        val conn = URL(resourceUrl).openConnection()
-        val inputStreamResource = InputStreamResource(conn.getInputStream())
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(conn.contentType)).body(inputStreamResource)
+    open fun internalFetchResource(resourceUrl: String): ResponseEntity<ByteArray> {
+        val conn = applyRequestHeaders(URL(resourceUrl).openConnection())
+        val inputStream = if (conn.contentEncoding == "gzip") {
+            GZIPInputStream(conn.getInputStream())
+        } else {
+            conn.getInputStream()
+        }
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(conn.contentType))
+                .body(IOUtils.toByteArray(inputStream))
     }
 
     /**
