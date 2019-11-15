@@ -213,9 +213,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
     private fun <T> postRequest(url: String, writeData: String, gsonType: Class<T>): T? {
         val conn = (URL(url).openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            doOutput = true
-            applyRequestHeaders(this)
+            applyRequestHeaders(this, true)
         }
 
         conn.outputStream.use { os ->
@@ -248,7 +246,12 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     }
 
     companion object {
-        fun applyRequestHeaders(conn: URLConnection): URLConnection = conn.apply {
+        fun applyRequestHeaders(conn: URLConnection, isPost: Boolean): URLConnection = conn.apply {
+            if (isPost) {
+                (this as HttpURLConnection).requestMethod = "POST"
+                doOutput = true
+                setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
+            }
             setRequestProperty("Pragma", "no-cache")
             setRequestProperty("Sec-Fetch-Site", "same-origin")
             setRequestProperty("Origin", "https://www.cogedim.com")
@@ -256,7 +259,6 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,zh-TW;q=0.5")
             setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36")
             setRequestProperty("Sec-Fetch-Mode", "cors")
-            setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
             setRequestProperty("Accept", "application/json, text/plain, */*")
             setRequestProperty("Cache-Control", "no-cache")
             setRequestProperty("Referer", "https://www.cogedim.com/programme-immobilier-neuf/m8j9/")

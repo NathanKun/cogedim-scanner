@@ -26,7 +26,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
+import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.zip.GZIPInputStream
 import javax.servlet.http.HttpServletRequest
@@ -107,12 +109,14 @@ open class ProgramController {
 
     @CachePut(key = "#url")
     open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
+
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
             synchronized(this) {
                 Thread.sleep(2000)
-                logger.info("requesting $url")
-                val conn = applyRequestHeaders(URL(url).openConnection())
+                val urlEncoded = encodeUrl(url)
+                logger.info("requesting $urlEncoded")
+                val conn = applyRequestHeaders(URL(urlEncoded).openConnection(), false)
                 val str = IOUtils.toString(GZIPInputStream(conn.getInputStream()), StandardCharsets.UTF_8)
                 ResponseEntity
                         .ok()
@@ -126,16 +130,24 @@ open class ProgramController {
 
     @CachePut(key = "#resourceUrl")
     open fun internalFetchResource(resourceUrl: String): ResponseEntity<ByteArray> {
-        val conn = applyRequestHeaders(URL(resourceUrl).openConnection())
-        val inputStream = if (conn.contentEncoding == "gzip") {
-            GZIPInputStream(conn.getInputStream())
+        val url = encodeUrl(resourceUrl)
+        val conn = applyRequestHeaders(URL(url).openConnection(), false) as HttpURLConnection
+
+        return if (conn.responseCode >= 400) {
+            val resp = IOUtils.toString(conn.errorStream, StandardCharsets.UTF_8)
+            logger.error("internalFetchResource error\nurl = ${conn.url}\ncode = ${conn.responseCode}\n$resp")
+            ResponseEntity(HttpStatus.valueOf(conn.responseCode))
         } else {
-            conn.getInputStream()
+            val inputStream = if (conn.contentEncoding == "gzip") {
+                GZIPInputStream(conn.inputStream)
+            } else {
+                conn.inputStream
+            }
+            ResponseEntity
+                    .ok()
+                    .contentType(MediaType.parseMediaType(conn.contentType))
+                    .body(IOUtils.toByteArray(inputStream))
         }
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(conn.contentType))
-                .body(IOUtils.toByteArray(inputStream))
     }
 
     /**
@@ -145,5 +157,14 @@ open class ProgramController {
     @Scheduled(fixedDelay = (12 * 60 * 60 * 1000).toLong(), initialDelay = 1000)
     open fun reportCacheEvict() {
         logger.info("Flush Cache")
+    }
+
+    private fun encodeUrl(url: String): String {
+        return "https://" + url
+                .replace("https://", "") // avoid : being encoded
+                .split("/")
+                .joinToString("/") {
+                    URLEncoder.encode(it, "UTF-8")
+                }
     }
 }
