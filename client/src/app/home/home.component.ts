@@ -12,8 +12,8 @@ import {environment} from '../../environments/environment';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
-  private hidedProgramsCookieName = 'hided_programs';
-  hideHidedPrograms = true;
+  private hidProgramsCookieName = 'hid_programs';
+  hideHidPrograms = true;
 
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   programDateLots: ProgramDateLot[];
@@ -124,7 +124,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   showAllHidedPrograms(show: boolean) {
-    this.hideHidedPrograms = !show;
+    this.hideHidPrograms = !show;
   }
 
   private animateMarker(marker: MapMarker) {
@@ -135,8 +135,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   private cookieIsProgramHided(programNumber: string) {
-    if (this.cookieService.check(this.hidedProgramsCookieName)) {
-      const cookieStr = this.cookieService.get(this.hidedProgramsCookieName);
+    if (this.cookieService.check(this.hidProgramsCookieName)) {
+      const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
       const hidePrograms = JSON.parse(cookieStr) as string[];
       return hidePrograms.indexOf(programNumber) >= 0;
     } else {
@@ -147,8 +147,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   private cookieSetProgramHided(programNumber: string, setHided: boolean) {
     // read cookie
     let hidedPrograms: string[];
-    if (this.cookieService.check(this.hidedProgramsCookieName)) {
-      const cookieStr = this.cookieService.get(this.hidedProgramsCookieName);
+    if (this.cookieService.check(this.hidProgramsCookieName)) {
+      const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
       hidedPrograms = JSON.parse(cookieStr) as string[];
     } else {
       hidedPrograms = [];
@@ -168,6 +168,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     // save
-    this.cookieService.set(this.hidedProgramsCookieName, JSON.stringify(hidedPrograms), 10 * 365, '/');
+    this.cookieService.set(this.hidProgramsCookieName, JSON.stringify(hidedPrograms), 10 * 365, '/');
   }
 }

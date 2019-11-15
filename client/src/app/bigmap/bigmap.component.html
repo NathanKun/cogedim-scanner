@@ -14,6 +14,50 @@
         [options]="marker.options"
         (mapClick)="markerClick(markerElem)">
     </map-marker>
-    <map-info-window>{{ infoContent }}</map-info-window>
+    <map-info-window [options]="infoWindowConfig">
+      <mat-card class="map-info px-0" *ngIf="infoWindowLoaded; else loadingTemplate">
+        <mat-card-header>
+          <mat-card-title>{{infoWindowBigMapPinDetail.programName}}</mat-card-title>
+          <mat-card-subtitle>{{infoWindowBigMapPinDetail.addressLocality}} {{infoWindowBigMapPinDetail.postalCode}}</mat-card-subtitle>
+        </mat-card-header>
+        <a [href]="infoWindowBigMapPinDetail.url" target="_blank">
+          <img class="map-info-img"
+               [lazyLoad]="infoWindowBigMapPinDetail.imgUrl"
+               src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"
+               [alt]="infoWindowBigMapPinDetail.programName"/>
+        </a>
+        <mat-card-content>
+          <div class="p-2" [innerHTML]="infoWindowBigMapPinDetail.summary"></div>
+        </mat-card-content>
+        <mat-card-actions>
+          <a [href]="infoWindowBigMapPinDetail.url" target="_blank" mat-icon-button>
+            <i class="material-icons">web</i>
+          </a>
+          <button *ngIf="!infoWindowBigMapPinDetail.hid"
+                  (click)="setPinHid(infoWindowBigMapPinDetail, true)"
+                  mat-icon-button>
+            <i class="material-icons-outlined">remove_red_eye</i>
+          </button>
+          <button *ngIf="infoWindowBigMapPinDetail.hid"
+                  (click)="setPinHid(infoWindowBigMapPinDetail, false)"
+                  mat-icon-button>
+            <i class="material-icons">remove_red_eye</i>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+      <ng-template #loadingTemplate>
+        loading...
+      </ng-template>
+    </map-info-window>
   </google-map>
+  <div #changeHideStateButton class="d-none">
+    <button (click)="changeHideState()" mat-flat-button class="change-state-button p-0">
+      <ng-container *ngIf="hideHidPins; else hideUnhidPins">
+        <i class="material-icons">remove_red_eye</i>
+      </ng-container>
+      <ng-template #hideUnhidPins>
+        <i class="material-icons-outlined">remove_red_eye</i>
+      </ng-template>
+    </button>
+  </div>
 </div>

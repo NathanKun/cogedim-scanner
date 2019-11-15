@@ -22,7 +22,7 @@
     <ng-container *ngIf="programDateLots">
       <ng-container *ngFor="let p of programDateLots">
         <!--suppress JSUnusedGlobalSymbols -->
-        <div #programcard class="my-3" *ngIf="!p.hided || !hideHidedPrograms">
+        <div #programcard class="my-3" *ngIf="!p.hided || !hideHidPrograms">
           <mat-card>
             <mat-card-header>
               <mat-card-title>
@@ -61,8 +61,8 @@
         </div>
       </ng-container>
       <div class="mb-3">
-        <button (click)="showAllHidedPrograms(hideHidedPrograms)" class="full-width" mat-button color="primary">
-          <ng-container *ngIf="hideHidedPrograms; else hideUnhidPrograms">
+        <button (click)="showAllHidedPrograms(hideHidPrograms)" class="full-width" mat-button color="primary">
+          <ng-container *ngIf="hideHidPrograms; else hideUnhidPrograms">
             <i class="material-icons">remove_red_eye</i>
             Show hidden programs
           </ng-container>

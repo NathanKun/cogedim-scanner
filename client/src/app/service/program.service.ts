@@ -7,21 +7,81 @@ import {Observable, of} from 'rxjs';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AuthService} from './auth.service';
 import {BigMapPin} from '../model/bigmappin';
+import {BigMapPinDetail} from '../model/bigmappindetail';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProgramService extends BaseService {
 
+  constructor(private http: HttpClient,
+              private sanitizer: DomSanitizer,
+              private authService: AuthService) {
+    super();
+    this.programPageCache = new Map<string, string>();
+    this.bigMapPinDetailCache = new Map<string, BigMapPinDetail>();
+  }
+
   private programDateLotCache: ProgramDateLot[];
   private programPageCache: Map<string, string>; // program url  => html str
   private bigMapPinsCache: BigMapPin[];
+  private bigMapPinDetailCache: Map<string, BigMapPinDetail>; // program number  => BigMapPinDetail object
 
-  constructor(private http: HttpClient,
-              private sanitizer: DomSanitizer,
-              private authServce: AuthService) {
-    super();
-    this.programPageCache = new Map<string, string>();
+  public getBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
+    if (this.bigMapPinDetailCache.has(pin.nid)) {
+      return of(this.bigMapPinDetailCache.get(pin.nid));
+    } else {
+      return this.fetchBigmapPinDetail(pin);
+    }
+  }
+
+  private fetchBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
+    return this.http.get<string>(
+      this.convertUrlToBackendResourceUrl('/marker/' + pin.nid + '/', true),
+      {responseType: 'text' as 'json'})
+      .pipe(
+        map(
+          str => {
+            const json: any = JSON.parse(str);
+            const htmlStr = json.markup;
+            const article = new DOMParser().parseFromString(htmlStr, 'text/html');
+
+            let imgUrl = article.querySelector('img[src^="/sites"]').getAttribute('src').split('?')[0];
+            imgUrl = this.convertUrlToBackendResourceUrl(imgUrl, true);
+
+            const programNameElement = article.querySelector('h2');
+            const programName = programNameElement != null ? programNameElement.textContent : '';
+
+            const postalCodeElement = article.querySelector('span[itemprop="postalCode"]');
+            const postalCode = postalCodeElement != null ? postalCodeElement.textContent : '';
+
+            const addressLocalityElement = article.querySelector('span[itemprop="addressLocality"]');
+            const addressLocality = addressLocalityElement != null ? addressLocalityElement.textContent : '';
+
+            const summaryElement = article.querySelector('.summary');
+            const summary = summaryElement != null ? summaryElement.innerHTML : '';
+
+            const urlElement = article.querySelector('a');
+            const url = urlElement != null ? ('https://www.cogedim.com/' + urlElement.getAttribute('href')) : '#';
+
+            const bigMapPinDetail = {
+              lat: pin.lat,
+              lng: pin.lng,
+              nid: pin.nid,
+              hid: pin.hid,
+              imgUrl,
+              programName,
+              postalCode,
+              addressLocality,
+              summary,
+              url
+            };
+            this.bigMapPinDetailCache.set(pin.nid, bigMapPinDetail);
+
+            return bigMapPinDetail;
+          }
+        )
+      );
   }
 
   public getBigmapPins(): Observable<BigMapPin[]> {
@@ -43,7 +103,7 @@ export class ProgramService extends BaseService {
             const doc = new DOMParser().parseFromString(str, 'text/html');
             const script = doc.querySelector('script[data-drupal-selector="drupal-settings-json"]');
             const json: any = JSON.parse(script.innerHTML);
-            this.bigMapPinsCache =  json.nearbyPrograms;
+            this.bigMapPinsCache = json.nearbyPrograms;
             return this.bigMapPinsCache;
           }
         )
@@ -67,9 +127,7 @@ export class ProgramService extends BaseService {
           res.forEach(p => {
             // convert the object to a map
             p.dateMap = new Map(Object.entries(p.dateMap));
-
-            // convert the image url to /resource
-            p.program.imgUrl = this.baseurl + '/resource?resourceUrl=' + p.program.imgUrl + '&token=' + this.authServce.getAccessToken();
+            p.program.imgUrl = this.convertUrlToBackendResourceUrl(p.program.imgUrl, false);
 
             // set the last day lot count prop
             const values = Array.from(p.dateMap.values());
@@ -157,8 +215,10 @@ export class ProgramService extends BaseService {
 
           // update images src, add cogedim's domain
           div.querySelectorAll('img[src^="/"]').forEach(
-            e => e.setAttribute('src', this.baseurl +
-              '/resource?resourceUrl=https://www.cogedim.com' + e.getAttribute('src') + '&token=' + this.authServce.getAccessToken())
+            e => e.setAttribute(
+              'src',
+              this.convertUrlToBackendResourceUrl(e.getAttribute('src'), true)
+            )
           );
 
           // remove sales office section
@@ -188,6 +248,13 @@ export class ProgramService extends BaseService {
         )
       );
     }
+  }
 
+  private convertUrlToBackendResourceUrl(url: string, addCogedimDomain: boolean): string {
+    if (addCogedimDomain) {
+      url = 'https://www.cogedim.com' + url;
+    }
+
+    return this.baseurl + '/resource?resourceUrl=' + url + '&token=' + this.authService.getAccessToken();
   }
 }

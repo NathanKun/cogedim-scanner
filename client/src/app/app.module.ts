@@ -21,7 +21,8 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {ServiceWorkerModule} from '@angular/service-worker';
-import { BigmapComponent } from './bigmap/bigmap.component';
+import {BigmapComponent} from './bigmap/bigmap.component';
+import {LazyLoadImageModule} from 'ng-lazyload-image';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { BigmapComponent } from './bigmap/bigmap.component';
     MatProgressSpinnerModule,
     GoogleMapsModule,
     MatButtonModule,
+    LazyLoadImageModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: true})
   ],
   providers: [AuthGuard, CookieService],
