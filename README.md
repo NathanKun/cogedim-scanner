@@ -1,2 +1,2 @@
-# cogedim-scanner
-Crawl and record cogedim programs
+# immo-scanner
+Crawl and record immo programs
