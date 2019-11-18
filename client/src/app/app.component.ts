@@ -8,15 +8,13 @@ import {Router} from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  isAuthenticated: boolean;
+  isAuthenticated = false;
 
   constructor(public authService: AuthService,
               public router: Router) {
   }
 
-  async ngOnInit() {
-    this.isAuthenticated = this.authService.isAuthenticated();
-
+  ngOnInit() {
     // Subscribe to authentication state changes
     this.authService.$authenticationState.subscribe(
       async (isAuthenticated: boolean) => {
@@ -25,7 +23,14 @@ export class AppComponent implements OnInit {
       }
     );
 
-    await this.authService.backendAuthCheck();
+    this.authService.backendAuthCheck().subscribe(
+      () => {
+        this.isAuthenticated = this.authService.isAuthenticated();
+      },
+      error => {
+        this.authService.logout();
+      }
+    );
   }
 
   private async authGuard() {

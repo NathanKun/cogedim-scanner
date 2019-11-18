@@ -1,17 +1,16 @@
 <mat-toolbar color="primary">
   <span>Cogedim Scanner</span>
   <span class="toolbar-spacer"></span>
-  <button mat-icon-button (click)="router.navigate(['/home'])">
+  <button mat-icon-button *ngIf="isAuthenticated" (click)="router.navigate(['/home'])">
     <i class="material-icons">home</i>
   </button>
-  <button mat-icon-button (click)="router.navigate(['/bigmap'])">
+  <button mat-icon-button *ngIf="isAuthenticated" (click)="router.navigate(['/bigmap'])">
     <i class="material-icons">map</i>
   </button>
   <button mat-icon-button *ngIf="isAuthenticated" (click)="authService.logout()">
     <i class="material-icons">exit_to_app</i>
   </button>
 </mat-toolbar>
-
 
 <!-- main app container -->
 <div class="main-container">

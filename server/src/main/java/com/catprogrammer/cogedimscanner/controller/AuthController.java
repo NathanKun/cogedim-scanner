@@ -1,7 +1,6 @@
 package com.catprogrammer.cogedimscanner.controller;
 
 import com.catprogrammer.cogedimscanner.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +37,6 @@ public class AuthController {
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @PostMapping(value = "/admin/hi")
     public String adminHi(Principal principal) throws AuthenticationException {
-        return "hi " + principal.getName() + " , you have 'admin' role";
+        return "{\"user\": \"" + principal.getName() + "\", \"role\": \"admin\"}";
     }
 }

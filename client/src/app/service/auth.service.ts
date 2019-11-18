@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
-import {Observable, Observer} from 'rxjs';
+import {Observable, Observer, throwError} from 'rxjs';
 import {BaseService} from './base.service';
 import {CookieService} from 'ngx-cookie-service';
 
@@ -37,12 +37,19 @@ export class AuthService extends BaseService {
     this.observers.forEach(observer => observer.next(state));
   }
 
-  public async backendAuthCheck() {
-    await this.http.post<string>(
-      this.baseurl + '/admin/hi',
-      {
-        responseType: 'text' as 'json'
-      }).toPromise().catch(() => this.logout());
+  public backendAuthCheck(): Observable<string> {
+    if (this.isAuthenticated()) {
+      return this.http.post<string>(
+        this.baseurl + '/admin/hi',
+        {
+          headers: {
+            Authorization: this.getAccessToken()
+          },
+          responseType: 'text' as 'json'
+        });
+    } else {
+      return throwError('No token');
+    }
   }
 
   public login(u: string, p: string): Observable<string> {
