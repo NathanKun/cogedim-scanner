@@ -115,7 +115,13 @@ export class ProgramComponent implements OnInit {
   }
 
   calculatePricePerM2(lot: Lot): string {
-    return Math.ceil(priceToNumber(lot.price) / surfaceToNumber(lot.surface)) + ' €';
+    const price = priceToNumber(lot.price);
+
+    if (isNaN(price)) {
+      return '';
+    }
+
+    return Math.ceil(price / surfaceToNumber(lot.surface)) + ' €';
   }
 }
 

@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
               public router: Router) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.isAuthenticated = this.authService.isAuthenticated();
 
     // Subscribe to authentication state changes
@@ -24,6 +24,8 @@ export class AppComponent implements OnInit {
         await this.authGuard();
       }
     );
+
+    await this.authService.backendAuthCheck();
   }
 
   private async authGuard() {

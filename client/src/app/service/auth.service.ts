@@ -37,6 +37,14 @@ export class AuthService extends BaseService {
     this.observers.forEach(observer => observer.next(state));
   }
 
+  public async backendAuthCheck() {
+    await this.http.post<string>(
+      this.baseurl + '/admin/hi',
+      {
+        responseType: 'text' as 'json'
+      }).toPromise().catch(() => this.logout());
+  }
+
   public login(u: string, p: string): Observable<string> {
     return this.http.post<string>(
       this.baseurl + '/auth/login',
