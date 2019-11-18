@@ -45,16 +45,21 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      * Return a list of SearchResult object.
      */
     override fun requestSearchResults(): List<SearchResult> {
+        val crawlData = arrayOf(
+                "location=ile-de-france&department=Paris&rooms=3,4,5"
+        )
         val results = mutableListOf<SearchResult>()
         var page = 0
         var res: SearchResult?
 
-        do {
-            res = fetchSearchResult(page++)
-            if (res != null) {
-                results.add(res)
-            }
-        } while (res?.hasMore != null && res.hasMore!!)
+        for (data in crawlData) {
+            do {
+                res = fetchSearchResult(page++, data)
+                if (res != null) {
+                    results.add(res)
+                }
+            } while (res?.hasMore != null && res.hasMore!!)
+        }
 
         return results
         // return mutableListOf(gson.fromJson<SearchResult>(mokeSearchResult, SearchResult::class.javaObjectType))
@@ -187,10 +192,10 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         return Jsoup.parse(result.form).select("div.confirmation a").attr("href")
     }
 
-    private fun fetchSearchResult(page: Int): SearchResult? {
+    private fun fetchSearchResult(page: Int, data: String): SearchResult? {
         return postRequest(
                 "https://www.cogedim.com/search-results?page=$page",
-                "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=3,4,5",
+                data,
                 SearchResult::class.javaObjectType
         )
     }

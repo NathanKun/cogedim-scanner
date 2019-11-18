@@ -88,6 +88,4 @@ public class JwtTokenUtil implements Serializable {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-
 }
