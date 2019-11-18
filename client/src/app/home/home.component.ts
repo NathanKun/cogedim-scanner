@@ -78,7 +78,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // so do this at the end of subscribe()
         for (const p of this.programDateLots) {
           // delivery info
-          p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
+          try {
+            p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
+          } catch (e) {
+            console.log('programService.getProgramPageDeliveryInfo(url) error, url = ' + p.program.url);
+            console.log('flush and retry');
+            await this.programService.flushUrl(p.program.url).toPromise();
+            try {
+              p.deliveryInfoHtml = await this.programService.getProgramPageDeliveryInfo(p.program.url).toPromise();
+            } catch (e) {
+              console.log('programService.getProgramPageDeliveryInfo(url) error, url = ' + p.program.url);
+              console.log(e);
+            }
+          }
         }
       }
     );

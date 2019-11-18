@@ -231,6 +231,12 @@ export class ProgramService extends BaseService {
     );
   }
 
+  public flushUrl(url: string): Observable<string> {
+    return this.http.get<string>(
+      this.baseurl + '/flush?url=' + url,
+      {responseType: 'text' as 'json'});
+  }
+
   private fetchProgramPage(url: string): Observable<string> {
     if (this.programPageCache.has(url)) {
       return of(this.programPageCache.get(url));

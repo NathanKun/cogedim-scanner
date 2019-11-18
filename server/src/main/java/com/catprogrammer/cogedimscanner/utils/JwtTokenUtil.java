@@ -1,14 +1,15 @@
 package com.catprogrammer.cogedimscanner.utils;
 
-import com.catprogrammer.cogedimscanner.config.Credentials;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.security.KeyPair;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,10 +27,11 @@ public class JwtTokenUtil implements Serializable {
      * 5天(毫秒)
      */
     private static final long EXPIRATION_TIME = 432000000;
+
     /**
      * JWT密码
      */
-    private static final String SECRET = Credentials.jwtSecret;
+    private static final KeyPair KEY_PAIR = Keys.keyPairFor(SignatureAlgorithm.RS512);
 
 
     /**
@@ -41,7 +43,7 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(Instant.now().toEpochMilli() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .signWith(KEY_PAIR.getPrivate())
                 .compact();
     }
 
@@ -82,7 +84,7 @@ public class JwtTokenUtil implements Serializable {
      */
     private Claims getClaimsFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET)
+                .setSigningKey(KEY_PAIR.getPublic())
                 .parseClaimsJws(token)
                 .getBody();
     }

@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import java.net.HttpURLConnection
@@ -107,13 +108,21 @@ open class ProgramController {
         }
     }
 
+    @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+    @PostMapping("/flush")
+    @CacheEvict(key = "#url", beforeInvocation = true)
+    open fun flushUrl(url: String): String {
+        logger.info("Flushed url $url")
+        return "OK"
+    }
+
     @CachePut(key = "#url")
     open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
 
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
             synchronized(this) {
-                Thread.sleep(2000)
+                Thread.sleep(5000)
                 val urlEncoded = encodeUrl(url)
                 logger.info("requesting $urlEncoded")
                 val conn = applyRequestHeaders(URL(urlEncoded).openConnection(), false)
@@ -151,10 +160,10 @@ open class ProgramController {
     }
 
     /**
-     * evict cache schedule
+     * evict cache schedule. Every 12 hours
      */
     @CacheEvict(allEntries = true)
-    @Scheduled(fixedDelay = (12 * 60 * 60 * 1000).toLong(), initialDelay = 1000)
+    @Scheduled(fixedDelay = (12 * 60 * 60 * 1000).toLong(), initialDelay = 2000)
     open fun reportCacheEvict() {
         logger.info("Flush Cache")
     }

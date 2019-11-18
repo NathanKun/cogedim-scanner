@@ -123,9 +123,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val pdfUrl =
                         if (requestPdf) {
                             if (blueprintId != null && blueprintId.length == 5) {
-                                // pause 1 sec to reduce request per sec
+                                // pause 10 sec to reduce request per sec
                                 // avoid being banned
-                                Thread.sleep(1000)
+                                Thread.sleep(10000)
 
                                 val blueprintUrl = fetchFormBlueprint(program.programNumber, blueprintId)
                                 if (blueprintUrl != null) {
