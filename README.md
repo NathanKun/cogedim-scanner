@@ -1,2 +1,2 @@
-# immo-scanner
-Crawl and record immo programs
+# real-estate-scanner
+Crawl and record real estate programs
