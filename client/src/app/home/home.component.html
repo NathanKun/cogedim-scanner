@@ -34,7 +34,10 @@
               </mat-card-subtitle>
             </mat-card-header>
             <a [routerLink]="['/programs', p.program.programNumber]">
-              <img mat-card-image [src]="p.program.imgUrl" [alt]="p.program.programName">
+              <img mat-card-image
+                   [lazyLoad]="p.program.imgUrl"
+                   src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"
+                   [alt]="p.program.programName">
             </a>
             <mat-card-content>
               <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>

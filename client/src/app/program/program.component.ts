@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {map, switchMap} from 'rxjs/operators';
@@ -12,7 +12,7 @@ import {Sort} from '@angular/material/sort';
   templateUrl: './program.component.html',
   styleUrls: ['./program.component.scss']
 })
-export class ProgramComponent implements OnInit {
+export class ProgramComponent implements OnInit, AfterViewInit {
 
   programDateLot: ProgramDateLot;
 
@@ -69,6 +69,10 @@ export class ProgramComponent implements OnInit {
           this.injectSalesInfo = await this.programService.getProgramPageSalesInfo(this.programDateLot.program.url).toPromise();
         }
       );
+  }
+
+  ngAfterViewInit(): void {
+    window.scrollTo(0, 0);
   }
 
   sortData(sort: Sort) {

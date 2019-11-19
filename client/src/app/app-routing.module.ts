@@ -13,6 +13,7 @@ import {AuthGuard} from './service/authguard';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {BigmapComponent} from './bigmap/bigmap.component';
+import {LazyLoadImageModule} from 'ng-lazyload-image';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -49,7 +50,8 @@ const routes: Routes = [
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    LazyLoadImageModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
