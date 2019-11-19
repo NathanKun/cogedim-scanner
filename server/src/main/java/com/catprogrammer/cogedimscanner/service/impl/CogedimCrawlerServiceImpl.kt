@@ -46,6 +46,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      */
     override fun requestSearchResults(): List<SearchResult> {
         val crawlData = arrayOf(
+                "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5",
                 "location=ile-de-france&department=Paris&rooms=3,4,5"
         )
         val results = mutableListOf<SearchResult>()
