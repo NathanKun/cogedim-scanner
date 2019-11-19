@@ -46,8 +46,6 @@
                 }
               ],
               "index": "src/index.dev.html",
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json",
               "stylePreprocessorOptions": {
                 "includePaths": ["src/environments/scss-dev"]
               }

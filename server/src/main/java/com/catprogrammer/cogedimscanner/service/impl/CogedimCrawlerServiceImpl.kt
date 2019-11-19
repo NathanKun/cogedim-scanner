@@ -54,6 +54,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         var res: SearchResult?
 
         for (data in crawlData) {
+            logger.info("Crawling $data")
             do {
                 res = fetchSearchResult(page++, data)
                 if (res != null) {
