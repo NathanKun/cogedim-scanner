@@ -132,14 +132,16 @@ export class ProgramService extends BaseService {
             // set the last day lot count prop
             const values = Array.from(p.dateMap.values());
             p.lastDayLotCount = values[values.length - 1].length;
-            const lastDaySortedLots = values[values.length - 1].sort(
-              (a, b) =>
-                +a.price.replace(' ', '').replace('€', '')
-                <
-                +b.price.replace(' ', '').replace('€', '')
-                  ?
-                  -1 : 1
-            );
+            const lastDaySortedLots = values[values.length - 1]
+              .filter(l => l.price.indexOf('€') >= 0)
+              .sort(
+                (a, b) =>
+                  +a.price.replace('/ /g', '').replace('€', '')
+                  <
+                  +b.price.replace('/ /g', '').replace('€', '')
+                    ?
+                    -1 : 1
+              );
             if (lastDaySortedLots.length) {
               p.lastDayMinPrice = lastDaySortedLots[0].price;
             }

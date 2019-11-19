@@ -1,10 +1,12 @@
-import {AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
 import {GoogleMap, MapMarker} from '@angular/google-maps';
 import {CookieService} from 'ngx-cookie-service';
 import {Title} from '@angular/platform-browser';
 import {environment} from '../../environments/environment';
+import {ScrollService} from '../service/scroll.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -34,9 +36,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   markerConfigs: MapMarker[] = [];
 
   constructor(private renderer: Renderer2,
+              private router: Router,
               private cookieService: CookieService,
               private titleService: Title,
-              private programService: ProgramService) {
+              private programService: ProgramService,
+              private scrollService: ScrollService) {
   }
 
   async ngOnInit() {
@@ -110,13 +114,21 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.programcards.changes.subscribe(
       res => this.programcards = res
     );
+
+    // restore scroll position
+    this.scrollService.scrollHome();
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onScroll() {
+    this.scrollService.recordHomePosition();
   }
 
   markerClick(marker: MapMarker) {
     const index = this.programDateLots.findIndex((pdl) => pdl.program.programName === marker.getTitle());
     this.programcards.filter((item, i) => i === index)[0].nativeElement.scrollIntoView({
       behavior: 'smooth',
-      block: 'center'
+      block: 'end'
     });
     this.animateMarker(marker);
   }
