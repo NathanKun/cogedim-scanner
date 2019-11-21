@@ -1,4 +1,5 @@
 import {BigMapPin} from './bigmappin';
+import {SafeHtml} from '@angular/platform-browser';
 
 export interface BigMapPinDetail extends BigMapPin {
   imgUrl: string;
@@ -7,4 +8,5 @@ export interface BigMapPinDetail extends BigMapPin {
   addressLocality: string;
   summary: string;
   url: string;
+  deliveryInfo: SafeHtml;
 }

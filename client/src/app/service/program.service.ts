@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {map, tap} from 'rxjs/operators';
+import {map, switchMap, tap} from 'rxjs/operators';
 import {ProgramDateLot} from '../model/programdatelot';
 import {BaseService} from './base.service';
 import {Observable, of} from 'rxjs';
@@ -74,14 +74,29 @@ export class ProgramService extends BaseService {
               postalCode,
               addressLocality,
               summary,
-              url
+              url,
+              deliveryInfo: null
             };
             this.bigMapPinDetailCache.set(pin.nid, bigMapPinDetail);
 
             return bigMapPinDetail;
           }
+        ),
+        switchMap(
+          pinDetail => this.getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail)
         )
       );
+  }
+
+  private getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail: BigMapPinDetail): Observable<BigMapPinDetail> {
+    return this.getProgramPageDeliveryInfo(pinDetail.url).pipe(
+      map(
+        safeHtml => {
+          pinDetail.deliveryInfo = safeHtml;
+          return pinDetail;
+        }
+      )
+    );
   }
 
   public getBigmapPins(): Observable<BigMapPin[]> {
