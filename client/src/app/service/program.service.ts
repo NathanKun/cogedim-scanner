@@ -62,7 +62,7 @@ export class ProgramService extends BaseService {
             const summary = summaryElement != null ? summaryElement.innerHTML : '';
 
             const urlElement = article.querySelector('a');
-            const url = urlElement != null ? ('https://www.cogedim.com/' + urlElement.getAttribute('href')) : '#';
+            const url = urlElement != null ? ('https://www.cogedim.com' + urlElement.getAttribute('href')) : '#';
 
             const bigMapPinDetail = {
               lat: pin.lat,

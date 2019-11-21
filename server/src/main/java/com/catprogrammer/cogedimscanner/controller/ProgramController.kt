@@ -42,6 +42,8 @@ open class ProgramController {
 
     private val logger = LoggerFactory.getLogger(ProgramController::class.java)
 
+    private var lastFetchAt: Long = 0L
+
     @Autowired
     private lateinit var programService: ProgramService
 
@@ -122,7 +124,12 @@ open class ProgramController {
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
             synchronized(this) {
-                Thread.sleep(5000)
+                val lastFetchDiff = System.currentTimeMillis() - lastFetchAt
+                if (lastFetchDiff < 5000) {
+                    Thread.sleep(5000 - lastFetchDiff)
+                }
+                lastFetchAt = System.currentTimeMillis()
+
                 val urlEncoded = encodeUrl(url)
                 logger.info("requesting $urlEncoded")
                 val conn = applyRequestHeaders(URL(urlEncoded).openConnection(), false)

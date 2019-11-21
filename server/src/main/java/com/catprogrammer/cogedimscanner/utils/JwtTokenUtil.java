@@ -4,6 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,8 @@ import java.util.Map;
  */
 @Component
 public class JwtTokenUtil implements Serializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     private static final String CLAIM_KEY_USERNAME = "sub";
 
@@ -69,23 +74,30 @@ public class JwtTokenUtil implements Serializable {
      * 根据token获取username
      */
     public String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
+        Claims claims = getClaimsFromToken(token);
+        return claims != null ? claims.getSubject() : null;
     }
 
     /**
      * 获取token的过期时间
      */
     private Date getExpirationDateFromToken(String token) {
-        return getClaimsFromToken(token).getExpiration();
+        Claims claims = getClaimsFromToken(token);
+        return claims != null ? claims.getExpiration() : null;
     }
 
     /**
      * 解析JWT
      */
     private Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(KEY_PAIR.getPublic())
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(KEY_PAIR.getPublic())
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (SignatureException e) {
+            LOGGER.warn("JwtTokenUtil.getClaimsFromToken throw SignatureException");
+            return null;
+        }
     }
 }
