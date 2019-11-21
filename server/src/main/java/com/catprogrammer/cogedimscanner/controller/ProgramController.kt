@@ -167,11 +167,11 @@ open class ProgramController {
     }
 
     /**
-     * evict cache schedule. Every 12 hours
+     * evict cache schedule
      */
     @CacheEvict(allEntries = true)
-    @Scheduled(fixedDelay = (12 * 60 * 60 * 1000).toLong(), initialDelay = 2000)
-    open fun reportCacheEvict() {
+    @Scheduled(fixedDelay = (7 * 24 * 60 * 60 * 1000).toLong(), initialDelay = 2000)
+    open fun flushCacheAllEntries() {
         logger.info("Flush Cache")
     }
 
