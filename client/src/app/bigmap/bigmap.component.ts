@@ -86,6 +86,9 @@ export class BigmapComponent implements OnInit, AfterViewInit {
       tooltip: true,
       unit: MeasureTool.UnitTypeId.METRIC // metric, imperial, or nautical
     });
+
+    // MeasureTool init will setClickableIcons to false
+    this.map._googleMap.setClickableIcons(true);
   }
 
   markerClick(marker: MapMarker) {
