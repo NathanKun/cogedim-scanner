@@ -7,6 +7,8 @@ import {ProgramService} from '../service/program.service';
 import {BigMapPin} from '../model/bigmappin';
 import {BigMapPinDetail} from '../model/bigmappindetail';
 
+declare const MeasureTool: any;
+
 @Component({
   selector: 'app-bigmap',
   templateUrl: './bigmap.component.html',
@@ -22,7 +24,8 @@ export class BigmapComponent implements OnInit, AfterViewInit {
   center: google.maps.LatLngLiteral;
   options: google.maps.MapOptions = {
     mapTypeId: 'roadmap',
-    zoomControl: false,
+    zoomControl: true,
+    scaleControl: true,
     scrollwheel: true,
     disableDoubleClickZoom: true,
     maxZoom: 18,
@@ -74,6 +77,15 @@ export class BigmapComponent implements OnInit, AfterViewInit {
 
     const transitLayer = new google.maps.TransitLayer();
     transitLayer.setMap(this.map._googleMap);
+
+    // google maps mesure tool
+    // tslint:disable-next-line:no-unused-expression
+    new MeasureTool(this.map._googleMap, {
+      contextMenu: true,
+      showSegmentLength: true,
+      tooltip: true,
+      unit: MeasureTool.UnitTypeId.METRIC // metric, imperial, or nautical
+    });
   }
 
   markerClick(marker: MapMarker) {
@@ -148,7 +160,6 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     if (this.cookieService.check(this.hidPinsCookieName)) {
       const cookieStr = this.cookieService.get(this.hidPinsCookieName);
       this.hidPins = JSON.parse(cookieStr) as string[];
-      console.log(this.hidPins);
     } else {
       this.hidPins = [];
     }

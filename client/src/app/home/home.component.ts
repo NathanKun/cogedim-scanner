@@ -8,6 +8,8 @@ import {environment} from '../../environments/environment';
 import {ScrollService} from '../service/scroll.service';
 import {Router} from '@angular/router';
 
+declare const MeasureTool: any;
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -24,7 +26,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   center: google.maps.LatLngLiteral;
   options: google.maps.MapOptions = {
     mapTypeId: 'roadmap',
-    zoomControl: false,
+    zoomControl: true,
+    scaleControl: true,
     scrollwheel: true,
     disableDoubleClickZoom: true,
     maxZoom: 18,
@@ -117,6 +120,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     // restore scroll position
     this.scrollService.scrollHome();
+
+    // google maps mesure tool
+    // tslint:disable-next-line:no-unused-expression
+    new MeasureTool(this.map._googleMap, {
+      contextMenu: true,
+      showSegmentLength: true,
+      tooltip: true,
+      unit: MeasureTool.UnitTypeId.METRIC // metric, imperial, or nautical
+    });
   }
 
   @HostListener('window:scroll', ['$event'])
