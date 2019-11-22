@@ -23,7 +23,12 @@
   }
 }
 
-#left {
+@media (max-width: 800px) {
+  #left {
+    height: 90vh;
+    top: 64px;
+    position: relative;
+  }
 }
 
 #right {

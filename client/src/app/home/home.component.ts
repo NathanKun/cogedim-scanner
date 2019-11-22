@@ -1,4 +1,14 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  QueryList,
+  Renderer2,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
 import {GoogleMap, MapMarker} from '@angular/google-maps';
@@ -164,6 +174,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   programCardLocationClick(programName) {
     this.animateMarker(this.markerElements.find(m => m.getTitle() === programName));
+
+    // scroll to map if map is not in viewport
+    const mapDiv = this.map._googleMap.getDiv();
+    const rect = mapDiv.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight) {
+      mapDiv.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
   }
 
   hideProgramClick(pdl: ProgramDateLot) {
