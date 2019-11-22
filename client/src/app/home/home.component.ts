@@ -136,12 +136,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // show secure zones
     this.programService.getGoodCities().subscribe(
       (data) => {
-        this.map._googleMap.data.addGeoJson(data)
+        this.map._googleMap.data.addGeoJson(data);
         this.map._googleMap.data.setStyle({
           fillColor: '#66CCFF',
           strokeWeight: 1,
           strokeOpacity: 0.5,
-          strokeColor: '#CCCCCC'
+          strokeColor: '#CCCCCC',
+          clickable: false
         });
       }
     );
