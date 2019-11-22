@@ -89,6 +89,19 @@ export class BigmapComponent implements OnInit, AfterViewInit {
 
     // MeasureTool init will setClickableIcons to false
     this.map._googleMap.setClickableIcons(true);
+
+    // show secure zones
+    this.programService.getGoodCities().subscribe(
+      (data) => {
+        this.map._googleMap.data.addGeoJson(data)
+        this.map._googleMap.data.setStyle({
+          fillColor: '#66CCFF',
+          strokeWeight: 1,
+          strokeOpacity: 0.5,
+          strokeColor: '#CCCCCC'
+        });
+      }
+    );
   }
 
   markerClick(marker: MapMarker) {

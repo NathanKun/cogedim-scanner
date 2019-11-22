@@ -27,6 +27,37 @@ export class ProgramService extends BaseService {
   private bigMapPinsCache: BigMapPin[];
   private bigMapPinDetailCache: Map<string, BigMapPinDetail>; // program number  => BigMapPinDetail object
 
+  public getGoodCities(): Observable<any> {
+    return this.http.get<any>('/assets/goodcities.json')
+      .pipe(
+        map(
+          (array) => {
+            const data = {
+              "type": "FeatureCollection",
+              "features": []
+            };
+
+            for (const item of array) {
+              data.features.push(
+                {
+                  "type": "Feature",
+                  "properties": {
+                    "letter": "G",
+                    "color": "blue",
+                    "rank": "7",
+                    "ascii": "71"
+                  },
+                  "geometry": item.geojson
+                }
+              );
+            }
+
+            return data;
+          }
+        )
+      )
+  }
+
   public getBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
     if (this.bigMapPinDetailCache.has(pin.nid)) {
       return of(this.bigMapPinDetailCache.get(pin.nid));
