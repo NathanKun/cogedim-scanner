@@ -48,7 +48,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val crawlData = arrayOf(
                 "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5", // 92
                 "location=ile-de-france&department=Paris&rooms=3,4,5", // Paris
-                "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3,4,5" // L’ Accord Parfait - 78 Le Vésinet
+                "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
         )
         val results = mutableListOf<SearchResult>()
         var page = 0
