@@ -46,8 +46,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      */
     override fun requestSearchResults(): List<SearchResult> {
         val crawlData = arrayOf(
-                "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5",
-                "location=ile-de-france&department=Paris&rooms=3,4,5"
+                "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5", // 92
+                "location=ile-de-france&department=Paris&rooms=3,4,5", // Paris
+                "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3,4,5" // L’ Accord Parfait - 78 Le Vésinet
         )
         val results = mutableListOf<SearchResult>()
         var page = 0
@@ -109,7 +110,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
                 val blueprintDownloadButton = lotTag.select("div.lot-details div.buttons v-btn[@click.native*=blueprint]")
                 val blueprintDownloadButtonAttr = blueprintDownloadButton.attr("@click.native")
-                val blueprintId = Regex("event, ?[0-9]{4}, ?([0-9]{5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
+                val blueprintId = Regex("event, ?[0-9]{3,4}, ?([0-9]{4,5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
 
                 // no need to request blueprint pdf if no blueprint id
                 var requestPdf = blueprintId != null
