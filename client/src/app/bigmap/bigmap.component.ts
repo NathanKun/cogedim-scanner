@@ -6,8 +6,7 @@ import {environment} from '../../environments/environment';
 import {ProgramService} from '../service/program.service';
 import {BigMapPin} from '../model/bigmappin';
 import {BigMapPinDetail} from '../model/bigmappindetail';
-
-declare const MeasureTool: any;
+import {MapInitService} from '../service/mapinit.service';
 
 @Component({
   selector: 'app-bigmap',
@@ -48,7 +47,8 @@ export class BigmapComponent implements OnInit, AfterViewInit {
 
   constructor(private cookieService: CookieService,
               private titleService: Title,
-              private programService: ProgramService) {
+              private programService: ProgramService,
+              private mapInitService: MapInitService) {
   }
 
   ngOnInit() {
@@ -78,31 +78,8 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     const transitLayer = new google.maps.TransitLayer();
     transitLayer.setMap(this.map._googleMap);
 
-    // google maps mesure tool
-    // tslint:disable-next-line:no-unused-expression
-    new MeasureTool(this.map._googleMap, {
-      contextMenu: true,
-      showSegmentLength: true,
-      tooltip: true,
-      unit: MeasureTool.UnitTypeId.METRIC // metric, imperial, or nautical
-    });
-
-    // MeasureTool init will setClickableIcons to false
-    this.map._googleMap.setClickableIcons(true);
-
-    // show secure zones
-    this.programService.getGoodCities().subscribe(
-      (data) => {
-        this.map._googleMap.data.addGeoJson(data);
-        this.map._googleMap.data.setStyle({
-          fillColor: '#66CCFF',
-          strokeWeight: 1,
-          strokeOpacity: 0.5,
-          strokeColor: '#CCCCCC',
-          clickable: false
-        });
-      }
-    );
+    // init google map
+    this.mapInitService.initGoogleMap(this.map);
   }
 
   markerClick(marker: MapMarker) {

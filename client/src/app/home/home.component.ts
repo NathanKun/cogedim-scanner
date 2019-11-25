@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  OnInit,
-  QueryList,
-  Renderer2,
-  ViewChild,
-  ViewChildren
-} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, Renderer2, ViewChild, ViewChildren} from '@angular/core';
 import {ProgramService} from '../service/program.service';
 import {ProgramDateLot} from '../model/programdatelot';
 import {GoogleMap, MapMarker} from '@angular/google-maps';
@@ -17,8 +7,8 @@ import {Title} from '@angular/platform-browser';
 import {environment} from '../../environments/environment';
 import {ScrollService} from '../service/scroll.service';
 import {Router} from '@angular/router';
+import {MapInitService} from '../service/mapinit.service';
 
-declare const MeasureTool: any;
 
 @Component({
   selector: 'app-home',
@@ -53,7 +43,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
               private cookieService: CookieService,
               private titleService: Title,
               private programService: ProgramService,
-              private scrollService: ScrollService) {
+              private scrollService: ScrollService,
+              private mapInitService: MapInitService) {
   }
 
   async ngOnInit() {
@@ -63,24 +54,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
       async programDateLots => {
         this.programDateLots = programDateLots;
 
+        // set program's hided property
         for (const p of this.programDateLots) {
-          // hided program
           p.hided = this.cookieIsProgramHided(p.program.programNumber);
-
-          // google map marker
-          this.markerConfigs.push({
-            position: {
-              lat: parseFloat(p.program.latitude),
-              lng: parseFloat(p.program.longitude)
-            },
-            title: p.program.programName,
-            options: {
-              animation: google.maps.Animation.DROP,
-            },
-          } as MapMarker);
         }
 
-        // move all hided program to bottom
+        // move all hidden program to bottom
         let iTo = this.programDateLots.length;
         for (let i = 0; i < iTo; i++) {
           const pdl = this.programDateLots[i];
@@ -89,6 +68,21 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.programDateLots.splice(i, 1);
             this.programDateLots.push(pdl);
           }
+        }
+
+        // add google map marker
+        for (const p of this.programDateLots) {
+          this.markerConfigs.push({
+            position: {
+              lat: parseFloat(p.program.latitude),
+              lng: parseFloat(p.program.longitude)
+            },
+            title: p.program.programName,
+            options: {
+              animation: google.maps.Animation.DROP,
+              visible: !p.hided
+            },
+          } as MapMarker);
         }
 
         // request delivery info may take lots of time if the backend has no cache
@@ -128,34 +122,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
       res => this.programcards = res
     );
 
+    this.markerElements.changes.subscribe(
+      res => this.markerElements = res
+    );
+
     // restore scroll position
     this.scrollService.scrollHome();
 
-    // google maps mesure tool
-    // tslint:disable-next-line:no-unused-expression
-    new MeasureTool(this.map._googleMap, {
-      contextMenu: true,
-      showSegmentLength: true,
-      tooltip: true,
-      unit: MeasureTool.UnitTypeId.METRIC // metric, imperial, or nautical
-    });
-
-    // MeasureTool init will setClickableIcons to false
-    this.map._googleMap.setClickableIcons(true);
-
-    // show secure zones
-    this.programService.getGoodCities().subscribe(
-      (data) => {
-        this.map._googleMap.data.addGeoJson(data);
-        this.map._googleMap.data.setStyle({
-          fillColor: '#66CCFF',
-          strokeWeight: 1,
-          strokeOpacity: 0.5,
-          strokeColor: '#CCCCCC',
-          clickable: false
-        });
-      }
-    );
+    // init google map
+    this.mapInitService.initGoogleMap(this.map);
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -182,22 +157,33 @@ export class HomeComponent implements OnInit, AfterViewInit {
       mapDiv.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
-      })
+      });
     }
   }
 
   hideProgramClick(pdl: ProgramDateLot) {
     pdl.hided = true;
+    this.refreshMarkersVisibility();
     this.cookieSetProgramHided(pdl.program.programNumber, true);
   }
 
   unhideProgramClick(pdl: ProgramDateLot) {
     pdl.hided = false;
+    this.refreshMarkersVisibility();
     this.cookieSetProgramHided(pdl.program.programNumber, false);
   }
 
   showAllHidedPrograms(show: boolean) {
     this.hideHidPrograms = !show;
+    this.refreshMarkersVisibility();
+  }
+
+  private refreshMarkersVisibility() {
+    this.markerElements.forEach(
+      (marker, index) => {
+        marker._marker.setVisible(!this.hideHidPrograms ? true : !this.programDateLots[index].hided);
+      }
+    );
   }
 
   private animateMarker(marker: MapMarker) {

@@ -33,21 +33,21 @@ export class ProgramService extends BaseService {
         map(
           (array) => {
             const data = {
-              "type": "FeatureCollection",
-              "features": []
+              type: 'FeatureCollection',
+              features: []
             };
 
             for (const item of array) {
               data.features.push(
                 {
-                  "type": "Feature",
-                  "properties": {
-                    "letter": "G",
-                    "color": "blue",
-                    "rank": "7",
-                    "ascii": "71"
+                  type: 'Feature',
+                  properties: {
+                    letter: 'G',
+                    color: 'blue',
+                    rank: '7',
+                    ascii: '71'
                   },
-                  "geometry": item.geojson
+                  geometry: item.geojson
                 }
               );
             }
@@ -55,7 +55,7 @@ export class ProgramService extends BaseService {
             return data;
           }
         )
-      )
+      );
   }
 
   public getBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
