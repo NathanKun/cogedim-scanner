@@ -176,7 +176,8 @@ open class ProgramController {
     }
 
     private fun encodeUrl(url: String): String {
-        return url
+        return "https://" + url
+                .replace("https://", "") // avoid : being encoded
                 .split("/")
                 .joinToString("/") {
                     URLEncoder.encode(it, "UTF-8")
