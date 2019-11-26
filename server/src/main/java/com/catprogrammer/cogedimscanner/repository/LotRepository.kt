@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface LotRepository: JpaRepository<Lot, Long> {
     fun findByBlueprintIdOrderByIdDesc(blueprintId: String): List<Lot>
+
+    fun findAllByLotNumber(lotNumber: String): List<Lot>
 }

@@ -9,7 +9,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
-data class Lot (
+data class Lot(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long?,
@@ -19,12 +19,18 @@ data class Lot (
         val price: String,
         val blueprintId: String?,
         val pdfUrl: String?,
+        var remark: String?,
+        var decision: Decision,
         @CreationTimestamp
         val createdAt: LocalDateTime?,
         @UpdateTimestamp
         val modifiedAt: LocalDateTime?
 ) {
-        override fun toString(): String {
-                return "Lot(id=$id, lotNumber='$lotNumber', surface='$surface', floor='$floor', price='$price', pdfUrl='$pdfUrl', createdAt=$createdAt, modifiedAt=$modifiedAt)"
-        }
+    override fun toString(): String {
+        return "Lot(id=$id, lotNumber='$lotNumber', surface='$surface', floor='$floor', price='$price', pdfUrl='$pdfUrl', createdAt=$createdAt, modifiedAt=$modifiedAt)"
+    }
+}
+
+enum class Decision(s: String) {
+    GOOD("GOOD"), SECONDARY("SECONDARY"), BAD("BAD"), NONE("NONE")
 }

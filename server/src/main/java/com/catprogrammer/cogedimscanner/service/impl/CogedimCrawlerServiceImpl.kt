@@ -1,5 +1,6 @@
 package com.catprogrammer.cogedimscanner.service.impl
 
+import com.catprogrammer.cogedimscanner.entity.Decision
 import com.catprogrammer.cogedimscanner.entity.Lot
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.FormGetResult
@@ -144,7 +145,8 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                             oldPdfUrl
                         }
 
-                val lot = Lot(null, lotNumber, surface, floor, price, blueprintId, pdfUrl, null, null)
+                val lot = Lot(null, lotNumber, surface, floor, price, blueprintId, pdfUrl,
+                        null, Decision.NONE, null, null)
                 program.lots.add(lot)
                 lotRepository.save(lot)
                 logger.info("saved lot ${lot.lotNumber}")
