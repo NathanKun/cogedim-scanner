@@ -23,15 +23,15 @@
         <mat-card-content>
           <div id="main-info" [innerHTML]="injectMainInfo"></div>
           <div class="date-bar">
-            <button [disabled]="!hasPreviousDate" mat-button>
-              <mat-icon (click)="changeDate(false)">arrow_back_ios</mat-icon>
+            <button [disabled]="!hasPreviousDate" (click)="changeDate(false)" mat-button>
+              <mat-icon>arrow_back_ios</mat-icon>
             </button>
             <div class="row">
               <div class="col-12 text-align-center"><span>{{selectedDate}}</span></div>
               <div class="col-12 text-align-center"><span>{{selectedDateLotCount}}</span></div>
             </div>
-            <button [disabled]="!hasNextDate" mat-button>
-              <mat-icon (click)="changeDate(true)">arrow_forward_ios</mat-icon>
+            <button [disabled]="!hasNextDate" (click)="changeDate(true)" mat-button>
+              <mat-icon>arrow_forward_ios</mat-icon>
             </button>
           </div>
 
