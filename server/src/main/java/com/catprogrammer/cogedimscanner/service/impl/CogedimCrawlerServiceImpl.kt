@@ -52,17 +52,20 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
         )
         val results = mutableListOf<SearchResult>()
-        var page = 0
-        var res: SearchResult?
 
         for (data in crawlData) {
             logger.info("Crawling $data")
+            var page = 0
+            var res: SearchResult?
+
             do {
                 res = fetchSearchResult(page++, data)
                 if (res != null) {
                     results.add(res)
                 }
             } while (res?.hasMore != null && res.hasMore!!)
+
+            Thread.sleep(5000)
         }
 
         return results

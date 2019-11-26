@@ -31,7 +31,7 @@ open class MvcConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
                 .allowedHeaders("*")
-                .allowedMethods("GET", "POST")
+                .allowedMethods("GET", "POST", "PUT", "OPTIONS")
                 .allowedOrigins("http://localhost:4200", "https://cogedimscanner.catprogrammer.com")
                 .allowCredentials(true)
     }

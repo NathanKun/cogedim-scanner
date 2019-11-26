@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //因为使用JWT，所以不需要HttpSession
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                //OPTIONS请求全部放行
+                //OPTIONS
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 //登录接口放行
                 .antMatchers("/auth/login").permitAll()

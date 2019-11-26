@@ -1,7 +1,6 @@
 package com.catprogrammer.cogedimscanner.controller
 
 import com.catprogrammer.cogedimscanner.entity.Decision
-import com.catprogrammer.cogedimscanner.repository.LotRepository
 import com.catprogrammer.cogedimscanner.service.LotService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
