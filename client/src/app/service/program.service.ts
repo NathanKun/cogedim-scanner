@@ -8,6 +8,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AuthService} from './auth.service';
 import {BigMapPin} from '../model/bigmappin';
 import {BigMapPinDetail} from '../model/bigmappindetail';
+import {Lot} from '../model/lot';
 
 @Injectable({
   providedIn: 'root'
@@ -282,6 +283,7 @@ export class ProgramService extends BaseService {
   public flushUrl(url: string): Observable<string> {
     return this.http.post<string>(
       this.baseurl + '/flush?url=' + url,
+      {},
       {responseType: 'text' as 'json'});
   }
 

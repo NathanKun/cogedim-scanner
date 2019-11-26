@@ -4,10 +4,10 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {LoginComponent} from './login/login.component';
-import {AlertComponent} from './component/alert.component';
+import {AlertComponent} from './component/alert/alert.component';
 import {ProgramComponent} from './program/program.component';
 import {AuthGuard} from './service/authguard';
 import {CookieService} from 'ngx-cookie-service';
@@ -25,6 +25,8 @@ import {BigmapComponent} from './bigmap/bigmap.component';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIconModule} from '@angular/material/icon';
+import {AuthInterceptor} from './interceptor/auth.interceptor';
+import {EditInputComponent} from './component/edit-input/edit-input.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,8 @@ import {MatIconModule} from '@angular/material/icon';
     LoginComponent,
     AlertComponent,
     ProgramComponent,
-    BigmapComponent
+    BigmapComponent,
+    EditInputComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +60,10 @@ import {MatIconModule} from '@angular/material/icon';
     MatMenuModule,
     MatIconModule
   ],
-  providers: [AuthGuard, CookieService],
+  providers: [AuthGuard,
+    CookieService,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

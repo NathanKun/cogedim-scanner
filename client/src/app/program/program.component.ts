@@ -6,6 +6,8 @@ import {ProgramDateLot} from '../model/programdatelot';
 import {Lot} from '../model/lot';
 import {SafeHtml, Title} from '@angular/platform-browser';
 import {Sort} from '@angular/material/sort';
+import {Decision} from '../model/decision';
+import {LotService} from '../service/lot.service';
 
 @Component({
   selector: 'app-program',
@@ -18,7 +20,7 @@ export class ProgramComponent implements OnInit, AfterViewInit {
 
   dataSource: Lot[];
   originalData: Lot[];
-  displayedColumns: string[] = ['lotNumber', 'surface', 'floor', 'price', 'price_per_m2', 'pdf'];
+  displayedColumns: string[] = ['lotNumber', 'surface', 'floor', 'price', 'price_per_m2', 'pdf', 'decision', 'remark'];
 
   dates: string[];
   selectedDate: string;
@@ -29,10 +31,14 @@ export class ProgramComponent implements OnInit, AfterViewInit {
   injectSalesInfo: SafeHtml;
   injectMainInfo: SafeHtml;
 
+  // Store a reference to the enum
+  Decision = Decision;
+
   constructor(
     private route: ActivatedRoute,
     private titleService: Title,
-    private programService: ProgramService) {
+    private programService: ProgramService,
+    private lotService: LotService) {
   }
 
   ngOnInit() {
@@ -126,6 +132,20 @@ export class ProgramComponent implements OnInit, AfterViewInit {
     }
 
     return Math.ceil(price / surfaceToNumber(lot.surface)) + ' €';
+  }
+
+  decisionButtonOnClick(lot: Lot, decision: Decision) {
+    if (lot.decision !== decision) {
+      lot.decision = decision;
+      this.lotService.putLotProperty(lot, this.programDateLot.program, false, true);
+    }
+  }
+
+  remarkChanged(lot: Lot, remark: string) {
+    if (lot.remark !== remark) {
+      lot.remark = remark;
+      this.lotService.putLotProperty(lot, this.programDateLot.program, true, false);
+    }
   }
 }
 
