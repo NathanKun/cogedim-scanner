@@ -32,17 +32,17 @@
         </mat-card-content>
         <mat-card-actions>
           <a [href]="infoWindowBigMapPinDetail.url" target="_blank" mat-icon-button>
-            <i class="material-icons">web</i>
+            <mat-icon>web</mat-icon>
           </a>
           <button *ngIf="!infoWindowBigMapPinDetail.hid"
                   (click)="setPinHid(infoWindowBigMapPinDetail, true)"
                   mat-icon-button>
-            <i class="material-icons-outlined">remove_red_eye</i>
+            <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
           </button>
           <button *ngIf="infoWindowBigMapPinDetail.hid"
                   (click)="setPinHid(infoWindowBigMapPinDetail, false)"
                   mat-icon-button>
-            <i class="material-icons">remove_red_eye</i>
+            <mat-icon>remove_red_eye</mat-icon>
           </button>
         </mat-card-actions>
       </mat-card>
@@ -54,10 +54,10 @@
   <div #changeHideStateButton class="d-none">
     <button (click)="changeHideState()" mat-flat-button class="change-state-button p-0">
       <ng-container *ngIf="hideHidPins; else hideUnhidPins">
-        <i class="material-icons">remove_red_eye</i>
+        <mat-icon>remove_red_eye</mat-icon>
       </ng-container>
       <ng-template #hideUnhidPins>
-        <i class="material-icons-outlined">remove_red_eye</i>
+        <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
       </ng-template>
     </button>
   </div>

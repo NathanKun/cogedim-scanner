@@ -23,6 +23,8 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {ServiceWorkerModule} from '@angular/service-worker';
 import {BigmapComponent} from './bigmap/bigmap.component';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import {LazyLoadImageModule} from 'ng-lazyload-image';
     GoogleMapsModule,
     MatButtonModule,
     LazyLoadImageModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {enabled: true})
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: true}),
+    MatMenuModule,
+    MatIconModule
   ],
   providers: [AuthGuard, CookieService],
   bootstrap: [AppComponent]

@@ -45,19 +45,19 @@
             </mat-card-content>
             <mat-card-actions>
               <a [href]="p.program.url" target="_blank" mat-icon-button>
-                <i class="material-icons">web</i>
+                <mat-icon>web</mat-icon>
               </a>
               <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button>
-                <i class="material-icons">picture_as_pdf</i>
+                <mat-icon>picture_as_pdf</mat-icon>
               </a>
               <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
-                <i class="material-icons">pin_drop</i>
+                <mat-icon>pin_drop</mat-icon>
               </button>
               <button *ngIf="!p.hided" (click)="hideProgramClick(p)" mat-icon-button>
-                <i class="material-icons-outlined">remove_red_eye</i>
+                <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
               </button>
               <button *ngIf="p.hided" (click)="unhideProgramClick(p)" mat-icon-button>
-                <i class="material-icons">remove_red_eye</i>
+                <mat-icon>remove_red_eye</mat-icon>
               </button>
             </mat-card-actions>
           </mat-card>
@@ -66,11 +66,11 @@
       <div class="mb-3">
         <button (click)="showAllHidedPrograms(hideHidPrograms)" class="full-width" mat-button color="primary">
           <ng-container *ngIf="hideHidPrograms; else hideUnhidPrograms">
-            <i class="material-icons">remove_red_eye</i>
+            <mat-icon>remove_red_eye</mat-icon>
             Show hidden programs
           </ng-container>
           <ng-template #hideUnhidPrograms>
-            <i class="material-icons-outlined">remove_red_eye</i>
+            <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
             Hide unhidden programs
           </ng-template>
         </button>
