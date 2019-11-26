@@ -4,4 +4,6 @@ import com.catprogrammer.cogedimscanner.entity.Program
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
-interface ProgramRepository : JpaRepository<Program, Long>
+interface ProgramRepository : JpaRepository<Program, Long> {
+    fun findAllByProgramNumber(programNumber: String): List<Program>
+}

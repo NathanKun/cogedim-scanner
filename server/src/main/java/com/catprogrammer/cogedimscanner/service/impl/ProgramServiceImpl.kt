@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class ProgramServiceImpl : ProgramService {
+open class ProgramServiceImpl : ProgramService {
     @Autowired
     lateinit var programRepository: ProgramRepository
 
