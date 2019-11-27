@@ -30,9 +30,7 @@ export class LotService extends BaseService {
         }
       })
       .subscribe(
-        res => {
-          console.log('putLotProperty OK');
-          console.log(res);
+        () => {
         },
         error => {
           console.log('putLotProperty error');
