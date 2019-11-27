@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './service/auth.service';
 import {Router} from '@angular/router';
+import {PwaUpdateService} from './service/pwaupdate.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,9 @@ export class AppComponent implements OnInit {
   isAuthenticated = false;
 
   constructor(public authService: AuthService,
-              public router: Router) {
+              public router: Router,
+              private pwaUpdateService: PwaUpdateService) {
+    pwaUpdateService.subscribeAvailable();
   }
 
   ngOnInit() {

@@ -8,7 +8,6 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {AuthService} from './auth.service';
 import {BigMapPin} from '../model/bigmappin';
 import {BigMapPinDetail} from '../model/bigmappindetail';
-import {Lot} from '../model/lot';
 
 @Injectable({
   providedIn: 'root'

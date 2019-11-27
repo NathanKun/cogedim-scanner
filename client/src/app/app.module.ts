@@ -27,6 +27,7 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatIconModule} from '@angular/material/icon';
 import {AuthInterceptor} from './interceptor/auth.interceptor';
 import {EditInputComponent} from './component/edit-input/edit-input.component';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import {EditInputComponent} from './component/edit-input/edit-input.component';
     MatInputModule,
     MatListModule,
     MatToolbarModule,
+    MatSnackBarModule,
     FormsModule,
     ReactiveFormsModule,
     MatTableModule,
