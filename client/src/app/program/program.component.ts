@@ -104,6 +104,8 @@ export class ProgramComponent implements OnInit, AfterViewInit {
             priceToNumber(a.price) / surfaceToNumber(a.surface),
             priceToNumber(b.price) / surfaceToNumber(b.surface),
             isAsc);
+        case 'decision':
+          return compare(decisionToNumber(a.decision, isAsc), decisionToNumber(b.decision, isAsc), isAsc);
         default:
           return 0;
       }
@@ -178,5 +180,18 @@ function floorToNumber(s: string) {
     } else {
       return -1;
     }
+  }
+}
+
+function decisionToNumber(d: Decision, isAsc) {
+  switch (d) {
+    case Decision.GOOD:
+      return 3;
+    case Decision.SECONDARY:
+      return 2;
+    case Decision.BAD:
+      return 1;
+    default: // Decision.NONE or null
+      return isAsc ? 4 : 0;
   }
 }

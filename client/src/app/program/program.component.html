@@ -97,7 +97,7 @@
               </td>
             </ng-container>
             <ng-container matColumnDef="remark">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Remark</th>
+              <th mat-header-cell *matHeaderCellDef>Remark</th>
               <td mat-cell *matCellDef="let lot">
                 <app-edit-input [data]="lot['remark']" (focusOut)='remarkChanged(lot, $event)'></app-edit-input>
               </td>
