@@ -58,6 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/test").permitAll()
                 // allow /
                 .antMatchers("/").permitAll()
+                // allow localhost /internalFlushPrograms
+                .antMatchers("/internalFlushPrograms").access("hasIpAddress('127.0.0.1')")
                 //其他接口全部接受验证
                 .anyRequest().authenticated();
 

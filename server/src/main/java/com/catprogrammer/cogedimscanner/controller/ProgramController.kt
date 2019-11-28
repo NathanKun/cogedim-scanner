@@ -1,7 +1,9 @@
 package com.catprogrammer.cogedimscanner.controller
 
+import com.catprogrammer.cogedimscanner.entity.Decision
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
+import com.catprogrammer.cogedimscanner.service.LotService
 import com.catprogrammer.cogedimscanner.service.ProgramService
 import com.catprogrammer.cogedimscanner.service.impl.CogedimCrawlerServiceImpl.Companion.applyRequestHeaders
 import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil
@@ -23,10 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -48,17 +47,77 @@ open class ProgramController {
     private lateinit var programService: ProgramService
 
     @Autowired
+    private lateinit var lotService: LotService
+
+    @Autowired
     private lateinit var userDetailsService: UserDetailsService
 
     @Autowired
     private lateinit var jwtTokenUtil: JwtTokenUtil
 
+
+    /**
+     * /programs
+     */
+
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @GetMapping("/programs")
     @JsonView(Program.SimpleView::class)
+    @Cacheable(cacheNames = ["programs"], key = "'programsCacheKey'")
     open fun findAllGroupByProgramNumber(): List<ProgramDateLotDto> {
+        return internalFindAllGroupByProgramNumber()
+    }
+
+    @CachePut(cacheNames = ["programs"], key = "'programsCacheKey'")
+    open fun internalFindAllGroupByProgramNumber(): List<ProgramDateLotDto> {
         return programService.findProgramsGroupByProgramNumber()
     }
+
+    @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+    @PostMapping("/flushPrograms")
+    @CacheEvict(cacheNames = ["programs"], key = "'programsCacheKey'")
+    open fun flushCachePrograms() {
+        logger.info("Flush Cache /programs")
+    }
+
+    @PostMapping("/internalFlushPrograms")
+    @CacheEvict(cacheNames = ["programs"], key = "'programsCacheKey'")
+    open fun internalFlushCachePrograms(request: HttpServletRequest) {
+        logger.info("Internal flush Cache /programs")
+    }
+
+
+    /**
+     * update lot
+     */
+
+    @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+    @PutMapping("/program/{programNumber}/lot/{lotNumber}")
+    @CacheEvict(cacheNames = ["programs"], key = "'programsCacheKey'")
+    open fun setLotProperty(@PathVariable programNumber: String,
+                            @PathVariable lotNumber: String,
+                            @RequestParam(value = "remark", required = false) remark: String?,
+                            @RequestParam(value = "decision", required = false) decision: String?) {
+        val lots = lotService.findAllByProgramNumberAndLotNumber(programNumber, lotNumber)
+        lots.forEach { lot ->
+            if (remark != null) {
+                lot.remark = remark
+            }
+            if (decision != null) {
+                try {
+                    lot.decision = Decision.valueOf(decision)
+                } catch (e: IllegalArgumentException) {
+                    logger.warn("parameter decision = '$decision' is not a valid value of enum Decision")
+                }
+            }
+            lotService.save(lot)
+        }
+    }
+
+
+    /**
+     * /program, /resource
+     */
 
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @GetMapping("/program")
@@ -167,13 +226,14 @@ open class ProgramController {
         }
     }
 
+
     /**
      * evict cache schedule
      */
     @CacheEvict(allEntries = true)
     @Scheduled(fixedDelay = (7 * 24 * 60 * 60 * 1000).toLong(), initialDelay = 2000)
-    open fun flushCacheAllEntries() {
-        logger.info("Flush Cache")
+    open fun flushCacheAllResources() {
+        logger.info("Flush Cache Resources")
     }
 
     private fun encodeUrl(url: String): String {
