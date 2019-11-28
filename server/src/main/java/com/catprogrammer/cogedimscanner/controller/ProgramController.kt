@@ -2,6 +2,7 @@ package com.catprogrammer.cogedimscanner.controller
 
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
+import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
 import com.catprogrammer.cogedimscanner.service.ProgramService
 import com.catprogrammer.cogedimscanner.service.impl.CogedimCrawlerServiceImpl.Companion.applyRequestHeaders
 import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil
@@ -132,7 +133,7 @@ open class ProgramController {
 
                 val urlEncoded = encodeUrl(url)
                 logger.info("requesting $urlEncoded")
-                val conn = applyRequestHeaders(URL(urlEncoded).openConnection(), false)
+                val conn = applyRequestHeaders(getDeveloperFromUrl(url), URL(urlEncoded).openConnection(), false)
                 val str = IOUtils.toString(GZIPInputStream(conn.getInputStream()), StandardCharsets.UTF_8)
                 ResponseEntity
                         .ok()
@@ -147,7 +148,7 @@ open class ProgramController {
     @CachePut(key = "#resourceUrl")
     open fun internalFetchResource(resourceUrl: String): ResponseEntity<ByteArray> {
         val url = encodeUrl(resourceUrl)
-        val conn = applyRequestHeaders(URL(url).openConnection(), false) as HttpURLConnection
+        val conn = applyRequestHeaders(getDeveloperFromUrl(url), URL(url).openConnection(), false) as HttpURLConnection
 
         return if (conn.responseCode >= 400) {
             val resp = IOUtils.toString(conn.errorStream, StandardCharsets.UTF_8)
@@ -182,5 +183,19 @@ open class ProgramController {
                 .joinToString("/") {
                     URLEncoder.encode(it, "UTF-8")
                 }
+    }
+
+    private fun getDeveloperFromUrl(url: String): RealEstateDeveloper {
+        return when {
+            url.contains("cogedim.com", ignoreCase = true) -> {
+                RealEstateDeveloper.COGEDIM
+            }
+            url.contains("kaufmanbroad", ignoreCase = true) -> {
+                RealEstateDeveloper.KAUFMANBROAD
+            }
+            else -> {
+                throw Exception("url does not belongs to any developer. Url = $url")
+            }
+        }
     }
 }

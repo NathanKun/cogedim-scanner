@@ -5,6 +5,7 @@ import com.catprogrammer.cogedimscanner.entity.Lot
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.FormGetResult
 import com.catprogrammer.cogedimscanner.model.NearbyProgram
+import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
 import com.catprogrammer.cogedimscanner.model.SearchResult
 import com.catprogrammer.cogedimscanner.repository.LotRepository
 import com.catprogrammer.cogedimscanner.repository.ProgramRepository
@@ -33,8 +34,8 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
     private val gson = Gson()
     private val type: Type = object : TypeToken<List<NearbyProgram>>() {}.type
-    private val baseurl = "https://www.cogedim.com"
-    private val contactinfo = "contact_info_known=true&contact_info%5BformCivility%5D=02&contact_info%5BformFirstName%5D=Not&contact_info%5BformLastName%5D=APerson&contact_info%5BformPhone%5D=0660600660&contact_info%5BformEmail%5D=notanemail%40gmail.com&contact_info%5BformLocation%5D=Paris&contact_info%5BformCity%5D=Paris&contact_info%5BformPostalCode%5D=75000&contact_info%5BformRegion%5D=%C3%8Ele-de-France&contact_info%5BformCountry%5D=France&contact_info%5BformDestination%5D=habiter"
+    private val contactinfoC = "contact_info_known=true&contact_info[formCivility]=02&contact_info[formFirstName]=Not&contact_info[formLastName]=APerson&contact_info[formPhone]=0660600660&contact_info[formEmail]=not@an.email&contact_info[formLocation]=Paris&contact_info[formCity]=Paris&contact_info[formPostalCode]=75000&contact_info[formRegion]=%C3%8Ele-de-France&contact_info[formCountry]=France&contact_info[formDestination]=habiter"
+    private val contactinfoK = "country=France&region=Normandie&department=Seine-Maritime&city=Rouen&postal_code=76000&email=not@an.emails&last_name=NOT&first_name=Aperson&civility=1&destination=habiter&location=Rouen&phone=0660606006"
 
     @Autowired
     private lateinit var programRepository: ProgramRepository
@@ -46,26 +47,39 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      * Return a list of SearchResult object.
      */
     override fun requestSearchResults(): List<SearchResult> {
-        val crawlData = arrayOf(
-                "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5", // 92
-                "location=ile-de-france&department=Paris&rooms=3,4,5", // Paris
-                "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
+        val crawlData = mapOf(
+                RealEstateDeveloper.COGEDIM to arrayOf(/*
+                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5", // 92
+                        "location=ile-de-france&department=Paris&rooms=3,4,5", // Paris
+                        "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
+                */),
+                RealEstateDeveloper.KAUFMANBROAD to arrayOf(
+                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5"
+                )
         )
         val results = mutableListOf<SearchResult>()
 
-        for (data in crawlData) {
-            logger.info("Crawling $data")
-            var page = 0
-            var res: SearchResult?
+        // for each developer
+        for (entry in crawlData) {
+            val developer = entry.key
+            val dataArray = entry.value
 
-            do {
-                res = fetchSearchResult(page++, data)
-                if (res != null) {
-                    results.add(res)
-                }
-            } while (res?.hasMore != null && res.hasMore!!)
+            // for each data for post request
+            for (data in dataArray) {
+                logger.info("Crawling ${developer.name} $data")
+                var page = 0
+                var res: SearchResult?
 
-            Thread.sleep(5000)
+                do {
+                    res = fetchSearchResult(developer, page++, data)
+                    if (res != null) {
+                        res.developer = developer
+                        results.add(res)
+                    }
+                } while (res?.hasMore != null && res.hasMore!!)
+
+                Thread.sleep(5000)
+            }
         }
 
         return results
@@ -76,7 +90,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      * Parse a list of SearchResult object.
      * Find and save all programs and lots.
      */
-    override fun parseSearchResuls(results: List<SearchResult>, onlyRequestMissingBlueprintPdf: Boolean) {
+    override fun parseSearchResults(results: List<SearchResult>, onlyRequestMissingBlueprintPdf: Boolean) {
         results.filter { it.results != null && it.results.size() > 0 }.forEach { searchResult ->
             val drupalSettings = searchResult.drupalSettings
             val nearbyPrograms: List<NearbyProgram> =
@@ -88,10 +102,20 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                     }
 
             searchResult.results?.forEach { result ->
-                val article = Jsoup.parse(result.asString)
+                var article = Jsoup.parse(result.asString)
                 // val article = Jsoup.parse(mokeArticle)
-                val program = parseSearchResultProgram(article, nearbyPrograms)
-                parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
+                val program = parseSearchResultProgram(searchResult.developer!!, article, nearbyPrograms)
+
+                if (program.developer == RealEstateDeveloper.KAUFMANBROAD) {
+                    val conn = applyRequestHeaders(program.developer, URL(program.url).openConnection(), false)
+                    val html = IOUtils.toString(
+                            GZIPInputStream(conn.getInputStream()),
+                            StandardCharsets.UTF_8
+                    )
+                    article = Jsoup.parse(html)
+                }
+
+                parseSearchResultLot(searchResult.developer!!, article, program, onlyRequestMissingBlueprintPdf)
                 programRepository.save(program)
                 logger.info("saved program ${program.programName} ${program.programNumber}")
             }
@@ -102,10 +126,19 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     /**
      * Parse the <article> dom object, find all lot and link to the given Program object and save
      */
-    private fun parseSearchResultLot(article: Document, program: Program, onlyRequestMissingBlueprintPdf: Boolean) {
-        article.select("v-expansion-panel[class^=regulation-] > *").forEach { programTypeTag ->
+    private fun parseSearchResultLot(developer: RealEstateDeveloper, article: Document, program: Program, onlyRequestMissingBlueprintPdf: Boolean) {
+        val selector1 = when (program.developer) {
+            RealEstateDeveloper.COGEDIM -> "v-expansion-panel[class^=regulation-] > *"
+            RealEstateDeveloper.KAUFMANBROAD -> "#tab-regulation-17"
+        }
+        val selector2 = when (program.developer) {
+            RealEstateDeveloper.COGEDIM -> "v-expansion-panel v-expansion-panel-content[ripple]"
+            RealEstateDeveloper.KAUFMANBROAD -> "v-expansion-panel-content[ref^=expand]"
+        }
+
+        article.select(selector1).forEach { programTypeTag ->
             // for each lot type. eg: 3 pièces, 4 pièces, etc
-            programTypeTag.select("v-expansion-panel v-expansion-panel-content[ripple]").forEach { lotTag ->
+            programTypeTag.select(selector2).forEach { lotTag ->
                 // for each lot
                 val lotNumber = lotTag.select("span.lot-lot_number").text()
                 val surface = lotTag.select("span.lot-surface").text()
@@ -139,9 +172,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                                 // avoid being banned
                                 Thread.sleep(10000)
 
-                                val blueprintUrl = fetchFormBlueprint(program.programNumber, blueprintId)
+                                val blueprintUrl = fetchFormBlueprint(developer, program.programNumber, blueprintId)
                                 if (blueprintUrl != null) {
-                                    baseurl + parseFormGetResultGetPdfUrl(blueprintUrl)
+                                    developer.baseurl + parseFormGetResultGetPdfUrl(developer, blueprintUrl)
                                 } else null
                             } else null
                         } else {
@@ -160,9 +193,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     /**
      * Parse the <article> dom object, find it's program, instantiate, save and return the Program object
      */
-    private fun parseSearchResultProgram(article: Document, nearbyPrograms: List<NearbyProgram>): Program {
+    private fun parseSearchResultProgram(developer: RealEstateDeveloper, article: Document, nearbyPrograms: List<NearbyProgram>): Program {
         val programName = article.select("div.info-box h2 span").text()
-        val programId = article.select("article[is=program-card-std]").attr("class")
+        val programId = article.select("article[is^=program-card-]").attr("class")
                 .split(" ")
                 .first { s -> s.startsWith("program-") }
                 .replace("program-", "")
@@ -177,56 +210,87 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             }
         }
 
-        val url = baseurl + article.select("div.visual .gradient a.more-link").attr("href")
-        val imgUrl = baseurl + article.select("div.visual img").attr("src")
+        val url = developer.baseurl +
+                when (developer) {
+                    RealEstateDeveloper.COGEDIM -> article.select("div.visual .gradient a.more-link").attr("href")
+                    RealEstateDeveloper.KAUFMANBROAD -> article.select("a.program-link").attr("href")
+                }
+        val imgUrl = developer.baseurl + article.select("div.visual img").attr("src")
                 .replace("/styles/visual_327x188/public", "") // remove resize
                 .replace(Regex("\\?itok.*"), "") // remove param
 
-        val leafletForm = fetchFormLeaflet(programId)
-        val pdfUrl = if (leafletForm != null) (baseurl + parseFormGetResultGetPdfUrl(leafletForm)) else null
+        val leafletForm = fetchFormLeaflet(developer, programId)
+        val pdfUrl = if (leafletForm != null) (developer.baseurl + parseFormGetResultGetPdfUrl(developer, leafletForm)) else null
 
         val nearbyProgram = nearbyPrograms.first { p -> p.nid == programId }
         val latitude = nearbyProgram.lat
         val longitude = nearbyProgram.lng
 
-        val program = Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
+        val program = Program(null, developer, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
                 latitude, longitude, mutableListOf(), null, null)
         programRepository.save(program)
 
         return program
     }
 
-    private fun parseFormGetResultGetPdfUrl(result: FormGetResult): String {
-        return Jsoup.parse(result.form).select("div.confirmation a").attr("href")
+    private fun parseFormGetResultGetPdfUrl(developer: RealEstateDeveloper, result: FormGetResult): String {
+        return when (developer) {
+            RealEstateDeveloper.COGEDIM -> Jsoup.parse(result.form).select("div.confirmation a").attr("href")
+            RealEstateDeveloper.KAUFMANBROAD -> Jsoup.parse(result.confirmation).select("div.download-btn v-btn").attr("href")
+        }
     }
 
-    private fun fetchSearchResult(page: Int, data: String): SearchResult? {
+    private fun fetchSearchResult(developer: RealEstateDeveloper, page: Int, data: String): SearchResult? {
+        val url = when {
+            developer === RealEstateDeveloper.COGEDIM -> {
+                "https://www.cogedim.com"
+            }
+            developer === RealEstateDeveloper.KAUFMANBROAD -> {
+                "https://www.kaufmanbroad.fr"
+            }
+            else -> {
+                throw Exception("Developer")
+            }
+        }
+
         return postRequest(
-                "https://www.cogedim.com/search-results?page=$page",
+                developer,
+                "$url/search-results?page=$page",
                 data,
                 SearchResult::class.javaObjectType
         )
     }
 
-    private fun fetchFormBlueprint(programNumber: String, lotNumber: String): FormGetResult? {
+    private fun fetchFormBlueprint(developer: RealEstateDeveloper, programNumber: String, lotNumber: String): FormGetResult? {
         return postRequest(
+                developer,
                 "https://www.cogedim.com/form-get",
-                "form=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfo",
+                "form=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfoC",
                 FormGetResult::class.javaObjectType
         )
     }
 
-    private fun fetchFormLeaflet(programNumber: String): FormGetResult? {
-        return postRequest(
-                "https://www.cogedim.com/form-get",
-                "form=re_forms_leaflet&program_nid=$programNumber&$contactinfo",
-                FormGetResult::class.javaObjectType
-        )
+    private fun fetchFormLeaflet(developer: RealEstateDeveloper, programNumber: String): FormGetResult? {
+
+        return when (developer) {
+            RealEstateDeveloper.COGEDIM -> postRequest(
+                    developer,
+                    "${developer.baseurl}/form-get",
+                    "form=${developer.leafletParam}&program_nid=$programNumber&$contactinfoC",
+                    FormGetResult::class.javaObjectType
+            )
+            RealEstateDeveloper.KAUFMANBROAD -> postRequest(
+                    developer,
+                    "${developer.baseurl}/form-post",
+                    "form_id=${developer.leafletParam}&program_nid=$programNumber&$contactinfoK",
+                    FormGetResult::class.javaObjectType
+            )
+        }
     }
 
-    private fun <T> postRequest(url: String, writeData: String, gsonType: Class<T>): T? {
+    private fun <T> postRequest(developer: RealEstateDeveloper, url: String, writeData: String, gsonType: Class<T>): T? {
         val conn = (URL(url).openConnection() as HttpURLConnection).apply {
-            applyRequestHeaders(this, true)
+            applyRequestHeaders(developer, this, true)
         }
 
         conn.outputStream.use { os ->
@@ -259,7 +323,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     }
 
     companion object {
-        fun applyRequestHeaders(conn: URLConnection, isPost: Boolean): URLConnection = conn.apply {
+        fun applyRequestHeaders(developer: RealEstateDeveloper, conn: URLConnection, isPost: Boolean): URLConnection = conn.apply {
             if (isPost) {
                 (this as HttpURLConnection).requestMethod = "POST"
                 doOutput = true
@@ -267,14 +331,14 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             }
             setRequestProperty("Pragma", "no-cache")
             setRequestProperty("Sec-Fetch-Site", "same-origin")
-            setRequestProperty("Origin", "https://www.cogedim.com")
+            setRequestProperty("Origin", developer.baseurl)
             setRequestProperty("Accept-Encoding", "gzip, deflate, br")
             setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,zh-TW;q=0.5")
             setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 XL Build/OPD1.170816.004) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36")
             setRequestProperty("Sec-Fetch-Mode", "cors")
             setRequestProperty("Accept", "application/json, text/plain, */*")
             setRequestProperty("Cache-Control", "no-cache")
-            setRequestProperty("Referer", "https://www.cogedim.com/programme-immobilier-neuf/m8j9/")
+            setRequestProperty("Referer", developer.baseurl)
             setRequestProperty("Cookie", "BACKENDID=COGEDIM-WEB-01; _gcl_au=1.1.25026551.1571652669; _ga=GA1.2.952906528.1571652669; _gid=GA1.2.1470064266.1571652669; __sonar=198838560166151756; _fbp=fb.1.1571652669541.1487313776; gwcc=%7B%22fallback%22%3A%220970255255%22%2C%22clabel%22%3A%22gO6yCLyn9ooBEN_DucMD%22%2C%22backoff%22%3A86400%2C%22backoff_expires%22%3A1571739069%7D; CookieConsent={stamp:\\'QVcpBClEOrYbHJsETUMHoiUDAGjhCNRwq538sc/7iFVZZ0pFv/CWGw==\\'%2Cnecessary:true%2Cpreferences:true%2Cstatistics:true%2Cmarketing:true%2Cver:1%2Cutc:1571652681875}; _gat_UA-57280140-1=1")
             setRequestProperty("Connection", "keep-alive")
         }

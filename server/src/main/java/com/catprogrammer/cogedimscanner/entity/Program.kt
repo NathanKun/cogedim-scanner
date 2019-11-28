@@ -1,5 +1,6 @@
 package com.catprogrammer.cogedimscanner.entity
 
+import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
 import com.fasterxml.jackson.annotation.JsonView
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -11,6 +12,7 @@ data class Program(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long?,
+        val developer: RealEstateDeveloper,
         val programName: String,
         val programNumber: String,
         val postalCode: String,
@@ -29,5 +31,5 @@ data class Program(
         val modifiedAt: LocalDateTime?
 ) {
     interface SimpleView
-    interface LotsView: SimpleView
+    interface LotsView : SimpleView
 }

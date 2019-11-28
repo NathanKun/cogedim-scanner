@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-class CronCrawler {
+open class CronCrawler {
 
     private val logger = LoggerFactory.getLogger(CronCrawler::class.java)
 
@@ -19,7 +19,7 @@ class CronCrawler {
     fun cron() {
         logger.info("Crawler cron starts")
         val res = cogedimCrawlerService?.requestSearchResults()
-        cogedimCrawlerService?.parseSearchResuls(res!!, true)
+        cogedimCrawlerService?.parseSearchResults(res!!, true)
         logger.info("Crawler cron ends")
     }
 }
