@@ -6,9 +6,9 @@ import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.FormGetResult
 import com.catprogrammer.cogedimscanner.model.NearbyProgram
 import com.catprogrammer.cogedimscanner.model.SearchResult
-import com.catprogrammer.cogedimscanner.repository.LotRepository
-import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.CogedimCrawlerService
+import com.catprogrammer.cogedimscanner.service.LotService
+import com.catprogrammer.cogedimscanner.service.ProgramService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.apache.commons.io.IOUtils
@@ -37,9 +37,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     private val contactinfo = "contact_info_known=true&contact_info%5BformCivility%5D=02&contact_info%5BformFirstName%5D=Not&contact_info%5BformLastName%5D=APerson&contact_info%5BformPhone%5D=0660600660&contact_info%5BformEmail%5D=notanemail%40gmail.com&contact_info%5BformLocation%5D=Paris&contact_info%5BformCity%5D=Paris&contact_info%5BformPostalCode%5D=75000&contact_info%5BformRegion%5D=%C3%8Ele-de-France&contact_info%5BformCountry%5D=France&contact_info%5BformDestination%5D=habiter"
 
     @Autowired
-    private lateinit var programRepository: ProgramRepository
+    private lateinit var programService: ProgramService
     @Autowired
-    private lateinit var lotRepository: LotRepository
+    private lateinit var lotService: LotService
 
     /**
      * Send one or multiple requests to fetch all program from Cogedim.
@@ -92,7 +92,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 // val article = Jsoup.parse(mokeArticle)
                 val program = parseSearchResultProgram(article, nearbyPrograms)
                 parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
-                programRepository.save(program)
+                programService.save(program)
                 logger.info("saved program ${program.programName} ${program.programNumber}")
             }
         }
@@ -116,19 +116,18 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val blueprintDownloadButtonAttr = blueprintDownloadButton.attr("@click.native")
                 val blueprintId = Regex("event, ?[0-9]{3,4}, ?([0-9]{4,5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
 
+                val oldLots = lotService.findAllByProgramNumberAndLotNumber(program.programNumber, lotNumber)
+
                 // no need to request blueprint pdf if no blueprint id
                 var requestPdf = blueprintId != null
                 var oldPdfUrl: String? = null
                 // check if already request pdf of this blueprint
                 if (requestPdf) {
-                    val sameLots = lotRepository.findByBlueprintIdOrderByIdDesc(blueprintId!!)
-                    if (sameLots.isNotEmpty()) {
-                        val sameLot = sameLots.first()
-                        if (sameLot.blueprintId != null) {
-                            // if already have the pdf url, not requesting it again if onlyRequestMissingBlueprintPdf is true
-                            requestPdf = !onlyRequestMissingBlueprintPdf
-                            oldPdfUrl = sameLot.pdfUrl
-                        }
+                    val lotHasBlueprintId = oldLots.find { l -> l.blueprintId == blueprintId!! }
+                    if (lotHasBlueprintId?.pdfUrl != null) {
+                        // if already have the pdf url, not requesting it again if onlyRequestMissingBlueprintPdf is true
+                        requestPdf = !onlyRequestMissingBlueprintPdf
+                        oldPdfUrl = lotHasBlueprintId.pdfUrl
                     }
                 }
 
@@ -148,10 +147,15 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                             oldPdfUrl
                         }
 
+                val lotsHaveDecision = oldLots.find { l -> l.decision != Decision.NONE }
+                val decision = lotsHaveDecision?.decision ?: Decision.NONE
+
+                val lotsHasRemark = oldLots.find { l -> l.remark != null }
+
                 val lot = Lot(null, lotNumber, surface, floor, price, blueprintId, pdfUrl,
-                        null, Decision.NONE, null, null)
+                        lotsHasRemark?.remark, decision, null, null)
                 program.lots.add(lot)
-                lotRepository.save(lot)
+                lotService.save(lot)
                 logger.info("saved lot ${lot.lotNumber}")
             }
         }
@@ -191,7 +195,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
         val program = Program(null, programName, programId, postalCode, address, url, imgUrl, pdfUrl,
                 latitude, longitude, mutableListOf(), null, null)
-        programRepository.save(program)
+        programService.save(program)
 
         return program
     }

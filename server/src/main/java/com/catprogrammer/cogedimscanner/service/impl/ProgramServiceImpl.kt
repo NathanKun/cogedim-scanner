@@ -1,6 +1,7 @@
 package com.catprogrammer.cogedimscanner.service.impl
 
 import com.catprogrammer.cogedimscanner.entity.Lot
+import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
 import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.ProgramService
@@ -28,5 +29,9 @@ open class ProgramServiceImpl : ProgramService {
         }
 
         return res
+    }
+
+    override fun save(p: Program): Program {
+        return programRepository.save(p)
     }
 }
