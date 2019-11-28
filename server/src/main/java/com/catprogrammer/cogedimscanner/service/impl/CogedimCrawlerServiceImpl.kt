@@ -76,7 +76,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      * Parse a list of SearchResult object.
      * Find and save all programs and lots.
      */
-    override fun parseSearchResuls(results: List<SearchResult>, onlyRequestMissingBlueprintPdf: Boolean) {
+    override fun parseSearchResults(results: List<SearchResult>, onlyRequestMissingBlueprintPdf: Boolean) {
         results.filter { it.results != null && it.results.size() > 0 }.forEach { searchResult ->
             val drupalSettings = searchResult.drupalSettings
             val nearbyPrograms: List<NearbyProgram> =
@@ -260,6 +260,10 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             }
             null
         }
+    }
+
+    override fun flushPrograms() {
+        URL("https://127.0.0.1:8080/internalFlushPrograms").openConnection()
     }
 
     companion object {
