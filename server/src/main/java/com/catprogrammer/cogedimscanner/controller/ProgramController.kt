@@ -118,9 +118,9 @@ open class ProgramController {
         return "OK"
     }
 
-    @CachePut(key = "#url")
+    @Suppress("SpringElInspection")
+    @CachePut(key = "#url", unless = "#result.statusCode != 200")
     open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
-
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
             synchronized(this) {
@@ -144,7 +144,8 @@ open class ProgramController {
         }
     }
 
-    @CachePut(key = "#resourceUrl")
+    @Suppress("SpringElInspection")
+    @CachePut(key = "#resourceUrl", unless = "#result.statusCode != 200")
     open fun internalFetchResource(resourceUrl: String): ResponseEntity<ByteArray> {
         val url = encodeUrl(resourceUrl)
         val conn = applyRequestHeaders(URL(url).openConnection(), false) as HttpURLConnection
