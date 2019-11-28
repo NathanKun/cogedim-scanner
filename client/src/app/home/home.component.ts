@@ -52,23 +52,23 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     this.programService.getProgramDateLots().subscribe(
       async programDateLots => {
-        this.programDateLots = programDateLots;
 
         // set program's hided property
-        for (const p of this.programDateLots) {
+        for (const p of programDateLots) {
           p.hided = this.cookieIsProgramHided(p.program.programNumber);
         }
 
         // move all hidden program to bottom
-        let iTo = this.programDateLots.length;
-        for (let i = 0; i < iTo; i++) {
-          const pdl = this.programDateLots[i];
+        const hidPrograms = [];
+        for (let i = programDateLots.length - 1; i >= 0; i--) {
+          const pdl = programDateLots[i];
           if (pdl.hided) {
-            iTo--;
-            this.programDateLots.splice(i, 1);
-            this.programDateLots.push(pdl);
+            hidPrograms.push(programDateLots.splice(i, 1)[0]);
           }
         }
+        programDateLots = programDateLots.concat(hidPrograms);
+
+        this.programDateLots = programDateLots;
 
         // add google map marker
         for (const p of this.programDateLots) {
