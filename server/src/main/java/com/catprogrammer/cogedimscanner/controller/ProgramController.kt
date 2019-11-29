@@ -43,6 +43,8 @@ open class ProgramController {
 
     private var lastFetchAt: Long = 0L
 
+    private val lock = Any()
+
     @Autowired
     private lateinit var programService: ProgramService
 
@@ -182,7 +184,7 @@ open class ProgramController {
     open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
         return if (url.startsWith("https://www.cogedim.com/")) {
             // avoid requesting cogedim's server concurrently
-            synchronized(this) {
+            synchronized(lock) {
                 val lastFetchDiff = System.currentTimeMillis() - lastFetchAt
                 if (lastFetchDiff < 5000) {
                     Thread.sleep(5000 - lastFetchDiff)
