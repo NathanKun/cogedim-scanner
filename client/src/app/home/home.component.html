@@ -22,7 +22,11 @@
     <ng-container *ngIf="programDateLots">
       <ng-container *ngFor="let p of programDateLots">
         <!--suppress JSUnusedGlobalSymbols -->
-        <div #programcard class="my-3" *ngIf="!p.hided || !hideHidPrograms">
+        <div #programcard
+             class="my-3 mat-elevation-z2" *ngIf="!p.hided || !hideHidPrograms"
+             matRipple
+             [matRippleRadius]="666"
+             [matRippleColor]="'#66ccff33'">
           <mat-card>
             <mat-card-header>
               <mat-card-title>

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { BigmapComponent } from './bigmap.component';
+import {BigmapComponent} from './bigmap.component';
 
 describe('BigmapComponent', () => {
   let component: BigmapComponent;
@@ -8,9 +8,9 @@ describe('BigmapComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BigmapComponent ]
+      declarations: [BigmapComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
