@@ -84,8 +84,9 @@ open class ProgramController {
 
     @PostMapping("/internalFlushPrograms")
     @CacheEvict(cacheNames = ["programs"], key = "'programsCacheKey'")
-    open fun internalFlushCachePrograms(request: HttpServletRequest) {
+    open fun internalFlushCachePrograms(request: HttpServletRequest): String {
         logger.info("Internal flush Cache /programs")
+        return "Internal flush Cache /programs OK"
     }
 
 

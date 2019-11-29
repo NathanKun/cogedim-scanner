@@ -263,7 +263,10 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     }
 
     override fun flushPrograms() {
-        URL("https://127.0.0.1:8080/internalFlushPrograms").openConnection()
+        logger.info("Flush...")
+        val conn = URL("http://127.0.0.1:8080/internalFlushPrograms").openConnection()
+        (conn as HttpURLConnection).requestMethod = "POST"
+        logger.info(IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8))
     }
 
     companion object {
