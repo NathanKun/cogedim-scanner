@@ -71,6 +71,11 @@ table {
       margin: 0 8px 0 0;
     }
 
+    .icons + span,
+    .line {
+      vertical-align: middle;
+    }
+
     .event-title {
       color: #a1217d;
       font-size: 18px;
@@ -82,6 +87,14 @@ table {
     .catchline-strengths-group {
       margin-top: 1vh;
     }
+
+    .program-infos {
+      margin-bottom: 3vh;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
   }
 }
 
@@ -92,6 +105,10 @@ table {
 #program-inject ::ng-deep {
   h2 {
     font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1rem;
   }
 
   .strate-title {

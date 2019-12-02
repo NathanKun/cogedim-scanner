@@ -1,5 +1,6 @@
 export interface Program {
   id: number;
+  developer: string;
   programName: string;
   programNumber: string;
   postalCode: string;

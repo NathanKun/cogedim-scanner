@@ -168,11 +168,16 @@ function compare(a: number, b: number, isAsc: boolean) {
 }
 
 function surfaceToNumber(p: string): number {
-  return +p.replace(/ /g, '').replace('m2', '');
+  return +p
+    .replace(/ /g, '')
+    .replace('m2', '')
+    .replace(',', '.');
 }
 
 function priceToNumber(p: string): number {
-  return +p.replace(/ /g, '').replace('€', '');
+  return +p
+    .replace(/ /g, '')
+    .replace('€', '');
 }
 
 function floorToNumber(s: string) {

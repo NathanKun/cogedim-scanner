@@ -22,7 +22,7 @@ export class LotService extends BaseService {
       body = body ? (body + '&') : '';
       body = body + 'decision=' + lot.decision;
     }
-    this.http.put(this.baseurl + '/program/' + program.programNumber + '/lot/' + lot.lotNumber,
+    this.http.put(program.developer + '/' + this.baseurl + '/program/' + program.programNumber + '/lot/' + lot.lotNumber,
       body,
       {
         headers: {

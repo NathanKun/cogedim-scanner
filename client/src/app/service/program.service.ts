@@ -202,7 +202,14 @@ export class ProgramService extends BaseService {
       map(
         html => {
           const doc = new DOMParser().parseFromString(html.toString(), 'text/html');
-          const div = doc.querySelector('.informations');
+
+          let div;
+          if (url.indexOf('cogedim') !== -1) {
+            div = doc.querySelector('.informations');
+          } else {
+            div = doc.querySelector('.program-infos');
+          }
+
           return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
         }
       )
@@ -214,7 +221,32 @@ export class ProgramService extends BaseService {
       map(
         str => {
           const doc = new DOMParser().parseFromString(str, 'text/html');
-          const div = doc.querySelector('#main_info');
+          let div;
+
+          if (url.indexOf('cogedim') !== -1) {
+            div = doc.querySelector('#main_info');
+
+            // remove .hidden-xs, info may be duplicated with .hidden-xl
+            div.querySelectorAll('.hidden-xs').forEach(b => b.remove());
+
+            // remove .anchors
+            div.querySelectorAll('.anchors').forEach(b => b.remove());
+          } else {
+            div = document.createElement('div');
+
+            const infoDiv = doc.querySelector('.introduction');
+            const deliveryDiv = doc.querySelector('.program-infos');
+
+            // remove useless info
+            deliveryDiv.querySelectorAll('.with_button').forEach((item) => item.remove());
+
+            div.append(deliveryDiv);
+            div.append(infoDiv);
+
+            div.querySelectorAll('a').forEach(aTag => unwrap(aTag));
+          }
+
+          // general changes
 
           // convert <v-icon> to material icons
           div.querySelectorAll('v-icon').forEach(
@@ -242,12 +274,6 @@ export class ProgramService extends BaseService {
           // remove v-btn
           div.querySelectorAll('v-btn').forEach(b => b.remove());
 
-          // remove .hidden-xs, info may be duplicated with .hidden-xl
-          div.querySelectorAll('.hidden-xs').forEach(b => b.remove());
-
-          // remove .anchors
-          div.querySelectorAll('.anchors').forEach(b => b.remove());
-
           return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
         }
       )
@@ -259,18 +285,25 @@ export class ProgramService extends BaseService {
       map(
         str => {
           const doc = new DOMParser().parseFromString(str, 'text/html');
-          const div = doc.querySelector('.paragraphs-sales_office');
+          let div;
 
-          // update images src, add cogedim's domain
-          div.querySelectorAll('img[src^="/"]').forEach(
-            e => e.setAttribute(
-              'src',
-              this.convertUrlToBackendResourceUrl(e.getAttribute('src'), true)
-            )
-          );
+          if (url.indexOf('cogedim') !== -1) {
+            div = doc.querySelector('.paragraphs-sales_office');
 
-          // remove sales office section
-          div.querySelector('.sales-office').remove();
+            // update images src, add cogedim's domain
+            div.querySelectorAll('img[src^="/"]').forEach(
+              e => e.setAttribute(
+                'src',
+                this.convertUrlToBackendResourceUrl(e.getAttribute('src'), true)
+              )
+            );
+
+            // remove sales office section
+            div.querySelector('.sales-office').remove();
+          } else {
+            div = doc.querySelector('.program-sections');
+            div.querySelector('div[v-if="commonUIState.viewPortIsLessThan768"]').remove();
+          }
 
           // sanitize html
           return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
@@ -312,4 +345,16 @@ export class ProgramService extends BaseService {
 
     return this.baseurl + '/resource?resourceUrl=' + url + '&token=' + this.authService.getAccessToken();
   }
+}
+
+function unwrap(wrapper) {
+  // place childNodes in document fragment
+  const docFrag = document.createDocumentFragment();
+  while (wrapper.firstChild) {
+    const child = wrapper.removeChild(wrapper.firstChild);
+    docFrag.appendChild(child);
+  }
+
+  // replace wrapper with document fragment
+  wrapper.parentNode.replaceChild(docFrag, wrapper);
 }
