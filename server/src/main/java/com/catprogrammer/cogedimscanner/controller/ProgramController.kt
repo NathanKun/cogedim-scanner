@@ -159,11 +159,16 @@ open class ProgramController {
 
         return if (resourceUrl != null) {
             if ((resourceUrl.startsWith("https://www.cogedim.com/marker/") && auth) || // big map pin detail
-                    (resourceUrl.startsWith("https://www.cogedim.com/sites/") && auth) || // program image
+                    (resourceUrl.startsWith("https://www.cogedim.com/sites/") && auth) || // program image cogedim
                     (resourceUrl.startsWith("https://www.cogedim.com/themes/") &&
                             (resourceUrl.endsWith(".png") ||
                                     resourceUrl.endsWith("jpg") ||
-                                    resourceUrl.endsWith("jpeg"))) // images for css
+                                    resourceUrl.endsWith("jpeg"))) || // images for css cogedim
+                    (resourceUrl.startsWith("https://www.kaufmanbroad.fr/sites/") && auth) || // program image kaufmanbroad
+                    (resourceUrl.startsWith("https://www.kaufmanbroad.fr/themes/") &&
+                            (resourceUrl.endsWith(".png") ||
+                                    resourceUrl.endsWith("jpg") ||
+                                    resourceUrl.endsWith("jpeg"))) // images for css kaufmanbroad
             ) {
                 internalFetchResource(resourceUrl)
             } else {
@@ -185,8 +190,9 @@ open class ProgramController {
     @Suppress("SpringElInspection")
     @CachePut(key = "#url", unless = "#result.statusCode != 200")
     open fun internalFetchProgramPageHtml(url: String): ResponseEntity<String> {
-        return if (url.startsWith("https://www.cogedim.com/")) {
-            // avoid requesting cogedim's server concurrently
+        return if (url.startsWith("https://www.cogedim.com/") ||
+                url.startsWith("https://www.kaufmanbroad.fr/")) {
+            // avoid requesting target's server concurrently
             synchronized(lock) {
                 val lastFetchDiff = System.currentTimeMillis() - lastFetchAt
                 if (lastFetchDiff < 5000) {

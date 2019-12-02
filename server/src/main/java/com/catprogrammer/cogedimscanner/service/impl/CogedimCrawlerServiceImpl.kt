@@ -229,7 +229,8 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                     RealEstateDeveloper.KAUFMANBROAD -> article.select("a.program-link").attr("href")
                 }
         val imgUrl = developer.baseurl + article.select("div.visual img").attr("src")
-                .replace("/styles/visual_327x188/public", "") // remove resize
+                .replace("/styles/visual_327x188/public", "") // remove resize cogedim
+                .replace("/styles/program_card/public", "") // remove resize kaufmanbroad
                 .replace(Regex("\\?itok.*"), "") // remove param
 
         val leafletForm = fetchFormLeaflet(developer, programId)

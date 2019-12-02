@@ -3,6 +3,7 @@ package com.catprogrammer.cogedimscanner.service.impl
 import com.catprogrammer.cogedimscanner.entity.Lot
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
+import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
 import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.ProgramService
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,10 +16,17 @@ open class ProgramServiceImpl : ProgramService {
     lateinit var programRepository: ProgramRepository
 
     override fun findProgramsGroupByProgramNumber(): List<ProgramDateLotDto> {
+        val programs = programRepository.findAll()
+        programs.forEach { p ->
+            @Suppress("SENSELESS_COMPARISON")
+            if (p.developer == null) p.developer = RealEstateDeveloper.COGEDIM
+        }
+
         val res = mutableListOf<ProgramDateLotDto>()
         // a map of programName => same program of different date
-        val programNumberToProgramMap = programRepository.findAll().groupBy({ it.programNumber }, { it })
-        programNumberToProgramMap.values.forEach { list -> // list of same program of different day
+        val programNumberToProgramMap = programs.groupBy({ it.programNumber }, { it })
+        programNumberToProgramMap.values.forEach { list ->
+            // list of same program of different day
             val program = list.last()
             val map = mutableMapOf<LocalDate, List<Lot>>()
             list.forEach {

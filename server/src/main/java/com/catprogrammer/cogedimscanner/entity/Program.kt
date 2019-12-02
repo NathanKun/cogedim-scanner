@@ -12,7 +12,7 @@ data class Program(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long?,
-        val developer: RealEstateDeveloper,
+        var developer: RealEstateDeveloper,
         val programName: String,
         val programNumber: String,
         val postalCode: String,
