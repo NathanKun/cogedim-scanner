@@ -63,7 +63,7 @@ table {
 #main-info {
   margin-top: 1vh;
 
-  #main-info ::ng-deep {
+  ::ng-deep {
     .icons {
       display: inline-block;
       vertical-align: middle;
