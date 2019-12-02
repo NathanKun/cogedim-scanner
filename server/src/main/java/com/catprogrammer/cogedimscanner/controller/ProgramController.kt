@@ -96,13 +96,14 @@ open class ProgramController {
      */
 
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
-    @PutMapping("/program/{programNumber}/lot/{lotNumber}")
+    @PutMapping("/program/{developer}/{programNumber}/lot/{lotNumber}")
     @CacheEvict(cacheNames = ["programs"], key = "'programsCacheKey'")
-    open fun setLotProperty(@PathVariable programNumber: String,
+    open fun setLotProperty(@PathVariable developer: RealEstateDeveloper,
+                            @PathVariable programNumber: String,
                             @PathVariable lotNumber: String,
                             @RequestParam(value = "remark", required = false) remark: String?,
                             @RequestParam(value = "decision", required = false) decision: String?) {
-        val lots = lotService.findAllByProgramNumberAndLotNumber(programNumber, lotNumber)
+        val lots = lotService.findAllByDeveloperAndProgramNumberAndLotNumber(developer, programNumber, lotNumber)
         lots.forEach { lot ->
             if (remark != null) {
                 lot.remark = remark

@@ -1,6 +1,7 @@
 package com.catprogrammer.cogedimscanner.service.impl
 
 import com.catprogrammer.cogedimscanner.entity.Lot
+import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
 import com.catprogrammer.cogedimscanner.repository.LotRepository
 import com.catprogrammer.cogedimscanner.repository.ProgramRepository
 import com.catprogrammer.cogedimscanner.service.LotService
@@ -17,8 +18,8 @@ open class LotServiceImpl : LotService {
     @Autowired
     lateinit var lotRepository: LotRepository
 
-    override fun findAllByProgramNumberAndLotNumber(programNumber: String, lotNumer: String): List<Lot> {
-        val programs = programRepository.findAllByProgramNumber(programNumber)
+    override fun findAllByDeveloperAndProgramNumberAndLotNumber(developer: RealEstateDeveloper, programNumber: String, lotNumer: String): List<Lot> {
+        val programs = programRepository.findAllByDeveloperAndProgramNumber(developer, programNumber)
         val lots = mutableListOf<Lot>()
 
         programs.forEach { p ->

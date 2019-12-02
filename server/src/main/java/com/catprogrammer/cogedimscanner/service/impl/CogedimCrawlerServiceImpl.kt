@@ -54,7 +54,9 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                         "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
                 */),
                 RealEstateDeveloper.KAUFMANBROAD to arrayOf(
-                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5"
+                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5",
+                        "location=ile-de-france&department=Paris&rooms=2,3,4,5",
+                        "location=Yvelines&department=Yvelines&region=Île-de-France&rooms=2,3,4"
                 )
         )
         val results = mutableListOf<SearchResult>()
@@ -115,25 +117,29 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                     article = Jsoup.parse(html)
                 }
 
-                parseSearchResultLot(searchResult.developer!!, article, program, onlyRequestMissingBlueprintPdf)
+                parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
                 programService.save(program)
                 logger.info("saved program ${program.programName} ${program.programNumber}")
             }
         }
-
     }
 
     /**
      * Parse the <article> dom object, find all lot and link to the given Program object and save
      */
-    private fun parseSearchResultLot(developer: RealEstateDeveloper, article: Document, program: Program, onlyRequestMissingBlueprintPdf: Boolean) {
+    private fun parseSearchResultLot(article: Document, program: Program, onlyRequestMissingBlueprintPdf: Boolean) {
         val selector1 = when (program.developer) {
             RealEstateDeveloper.COGEDIM -> "v-expansion-panel[class^=regulation-] > *"
-            RealEstateDeveloper.KAUFMANBROAD -> "#tab-regulation-17"
+            RealEstateDeveloper.KAUFMANBROAD -> "#tab-regulation-17 div.lot-items"
         }
         val selector2 = when (program.developer) {
             RealEstateDeveloper.COGEDIM -> "v-expansion-panel v-expansion-panel-content[ripple]"
-            RealEstateDeveloper.KAUFMANBROAD -> "v-expansion-panel-content[ref^=expand]"
+            RealEstateDeveloper.KAUFMANBROAD -> "div.lot-item"
+        }
+
+        val blueprintSelector = when (program.developer) {
+            RealEstateDeveloper.COGEDIM -> "div.lot-details div.buttons v-btn[@click.native*=blueprint]"
+            RealEstateDeveloper.KAUFMANBROAD -> "v-btn[@click.native*=blueprint]"
         }
 
         article.select(selector1).forEach { programTypeTag ->
@@ -145,11 +151,11 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val floor = lotTag.select("span.lot-floor").text()
                 val price = lotTag.select("span.lot-price").text()
 
-                val blueprintDownloadButton = lotTag.select("div.lot-details div.buttons v-btn[@click.native*=blueprint]")
+                val blueprintDownloadButton = lotTag.select(blueprintSelector)
                 val blueprintDownloadButtonAttr = blueprintDownloadButton.attr("@click.native")
-                val blueprintId = Regex("event, ?[0-9]{3,4}, ?([0-9]{4,5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
+                val blueprintId = Regex("event, ?[0-9]{3,5}, ?([0-9]{3,5})").find(blueprintDownloadButtonAttr)?.groups?.get(1)?.value
 
-                val oldLots = lotService.findAllByProgramNumberAndLotNumber(program.programNumber, lotNumber)
+                val oldLots = lotService.findAllByDeveloperAndProgramNumberAndLotNumber(program.developer, program.programNumber, lotNumber)
 
                 // no need to request blueprint pdf if no blueprint id
                 var requestPdf = blueprintId != null
@@ -166,14 +172,14 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
 
                 val pdfUrl =
                         if (requestPdf) {
-                            if (blueprintId != null && blueprintId.length == 5) {
+                            if (blueprintId != null) {
                                 // pause 10 sec to reduce request per sec
                                 // avoid being banned
                                 Thread.sleep(10000)
 
-                                val blueprintUrl = fetchFormBlueprint(developer, program.programNumber, blueprintId)
-                                if (blueprintUrl != null) {
-                                    developer.baseurl + parseFormGetResultGetPdfUrl(developer, blueprintUrl)
+                                val blueprintForm = fetchFormBlueprint(program.developer, program.programNumber, blueprintId)
+                                if (blueprintForm != null) {
+                                    program.developer.baseurl + parseFormGetResultGetPdfUrl(program.developer, blueprintForm)
                                 } else null
                             } else null
                         } else {
@@ -198,7 +204,10 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      * Parse the <article> dom object, find it's program, instantiate, save and return the Program object
      */
     private fun parseSearchResultProgram(developer: RealEstateDeveloper, article: Document, nearbyPrograms: List<NearbyProgram>): Program {
-        val programName = article.select("div.info-box h2 span").text()
+        val programName = when (developer) {
+            RealEstateDeveloper.COGEDIM -> article.select("div.info-box h2 span").text()
+            RealEstateDeveloper.KAUFMANBROAD -> article.select("div.left-part h2 span").text()
+        }
         val programId = article.select("article[is^=program-card-]").attr("class")
                 .split(" ")
                 .first { s -> s.startsWith("program-") }
@@ -224,7 +233,10 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 .replace(Regex("\\?itok.*"), "") // remove param
 
         val leafletForm = fetchFormLeaflet(developer, programId)
-        val pdfUrl = if (leafletForm != null) (developer.baseurl + parseFormGetResultGetPdfUrl(developer, leafletForm)) else null
+        val pdfUrl = if (leafletForm != null) {
+            Thread.sleep(10000)
+            developer.baseurl + parseFormGetResultGetPdfUrl(developer, leafletForm)
+        } else null
 
         val nearbyProgram = nearbyPrograms.first { p -> p.nid == programId }
         val latitude = nearbyProgram.lat
@@ -266,12 +278,20 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
     }
 
     private fun fetchFormBlueprint(developer: RealEstateDeveloper, programNumber: String, lotNumber: String): FormGetResult? {
-        return postRequest(
-                developer,
-                "https://www.cogedim.com/form-get",
-                "form=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfoC",
-                FormGetResult::class.javaObjectType
-        )
+        return when (developer) {
+            RealEstateDeveloper.COGEDIM -> postRequest(
+                    developer,
+                    "${developer.baseurl}/form-get",
+                    "form=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfoC",
+                    FormGetResult::class.javaObjectType
+            )
+            RealEstateDeveloper.KAUFMANBROAD -> postRequest(
+                    developer,
+                    "${developer.baseurl}/form-post",
+                    "form_id=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfoK",
+                    FormGetResult::class.javaObjectType
+            )
+        }
     }
 
     private fun fetchFormLeaflet(developer: RealEstateDeveloper, programNumber: String): FormGetResult? {
@@ -280,13 +300,13 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             RealEstateDeveloper.COGEDIM -> postRequest(
                     developer,
                     "${developer.baseurl}/form-get",
-                    "form=${developer.leafletParam}&program_nid=$programNumber&$contactinfoC",
+                    "form=re_forms_leaflet&program_nid=$programNumber&$contactinfoC",
                     FormGetResult::class.javaObjectType
             )
             RealEstateDeveloper.KAUFMANBROAD -> postRequest(
                     developer,
                     "${developer.baseurl}/form-post",
-                    "form_id=${developer.leafletParam}&program_nid=$programNumber&$contactinfoK",
+                    "form_id=re_forms_booklet&program_nid=$programNumber&$contactinfoK",
                     FormGetResult::class.javaObjectType
             )
         }
@@ -320,7 +340,12 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             // if pdf not found it response 500, so skip the error 500
             if (conn.responseCode != 500) {
                 logger.info("Request error. Url = $url, data = $writeData")
-                logger.info(IOUtils.toString(GZIPInputStream(conn.errorStream), StandardCharsets.UTF_8))
+                val stream = if (conn.contentEncoding == "gzip") {
+                    GZIPInputStream(conn.errorStream)
+                } else {
+                    conn.errorStream
+                }
+                logger.info(IOUtils.toString(stream, StandardCharsets.UTF_8))
             }
             null
         }
