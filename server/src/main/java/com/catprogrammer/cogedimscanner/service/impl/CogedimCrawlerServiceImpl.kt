@@ -149,7 +149,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 val lotNumber = lotTag.select("span.lot-lot_number").text()
                 val surface = lotTag.select("span.lot-surface").text()
                 val floor = lotTag.select("span.lot-floor").text()
-                val price = lotTag.select("span.lot-price").text()
+                val price = lotTag.select("span.lot-price").text().replace(',', '.')
 
                 val blueprintDownloadButton = lotTag.select(blueprintSelector)
                 val blueprintDownloadButtonAttr = blueprintDownloadButton.attr("@click.native")
