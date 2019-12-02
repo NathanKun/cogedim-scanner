@@ -8,6 +8,7 @@ import {environment} from '../../environments/environment';
 import {ScrollService} from '../service/scroll.service';
 import {Router} from '@angular/router';
 import {MapInitService} from '../service/mapinit.service';
+import {MatRipple} from '@angular/material/core';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   hideHidPrograms = true;
 
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
+  @ViewChildren(MatRipple) rippleList: QueryList<MatRipple>;
   programDateLots: ProgramDateLot[];
 
   zoom = 13;
@@ -112,6 +114,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
         lng: position.coords.longitude,
       };
     });
+
+    this.rippleList.changes.subscribe(
+      res => this.rippleList = res
+    );
   }
 
   ngAfterViewInit() {
@@ -139,12 +145,23 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   markerClick(marker: MapMarker) {
+    // find index
     const index = this.programDateLots.findIndex((pdl) => pdl.program.programName === marker.getTitle());
+
+    // scroll to card
     this.programcards.filter((item, i) => i === index)[0].nativeElement.scrollIntoView({
       behavior: 'smooth',
       block: 'end'
     });
+
+    // animate marker
     this.animateMarker(marker);
+
+    // launch ripple on card
+    const ripple = this.rippleList.filter((item, i) => i === index)[0];
+    setTimeout(() => ripple.launch({centered: true}), 1000);
+    setTimeout(() => ripple.launch({centered: true}), 1500);
+    setTimeout(() => ripple.launch({centered: true}), 2000);
   }
 
   programCardLocationClick(programName) {
