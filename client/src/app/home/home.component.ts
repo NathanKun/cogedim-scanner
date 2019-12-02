@@ -114,10 +114,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         lng: position.coords.longitude,
       };
     });
-
-    this.rippleList.changes.subscribe(
-      res => this.rippleList = res
-    );
   }
 
   ngAfterViewInit() {
@@ -130,6 +126,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     this.markerElements.changes.subscribe(
       res => this.markerElements = res
+    );
+
+    this.rippleList.changes.subscribe(
+      res => this.rippleList = res
     );
 
     // restore scroll position
