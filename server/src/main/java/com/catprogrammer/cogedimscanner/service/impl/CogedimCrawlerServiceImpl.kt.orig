@@ -104,6 +104,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
             searchResult.results?.forEach { result ->
                 var article = Jsoup.parse(result.asString)
                 // val article = Jsoup.parse(mokeArticle)
+<<<<<<< HEAD
                 val program = parseSearchResultProgram(searchResult.developer!!, article, nearbyPrograms)
 
                 if (program.developer == RealEstateDeveloper.KAUFMANBROAD) {
@@ -116,7 +117,12 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 }
 
                 parseSearchResultLot(searchResult.developer!!, article, program, onlyRequestMissingBlueprintPdf)
+                programRepository.save(program)
+=======
+                val program = parseSearchResultProgram(article, nearbyPrograms)
+                parseSearchResultLot(article, program, onlyRequestMissingBlueprintPdf)
                 programService.save(program)
+>>>>>>> master
                 logger.info("saved program ${program.programName} ${program.programNumber}")
             }
         }

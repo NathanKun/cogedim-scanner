@@ -16,11 +16,15 @@ import {LotService} from '../service/lot.service';
 })
 export class ProgramComponent implements OnInit, AfterViewInit {
 
+  smallScreen: boolean;
+
   programDateLot: ProgramDateLot;
 
   dataSource: Lot[];
   originalData: Lot[];
-  displayedColumns: string[] = ['lotNumber', 'surface', 'floor', 'price', 'price_per_m2', 'pdf', 'decision', 'remark'];
+  displayedColumns: string[];
+  displayedColumnsFirstRow: string[] = ['lotNumber', 'surface', 'floor', 'price', 'price_per_m2', 'decision'];
+  displayedColumnsSecondRow: string[] = ['remark'];
 
   dates: string[];
   selectedDate: string;
@@ -42,6 +46,14 @@ export class ProgramComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    if (document.documentElement.clientWidth < 700) { // 768px portrait
+      this.smallScreen = true;
+      this.displayedColumns = this.displayedColumnsFirstRow;
+    } else {
+      this.smallScreen = false;
+      this.displayedColumns = this.displayedColumnsFirstRow.concat(this.displayedColumnsSecondRow);
+    }
+
     this.route.paramMap
       .pipe(
         switchMap(
@@ -104,6 +116,8 @@ export class ProgramComponent implements OnInit, AfterViewInit {
             priceToNumber(a.price) / surfaceToNumber(a.surface),
             priceToNumber(b.price) / surfaceToNumber(b.surface),
             isAsc);
+        case 'decision':
+          return compare(decisionToNumber(a.decision, isAsc), decisionToNumber(b.decision, isAsc), isAsc);
         default:
           return 0;
       }
@@ -178,5 +192,18 @@ function floorToNumber(s: string) {
     } else {
       return -1;
     }
+  }
+}
+
+function decisionToNumber(d: Decision, isAsc) {
+  switch (d) {
+    case Decision.GOOD:
+      return 3;
+    case Decision.SECONDARY:
+      return 2;
+    case Decision.BAD:
+      return 1;
+    default: // Decision.NONE or null
+      return isAsc ? 4 : 0;
   }
 }

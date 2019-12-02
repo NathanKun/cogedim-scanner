@@ -3,8 +3,11 @@ package com.catprogrammer.cogedimscanner.controller
 import com.catprogrammer.cogedimscanner.entity.Decision
 import com.catprogrammer.cogedimscanner.entity.Program
 import com.catprogrammer.cogedimscanner.model.ProgramDateLotDto
+<<<<<<< HEAD
 import com.catprogrammer.cogedimscanner.model.RealEstateDeveloper
+=======
 import com.catprogrammer.cogedimscanner.service.LotService
+>>>>>>> master
 import com.catprogrammer.cogedimscanner.service.ProgramService
 import com.catprogrammer.cogedimscanner.service.impl.CogedimCrawlerServiceImpl.Companion.applyRequestHeaders
 import com.catprogrammer.cogedimscanner.utils.JwtTokenUtil

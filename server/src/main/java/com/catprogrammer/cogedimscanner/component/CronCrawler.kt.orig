@@ -19,7 +19,10 @@ open class CronCrawler {
         logger.info("Crawler cron starts")
         val res = cogedimCrawlerService?.requestSearchResults()
         cogedimCrawlerService?.parseSearchResults(res!!, true)
+<<<<<<< HEAD
+=======
         cogedimCrawlerService?.flushPrograms()
+>>>>>>> master
         logger.info("Crawler cron ends")
     }
 }

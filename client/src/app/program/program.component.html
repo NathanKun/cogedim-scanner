@@ -1,6 +1,6 @@
 <div class="container p-0">
   <div class="row m-0">
-    <div class="col-md-12 col-lg-10 offset-lg-1 p-0">
+    <div class="col-12 p-0">
       <mat-card *ngIf="programDateLot" class="my-sm-2">
         <img class="hero-image" mat-card-image [src]="programDateLot.program.imgUrl"
              [alt]="programDateLot.program.programName">
@@ -36,76 +36,117 @@
           </div>
 
           <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
-                 class="mat-elevation-z8">
+                 class="mat-elevation-z8" multiTemplateDataRows>
+
+            <!-- Cell Definition -->
+
+            <!-- Lot Number & Blueprint -->
             <ng-container matColumnDef="lotNumber">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Number</th>
-              <td mat-cell *matCellDef="let lot"> {{lot['lotNumber']}} </td>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header><span
+                class="px-0 px-sm-3 mr-3 mx-sm-0">Number</span></th>
+              <td mat-cell *matCellDef="let lot">
+                <a *ngIf="lot['pdfUrl'] else lotNumberTemplate" [href]="lot['pdfUrl']" target="_blank" mat-button
+                   class="px-0 px-sm-3 mr-3 mx-sm-0 a-tag-no-underline">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  {{lot['lotNumber']}}
+                </a>
+                <ng-template #lotNumberTemplate>
+                  <button mat-button class="px-0 px-sm-3 mr-3 mx-sm-0">
+                    <mat-icon>crop_din</mat-icon>
+                    {{lot['lotNumber']}}
+                  </button>
+                </ng-template>
+              </td>
             </ng-container>
+
+            <!-- Surface -->
             <ng-container matColumnDef="surface">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Surface</th>
               <td mat-cell *matCellDef="let lot"> {{lot['surface']}} </td>
             </ng-container>
+
+            <!-- Floor -->
             <ng-container matColumnDef="floor">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Floor</th>
               <td mat-cell *matCellDef="let lot"> {{lot['floor']}} </td>
             </ng-container>
+
+            <!-- Price -->
             <ng-container matColumnDef="price">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
               <td mat-cell *matCellDef="let lot"> {{lot['price']}} </td>
             </ng-container>
+
+            <!-- Price m2 -->
             <ng-container matColumnDef="price_per_m2">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Price m2</th>
               <td mat-cell *matCellDef="let lot"> {{calculatePricePerM2(lot)}} </td>
             </ng-container>
-            <ng-container matColumnDef="pdf">
-              <th mat-header-cell *matHeaderCellDef>Blueprint</th>
-              <td mat-cell *matCellDef="let lot">
-                <a *ngIf="lot['pdfUrl']" [href]="lot['pdfUrl']" target="_blank" mat-icon-button>
-                  <mat-icon>picture_as_pdf</mat-icon>
-                </a>
-              </td>
-            </ng-container>
+
+            <!-- Decision -->
             <ng-container matColumnDef="decision">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Decision</th>
-              <td mat-cell *matCellDef="let lot">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="row-decision">Decision</th>
+              <td mat-cell *matCellDef="let lot" class="row-decision">
                 <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.GOOD">
                   <mat-icon>sentiment_very_satisfied</mat-icon>
                 </button>
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.SECONDARY">
+                <button mat-icon-button [matMenuTriggerFor]="decisionMenu"
+                        *ngIf="lot['decision'] === Decision.SECONDARY">
                   <mat-icon>sentiment_satisfied</mat-icon>
                 </button>
                 <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.BAD">
                   <mat-icon>sentiment_very_dissatisfied</mat-icon>
                 </button>
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.NONE || !lot['decision']">
-                    <mat-icon>hourglass_empty</mat-icon>
+                <button mat-icon-button [matMenuTriggerFor]="decisionMenu"
+                        *ngIf="lot['decision'] === Decision.NONE || !lot['decision']">
+                  <mat-icon>hourglass_empty</mat-icon>
                 </button>
                 <mat-menu #decisionMenu="matMenu">
                   <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.GOOD)">
-                    <mat-icon>sentiment_very_satisfied</mat-icon>Good
+                    <mat-icon>sentiment_very_satisfied</mat-icon>
+                    Good
                   </button>
                   <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.SECONDARY)">
-                    <mat-icon>sentiment_satisfied</mat-icon>Secondary
+                    <mat-icon>sentiment_satisfied</mat-icon>
+                    Secondary
                   </button>
                   <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.BAD)">
-                    <mat-icon>sentiment_very_dissatisfied</mat-icon>Bad
+                    <mat-icon>sentiment_very_dissatisfied</mat-icon>
+                    Bad
                   </button>
                   <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.NONE)">
-                    <mat-icon>hourglass_empty</mat-icon>Wait
+                    <mat-icon>hourglass_empty</mat-icon>
+                    Wait
                   </button>
                 </mat-menu>
               </td>
             </ng-container>
+
+            <!-- Remark -->
             <ng-container matColumnDef="remark">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Remark</th>
-              <td mat-cell *matCellDef="let lot">
+              <ng-container *ngIf="!smallScreen">
+                <th mat-header-cell *matHeaderCellDef>Remark</th>
+              </ng-container>
+              <td mat-cell *matCellDef="let lot" [attr.colspan]="displayedColumns.length">
                 <app-edit-input [data]="lot['remark']" (focusOut)='remarkChanged(lot, $event)'></app-edit-input>
               </td>
             </ng-container>
 
+
+            <!-- Header -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+
+            <!-- Row 1 -->
             <!--suppress JSUnusedGlobalSymbols -->
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+
+            <!-- Row 2 for small screen -->
+            <ng-container *ngIf="smallScreen">
+              <!--suppress JSUnusedGlobalSymbols -->
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsSecondRow;"></tr>
+            </ng-container>
           </table>
 
           <div id="program-inject" class="mt-5" [innerHtml]="injectSalesInfo"></div>
@@ -115,3 +156,4 @@
     </div>
   </div>
 </div>
+
