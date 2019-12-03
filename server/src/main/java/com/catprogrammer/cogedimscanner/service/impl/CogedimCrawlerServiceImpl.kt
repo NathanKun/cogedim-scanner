@@ -48,15 +48,13 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
      */
     override fun requestSearchResults(): List<SearchResult> {
         val crawlData = mapOf(
-                RealEstateDeveloper.COGEDIM to arrayOf(/*
+                RealEstateDeveloper.COGEDIM to arrayOf(
                         "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5", // 92
                         "location=ile-de-france&department=Paris&rooms=3,4,5", // Paris
                         "location=Le Vésinet&city=Le Vésinet&department=Yvelines&region=Île-de-France&rooms=2,3" // L’ Accord Parfait - 78 Le Vésinet
-                */),
+                ),
                 RealEstateDeveloper.KAUFMANBROAD to arrayOf(
-                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5",
-                        "location=ile-de-france&department=Paris&rooms=2,3,4,5",
-                        "location=Yvelines&department=Yvelines&region=Île-de-France&rooms=2,3,4"
+                        "location=Hauts-de-Seine&department=Hauts-de-Seine&rooms=2,3,4,5"
                 )
         )
         val results = mutableListOf<SearchResult>()
