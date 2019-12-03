@@ -54,9 +54,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   private static getMarkerIconUrlForDeveloper(d: RealEstateDeveloper) {
     if (d === RealEstateDeveloper.COGEDIM) {
-      return 'https://mt.google.com/vt/icon/text=C&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+      return 'https://mt.google.com/vt/icon/text=C&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2-1-small.png&highlight=a1217d&scale=1';
     } else if (d === RealEstateDeveloper.KAUFMANBROAD) {
-      return 'https://mt.google.com/vt/icon/text=K&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+      return 'https://mt.google.com/vt/icon/text=K&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2-1-small.png&highlight=4b9190&scale=1';
     } else {
       return null;
     }
