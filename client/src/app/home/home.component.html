@@ -7,13 +7,13 @@
       [options]="options"
       [zoom]="zoom">
       <map-marker
-          #markerElem
-          *ngFor="let marker of markerConfigs"
-          [position]="marker.position"
-          [label]="marker.label"
-          [title]="marker.title"
-          [options]="marker.options"
-          (mapClick)="markerClick(markerElem)">
+        #markerElem
+        *ngFor="let marker of markerConfigs"
+        [position]="marker.position"
+        [label]="marker.label"
+        [title]="marker.title"
+        [options]="marker.options"
+        (mapClick)="markerClick(markerElem)">
       </map-marker>
     </google-map>
   </div>
@@ -23,10 +23,10 @@
       <ng-container *ngFor="let p of programDateLots">
         <!--suppress JSUnusedGlobalSymbols -->
         <div #programcard
-             class="my-3 mat-elevation-z2" *ngIf="!p.hided || !hideHidPrograms"
+             class="my-3 mat-elevation-z2" *ngIf="!p.programCardHid"
              matRipple
              [matRippleRadius]="666"
-             [matRippleColor]="'#66ccff33'">
+             [matRippleColor]="'#66CCFF33'">
           <mat-card>
             <mat-card-header>
               <mat-card-title>
@@ -57,10 +57,10 @@
               <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
                 <mat-icon>pin_drop</mat-icon>
               </button>
-              <button *ngIf="!p.hided" (click)="hideProgramClick(p)" mat-icon-button>
+              <button *ngIf="!p.hid" (click)="hideProgramClick(p)" mat-icon-button>
                 <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
               </button>
-              <button *ngIf="p.hided" (click)="unhideProgramClick(p)" mat-icon-button>
+              <button *ngIf="p.hid" (click)="unhideProgramClick(p)" mat-icon-button>
                 <mat-icon>remove_red_eye</mat-icon>
               </button>
             </mat-card-actions>
@@ -68,7 +68,7 @@
         </div>
       </ng-container>
       <div class="mb-3">
-        <button (click)="showAllHidedPrograms(hideHidPrograms)" class="full-width" mat-button color="primary">
+        <button (click)="showAllHidedPrograms()" class="full-width" mat-button color="primary">
           <ng-container *ngIf="hideHidPrograms; else hideUnhidPrograms">
             <mat-icon>remove_red_eye</mat-icon>
             Show hidden programs
@@ -81,4 +81,22 @@
       </div>
     </ng-container>
   </div>
+</div>
+
+
+<div #selectDeveloperButtons class="d-none">
+  <button
+    (click)="cogedimBtnOnclick()"
+    [ngClass]="cogedimProgramsHid ? 'developer-btn-hide' : 'developer-btn-show'"
+    class="select-developer-button"
+    mat-icon-button>
+    <mat-icon svgIcon="icon-c"></mat-icon>
+  </button>
+  <button
+    (click)="kaufmanbroadBtnOnclick()"
+    [ngClass]="kaufmanbroadProgramsHid ? 'developer-btn-hide' : 'developer-btn-show'"
+    class="select-developer-button mb-4 mx-2"
+    mat-icon-button>
+    <mat-icon svgIcon="icon-k"></mat-icon>
+  </button>
 </div>

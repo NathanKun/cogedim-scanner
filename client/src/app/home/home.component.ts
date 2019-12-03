@@ -9,6 +9,7 @@ import {ScrollService} from '../service/scroll.service';
 import {Router} from '@angular/router';
 import {MapInitService} from '../service/mapinit.service';
 import {MatRipple} from '@angular/material/core';
+import {RealEstateDeveloper} from '../model/realestatedeveloper';
 
 
 @Component({
@@ -40,6 +41,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
 
+  @ViewChild('selectDeveloperButtons') selectDeveloperButtons: ElementRef;
+  cogedimProgramsHid = false;
+  kaufmanbroadProgramsHid = false;
+
   constructor(private renderer: Renderer2,
               private router: Router,
               private cookieService: CookieService,
@@ -57,14 +62,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
         // set program's hided property
         for (const p of programDateLots) {
-          p.hided = this.cookieIsProgramHided(p.program.programNumber);
+          p.hid = this.cookieIsProgramHided(p.program.programNumber);
+          p.programCardHid = p.hid;
         }
 
         // move all hidden program to bottom
         const hidPrograms = [];
         for (let i = programDateLots.length - 1; i >= 0; i--) {
           const pdl = programDateLots[i];
-          if (pdl.hided) {
+          if (pdl.hid) {
             hidPrograms.push(programDateLots.splice(i, 1)[0]);
           }
         }
@@ -82,8 +88,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
             title: p.program.programName,
             options: {
               animation: google.maps.Animation.DROP,
-              visible: !p.hided
-            },
+              visible: !p.hid,
+              icon: this.getMarkerIconUrlForDeveloper(p.program.developer)
+            }
           } as MapMarker);
         }
 
@@ -137,6 +144,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     // init google map
     this.mapInitService.initGoogleMap(this.map);
+
+    this.map._googleMap.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.selectDeveloperButtons.nativeElement);
+    this.selectDeveloperButtons.nativeElement.setAttribute('class', ''); // remove the d-none class
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -179,26 +189,46 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   hideProgramClick(pdl: ProgramDateLot) {
-    pdl.hided = true;
-    this.refreshMarkersVisibility();
+    pdl.hid = true;
+    this.refreshMarkersAndProgramCardsVisibility();
     this.cookieSetProgramHided(pdl.program.programNumber, true);
   }
 
   unhideProgramClick(pdl: ProgramDateLot) {
-    pdl.hided = false;
-    this.refreshMarkersVisibility();
+    pdl.hid = false;
+    this.refreshMarkersAndProgramCardsVisibility();
     this.cookieSetProgramHided(pdl.program.programNumber, false);
   }
 
-  showAllHidedPrograms(show: boolean) {
-    this.hideHidPrograms = !show;
-    this.refreshMarkersVisibility();
+  showAllHidedPrograms() {
+    this.hideHidPrograms = !this.hideHidPrograms;
+    this.refreshMarkersAndProgramCardsVisibility();
   }
 
-  private refreshMarkersVisibility() {
+  cogedimBtnOnclick() {
+    this.cogedimProgramsHid = !this.cogedimProgramsHid;
+    this.refreshMarkersAndProgramCardsVisibility();
+  }
+
+  kaufmanbroadBtnOnclick() {
+    this.kaufmanbroadProgramsHid = !this.kaufmanbroadProgramsHid;
+    this.refreshMarkersAndProgramCardsVisibility();
+  }
+
+  private refreshMarkersAndProgramCardsVisibility() {
     this.markerElements.forEach(
       (marker, index) => {
-        marker._marker.setVisible(!this.hideHidPrograms ? true : !this.programDateLots[index].hided);
+        const pdl = this.programDateLots[index];
+        if (pdl.program.developer === RealEstateDeveloper.COGEDIM && this.cogedimProgramsHid) {
+          marker._marker.setVisible(false);
+          pdl.programCardHid = true;
+        } else if (pdl.program.developer === RealEstateDeveloper.KAUFMANBROAD && this.kaufmanbroadProgramsHid) {
+          marker._marker.setVisible(false);
+          pdl.programCardHid = true;
+        } else {
+          marker._marker.setVisible(!this.hideHidPrograms ? true : !pdl.hid);
+          pdl.programCardHid = !pdl.hid ? false : this.hideHidPrograms;
+        }
       }
     );
   }
@@ -245,5 +275,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     // save
     this.cookieService.set(this.hidProgramsCookieName, JSON.stringify(hidedPrograms), 10 * 365, '/');
+  }
+
+  private getMarkerIconUrlForDeveloper(d: RealEstateDeveloper) {
+    if (d === RealEstateDeveloper.COGEDIM) {
+      return 'https://mt.google.com/vt/icon/text=C&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+    } else if (d === RealEstateDeveloper.KAUFMANBROAD) {
+      return 'https://mt.google.com/vt/icon/text=K&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+    } else {
+      return null;
+    }
+
   }
 }

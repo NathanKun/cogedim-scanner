@@ -8,5 +8,6 @@ export interface ProgramDateLot {
   lastDayLotCount: number;
   lastDayMinPrice: string;
   deliveryInfoHtml: SafeHtml;
-  hided: boolean;
+  hid: boolean; // hid by cookie preference
+  programCardHid: boolean;
 }

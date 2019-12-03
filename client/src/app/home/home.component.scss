@@ -49,6 +49,19 @@
   width: 100%;
 }
 
+.select-developer-button {
+  border-radius: 0; // square
+  background-color: aliceblue;
+}
+
+.developer-btn-show {
+
+}
+
+.developer-btn-hide {
+  opacity: 0.5;
+}
+
 mat-card-subtitle {
   margin-bottom: 24px;
 }

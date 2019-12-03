@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from './service/auth.service';
 import {Router} from '@angular/router';
 import {PwaUpdateService} from './service/pwaupdate.service';
+import {DomSanitizer} from '@angular/platform-browser';
+import {MatIconRegistry} from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +15,19 @@ export class AppComponent implements OnInit {
 
   constructor(public authService: AuthService,
               public router: Router,
-              private pwaUpdateService: PwaUpdateService) {
+              private pwaUpdateService: PwaUpdateService,
+              private iconRegistry: MatIconRegistry,
+              private sanitizer: DomSanitizer) {
+
     pwaUpdateService.subscribeAvailable();
+
+    iconRegistry.addSvgIcon(
+      'icon-c',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icon-c.svg'));
+
+    iconRegistry.addSvgIcon(
+      'icon-k',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/icon-k.svg'));
   }
 
   ngOnInit() {

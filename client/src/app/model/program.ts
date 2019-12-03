@@ -1,6 +1,8 @@
+import {RealEstateDeveloper} from './realestatedeveloper';
+
 export interface Program {
   id: number;
-  developer: string;
+  developer: RealEstateDeveloper;
   programName: string;
   programNumber: string;
   postalCode: string;
