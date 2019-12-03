@@ -10,6 +10,7 @@ import {Router} from '@angular/router';
 import {MapInitService} from '../service/mapinit.service';
 import {MatRipple} from '@angular/material/core';
 import {RealEstateDeveloper} from '../model/realestatedeveloper';
+import {Program} from '../model/program';
 
 
 @Component({
@@ -18,6 +19,16 @@ import {RealEstateDeveloper} from '../model/realestatedeveloper';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
+
+  constructor(private renderer: Renderer2,
+              private router: Router,
+              private cookieService: CookieService,
+              private titleService: Title,
+              private programService: ProgramService,
+              private scrollService: ScrollService,
+              private mapInitService: MapInitService) {
+  }
+
   private hidProgramsCookieName = 'hid_programs';
   hideHidPrograms = true;
 
@@ -45,16 +56,37 @@ export class HomeComponent implements OnInit, AfterViewInit {
   cogedimProgramsHid = false;
   kaufmanbroadProgramsHid = false;
 
-  constructor(private renderer: Renderer2,
-              private router: Router,
-              private cookieService: CookieService,
-              private titleService: Title,
-              private programService: ProgramService,
-              private scrollService: ScrollService,
-              private mapInitService: MapInitService) {
+  private static getMarkerIconUrlForDeveloper(d: RealEstateDeveloper) {
+    if (d === RealEstateDeveloper.COGEDIM) {
+      return 'https://mt.google.com/vt/icon/text=C&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+    } else if (d === RealEstateDeveloper.KAUFMANBROAD) {
+      return 'https://mt.google.com/vt/icon/text=K&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
+    } else {
+      return null;
+    }
+
+  }
+
+  private static formatCookie(developer: RealEstateDeveloper, programNumber: string): string {
+    let token;
+    switch (developer) {
+      case RealEstateDeveloper.COGEDIM:
+        token = 'C:' + programNumber;
+        break;
+      case RealEstateDeveloper.KAUFMANBROAD:
+        token = 'K:' + programNumber;
+        break;
+      default:
+        return 'ERROR';
+    }
+
+    return token;
   }
 
   async ngOnInit() {
+    // remove this in a few release
+    this.cookieUpgradeToMultipleDeveloper();
+
     this.titleService.setTitle(environment.title);
 
     this.programService.getProgramDateLots().subscribe(
@@ -62,7 +94,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
         // set program's hided property
         for (const p of programDateLots) {
-          p.hid = this.cookieIsProgramHided(p.program.programNumber);
+          p.hid = this.cookieIsProgramHided(p.program);
           p.programCardHid = p.hid;
         }
 
@@ -89,7 +121,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
             options: {
               animation: google.maps.Animation.DROP,
               visible: !p.hid,
-              icon: this.getMarkerIconUrlForDeveloper(p.program.developer)
+              icon: HomeComponent.getMarkerIconUrlForDeveloper(p.program.developer)
             }
           } as MapMarker);
         }
@@ -191,13 +223,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
   hideProgramClick(pdl: ProgramDateLot) {
     pdl.hid = true;
     this.refreshMarkersAndProgramCardsVisibility();
-    this.cookieSetProgramHided(pdl.program.programNumber, true);
+    this.cookieSetProgramHided(pdl.program, true);
   }
 
   unhideProgramClick(pdl: ProgramDateLot) {
     pdl.hid = false;
     this.refreshMarkersAndProgramCardsVisibility();
-    this.cookieSetProgramHided(pdl.program.programNumber, false);
+    this.cookieSetProgramHided(pdl.program, false);
   }
 
   showAllHidedPrograms() {
@@ -240,17 +272,43 @@ export class HomeComponent implements OnInit, AfterViewInit {
     setTimeout(() => marker._marker.setAnimation(null), 1500);
   }
 
-  private cookieIsProgramHided(programNumber: string) {
+  private cookieUpgradeToMultipleDeveloper() {
+    if (this.cookieService.check(this.hidProgramsCookieName)) {
+      const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
+      const hidPrograms = JSON.parse(cookieStr) as string[];
+
+      // if is old format of cookie
+      if (hidPrograms.length && hidPrograms[0].indexOf(':') === -1) {
+        const newCookie = [];
+
+        for (const p of hidPrograms) {
+          newCookie.push('C:' + p);
+        }
+
+        this.cookieService.set(this.hidProgramsCookieName, JSON.stringify(newCookie), 10 * 365, '/');
+      }
+    }
+  }
+
+  private cookieIsProgramHided(program: Program) {
+    const developer = program.developer;
+    const programNumber = program.programNumber;
+
     if (this.cookieService.check(this.hidProgramsCookieName)) {
       const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
       const hidePrograms = JSON.parse(cookieStr) as string[];
-      return hidePrograms.indexOf(programNumber) >= 0;
+      const token = HomeComponent.formatCookie(developer, programNumber);
+
+      return hidePrograms.indexOf(token) >= 0;
     } else {
       return false;
     }
   }
 
-  private cookieSetProgramHided(programNumber: string, setHided: boolean) {
+  private cookieSetProgramHided(program: Program, setHided: boolean) {
+    const developer = program.developer;
+    const programNumber = program.programNumber;
+
     // read cookie
     let hidedPrograms: string[];
     if (this.cookieService.check(this.hidProgramsCookieName)) {
@@ -260,14 +318,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
       hidedPrograms = [];
     }
 
+    const token = HomeComponent.formatCookie(developer, programNumber);
     if (setHided) {
       // hide program
-      if (hidedPrograms.indexOf(programNumber) === -1) {
-        hidedPrograms.push(programNumber);
+      if (hidedPrograms.indexOf(token) === -1) {
+        hidedPrograms.push(token);
       }
     } else {
       // unhide program
-      const index = hidedPrograms.indexOf(programNumber);
+      const index = hidedPrograms.indexOf(token);
       if (index >= 0) {
         hidedPrograms.splice(index, 1);
       }
@@ -275,16 +334,5 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     // save
     this.cookieService.set(this.hidProgramsCookieName, JSON.stringify(hidedPrograms), 10 * 365, '/');
-  }
-
-  private getMarkerIconUrlForDeveloper(d: RealEstateDeveloper) {
-    if (d === RealEstateDeveloper.COGEDIM) {
-      return 'https://mt.google.com/vt/icon/text=C&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
-    } else if (d === RealEstateDeveloper.KAUFMANBROAD) {
-      return 'https://mt.google.com/vt/icon/text=K&psize=16&ax=49&ay=55&font=fonts/arialuni_t.ttf&color=ff330000&name=assets/icons/spotlight/spotlight_pin_v2_shadow-1-small.png,assets/icons/spotlight/spotlight_pin_v2-1-small.png,assets/icons/spotlight/spotlight_pin_v2_accent-1-small.png&highlight=ff000000,ea4335,ffffff&scale=1';
-    } else {
-      return null;
-    }
-
   }
 }

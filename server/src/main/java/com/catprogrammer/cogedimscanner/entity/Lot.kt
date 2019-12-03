@@ -31,6 +31,6 @@ data class Lot(
     }
 }
 
-enum class Decision(s: String) {
-    GOOD("GOOD"), SECONDARY("SECONDARY"), BAD("BAD"), NONE("NONE")
+enum class Decision {
+    GOOD, SECONDARY, BAD, NONE
 }

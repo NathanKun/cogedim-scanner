@@ -6,13 +6,13 @@
     [options]="options"
     [zoom]="zoom">
     <map-marker
-        #markerElem
-        *ngFor="let marker of markerConfigs"
-        [position]="marker.position"
-        [label]="marker.label"
-        [title]="marker.title"
-        [options]="marker.options"
-        (mapClick)="markerClick(markerElem)">
+      #markerElem
+      *ngFor="let marker of markerConfigs"
+      [position]="marker.position"
+      [label]="marker.label"
+      [title]="marker.title"
+      [options]="marker.options"
+      (mapClick)="markerClick(markerElem)">
     </map-marker>
     <map-info-window [options]="infoWindowConfig">
       <mat-card class="map-info px-0" *ngIf="infoWindowLoaded; else loadingTemplate">
