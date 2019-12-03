@@ -29,6 +29,11 @@ export class LoginComponent implements OnInit {
   ) {
   }
 
+  // convenience getter for easy access to form fields
+  get f() {
+    return this.loginForm.controls;
+  }
+
   async ngOnInit() {
     // redirect to home if already logged in
     this.isAuthenticated = this.authService.isAuthenticated();
@@ -46,11 +51,6 @@ export class LoginComponent implements OnInit {
 
     // get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
-  }
-
-  // convenience getter for easy access to form fields
-  get f() {
-    return this.loginForm.controls;
   }
 
   async onSubmit() {

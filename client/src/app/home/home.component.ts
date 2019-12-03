@@ -20,22 +20,10 @@ import {Program} from '../model/program';
 })
 export class HomeComponent implements OnInit, AfterViewInit {
 
-  constructor(private renderer: Renderer2,
-              private router: Router,
-              private cookieService: CookieService,
-              private titleService: Title,
-              private programService: ProgramService,
-              private scrollService: ScrollService,
-              private mapInitService: MapInitService) {
-  }
-
-  private hidProgramsCookieName = 'hid_programs';
   hideHidPrograms = true;
-
   @ViewChildren('programcard') programcards: QueryList<ElementRef>;
   @ViewChildren(MatRipple) rippleList: QueryList<MatRipple>;
   programDateLots: ProgramDateLot[];
-
   zoom = 13;
   center: google.maps.LatLngLiteral;
   options: google.maps.MapOptions = {
@@ -47,14 +35,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
     maxZoom: 18,
     minZoom: 8,
   };
-
   @ViewChild(GoogleMap) map: GoogleMap;
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
-
   @ViewChild('selectDeveloperButtons') selectDeveloperButtons: ElementRef;
   cogedimProgramsHid = false;
   kaufmanbroadProgramsHid = false;
+  private hidProgramsCookieName = 'hid_programs';
+
+  constructor(private renderer: Renderer2,
+              private router: Router,
+              private cookieService: CookieService,
+              private titleService: Title,
+              private programService: ProgramService,
+              private scrollService: ScrollService,
+              private mapInitService: MapInitService) {
+  }
 
   private static getMarkerIconUrlForDeveloper(d: RealEstateDeveloper) {
     if (d === RealEstateDeveloper.COGEDIM) {

@@ -15,9 +15,7 @@ import {MapInitService} from '../service/mapinit.service';
 })
 export class BigmapComponent implements OnInit, AfterViewInit {
 
-  private hidPinsCookieName = 'hided_pins';
   hideHidPins = true;
-
   @ViewChild(GoogleMap) map: GoogleMap;
   zoom = 12;
   center: google.maps.LatLngLiteral;
@@ -30,10 +28,8 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     maxZoom: 18,
     minZoom: 8,
   };
-
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
-
   @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
   infoWindowConfig: google.maps.InfoWindowOptions = {
     disableAutoPan: false
@@ -41,9 +37,9 @@ export class BigmapComponent implements OnInit, AfterViewInit {
   infoWindowBigMapPinDetail: BigMapPinDetail;
   infoWindowLoaded = false;
   bigMapPins: BigMapPin[];
-
   @ViewChild('changeHideStateButton') changeHideStateButton: ElementRef;
   hidPins: string[];
+  private hidPinsCookieName = 'hided_pins';
 
   constructor(private cookieService: CookieService,
               private titleService: Title,
@@ -96,10 +92,6 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     );
   }
 
-  private isPinHid(nid: string) {
-    return this.hidPins.indexOf(nid) >= 0;
-  }
-
   setPinHid(pin: BigMapPin, setHided: boolean) {
     // this update the opened info window
     pin.hid = !pin.hid;
@@ -129,6 +121,10 @@ export class BigmapComponent implements OnInit, AfterViewInit {
   changeHideState() {
     this.hideHidPins = !this.hideHidPins;
     this.showMarkers(this.hideHidPins, false);
+  }
+
+  private isPinHid(nid: string) {
+    return this.hidPins.indexOf(nid) >= 0;
   }
 
   private showMarkers(hideHid: boolean, animate: boolean) {

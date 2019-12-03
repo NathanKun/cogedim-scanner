@@ -25,8 +25,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableCaching
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
+    private PasswordEncoder passwordEncoder;
 
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;

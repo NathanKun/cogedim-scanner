@@ -1,32 +1,32 @@
 <div>
   <div id="left">
     <google-map
-      height="100%"
-      width="100%"
       [center]="center"
       [options]="options"
-      [zoom]="zoom">
+      [zoom]="zoom"
+      height="100%"
+      width="100%">
       <map-marker
         #markerElem
+        (mapClick)="markerClick(markerElem)"
         *ngFor="let marker of markerConfigs"
-        [position]="marker.position"
         [label]="marker.label"
-        [title]="marker.title"
         [options]="marker.options"
-        (mapClick)="markerClick(markerElem)">
+        [position]="marker.position"
+        [title]="marker.title">
       </map-marker>
     </google-map>
   </div>
-  <div id="right" class="px-3">
+  <div class="px-3" id="right">
     <mat-spinner *ngIf="!programDateLots" class="my-5 mx-auto"></mat-spinner>
     <ng-container *ngIf="programDateLots">
       <ng-container *ngFor="let p of programDateLots">
         <!--suppress JSUnusedGlobalSymbols -->
         <div #programcard
-             class="my-3 mat-elevation-z2" *ngIf="!p.programCardHid"
-             matRipple
+             *ngIf="!p.programCardHid" [matRippleColor]="'#66CCFF33'"
              [matRippleRadius]="666"
-             [matRippleColor]="'#66CCFF33'">
+             class="my-3 mat-elevation-z2"
+             matRipple>
           <mat-card>
             <mat-card-header>
               <mat-card-title>
@@ -34,33 +34,33 @@
               </mat-card-title>
               <mat-card-subtitle>
                 <!-- {{p.program.address}} {{p.program.postalCode}} -->
-                <div id="delivery-info" [innerHTML]="p.deliveryInfoHtml"></div>
+                <div [innerHTML]="p.deliveryInfoHtml" id="delivery-info"></div>
               </mat-card-subtitle>
             </mat-card-header>
             <a [routerLink]="['/programs', p.program.programNumber]">
-              <img mat-card-image
+              <img [alt]="p.program.programName"
                    [lazyLoad]="p.program.imgUrl"
-                   src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"
-                   [alt]="p.program.programName">
+                   mat-card-image
+                   src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg">
             </a>
             <mat-card-content>
               <p>{{p.lastDayLotCount + ' lot' + (p.lastDayLotCount > 1 ? 's' : '')}}</p>
               <p *ngIf="p.lastDayMinPrice">Starts at {{p.lastDayMinPrice}}</p>
             </mat-card-content>
             <mat-card-actions>
-              <a [href]="p.program.url" target="_blank" mat-icon-button>
+              <a [href]="p.program.url" mat-icon-button target="_blank">
                 <mat-icon>web</mat-icon>
               </a>
-              <a [href]="p.program.pdfUrl" target="_blank" mat-icon-button>
+              <a [href]="p.program.pdfUrl" mat-icon-button target="_blank">
                 <mat-icon>picture_as_pdf</mat-icon>
               </a>
               <button (click)="programCardLocationClick(p.program.programName)" mat-icon-button>
                 <mat-icon>pin_drop</mat-icon>
               </button>
-              <button *ngIf="!p.hid" (click)="hideProgramClick(p)" mat-icon-button>
+              <button (click)="hideProgramClick(p)" *ngIf="!p.hid" mat-icon-button>
                 <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
               </button>
-              <button *ngIf="p.hid" (click)="unhideProgramClick(p)" mat-icon-button>
+              <button (click)="unhideProgramClick(p)" *ngIf="p.hid" mat-icon-button>
                 <mat-icon>remove_red_eye</mat-icon>
               </button>
             </mat-card-actions>
@@ -68,7 +68,7 @@
         </div>
       </ng-container>
       <div class="mb-3">
-        <button (click)="showAllHidedPrograms()" class="full-width" mat-button color="primary">
+        <button (click)="showAllHidedPrograms()" class="full-width" color="primary" mat-button>
           <ng-container *ngIf="hideHidPrograms; else hideUnhidPrograms">
             <mat-icon>remove_red_eye</mat-icon>
             Show hidden programs

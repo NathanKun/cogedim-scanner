@@ -14,7 +14,7 @@ open class CronCrawler {
     @Autowired
     val cogedimCrawlerService: CogedimCrawlerService? = null
 
-    @Scheduled(cron="0 0 5 ? * *")
+    @Scheduled(cron = "0 0 5 ? * *")
     fun cron() {
         logger.info("Crawler cron starts")
         val res = cogedimCrawlerService?.requestSearchResults()

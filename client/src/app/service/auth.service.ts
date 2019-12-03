@@ -11,10 +11,10 @@ import {CookieService} from 'ngx-cookie-service';
 })
 export class AuthService extends BaseService {
 
+  $authenticationState: Observable<boolean>;
   private authTokenCookieName = 'auth_token';
   private accessToken: string = null;
   private observers: Observer<boolean>[];
-  $authenticationState: Observable<boolean>;
 
   constructor(private http: HttpClient,
               private cookieService: CookieService) {
@@ -31,10 +31,6 @@ export class AuthService extends BaseService {
 
   public isAuthenticated(): boolean {
     return this.accessToken != null;
-  }
-
-  private emitAuthenticationState(state: boolean) {
-    this.observers.forEach(observer => observer.next(state));
   }
 
   public backendAuthCheck(): Observable<string> {
@@ -81,5 +77,9 @@ export class AuthService extends BaseService {
 
   public getAccessToken(): string {
     return this.accessToken;
+  }
+
+  private emitAuthenticationState(state: boolean) {
+    this.observers.forEach(observer => observer.next(state));
   }
 }

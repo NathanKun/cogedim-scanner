@@ -14,6 +14,11 @@ import {BigMapPinDetail} from '../model/bigmappindetail';
 })
 export class ProgramService extends BaseService {
 
+  private programDateLotCache: ProgramDateLot[];
+  private programPageCache: Map<string, string>; // program url  => html str
+  private bigMapPinsCache: BigMapPin[];
+  private bigMapPinDetailCache: Map<string, BigMapPinDetail>; // program number  => BigMapPinDetail object
+
   constructor(private http: HttpClient,
               private sanitizer: DomSanitizer,
               private authService: AuthService) {
@@ -21,11 +26,6 @@ export class ProgramService extends BaseService {
     this.programPageCache = new Map<string, string>();
     this.bigMapPinDetailCache = new Map<string, BigMapPinDetail>();
   }
-
-  private programDateLotCache: ProgramDateLot[];
-  private programPageCache: Map<string, string>; // program url  => html str
-  private bigMapPinsCache: BigMapPin[];
-  private bigMapPinDetailCache: Map<string, BigMapPinDetail>; // program number  => BigMapPinDetail object
 
   public getGoodCities(): Observable<any> {
     return this.http.get<any>('/assets/goodcities.json')
@@ -66,70 +66,6 @@ export class ProgramService extends BaseService {
     }
   }
 
-  private fetchBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
-    return this.http.get<string>(
-      this.convertUrlToBackendResourceUrl('/marker/' + pin.nid + '/', true),
-      {responseType: 'text' as 'json'})
-      .pipe(
-        map(
-          str => {
-            const json: any = JSON.parse(str);
-            const htmlStr = json.markup;
-            const article = new DOMParser().parseFromString(htmlStr, 'text/html');
-
-            let imgUrl = article.querySelector('img[src^="/sites"]').getAttribute('src').split('?')[0];
-            imgUrl = this.convertUrlToBackendResourceUrl(imgUrl, true);
-
-            const programNameElement = article.querySelector('h2');
-            const programName = programNameElement != null ? programNameElement.textContent : '';
-
-            const postalCodeElement = article.querySelector('span[itemprop="postalCode"]');
-            const postalCode = postalCodeElement != null ? postalCodeElement.textContent : '';
-
-            const addressLocalityElement = article.querySelector('span[itemprop="addressLocality"]');
-            const addressLocality = addressLocalityElement != null ? addressLocalityElement.textContent : '';
-
-            const summaryElement = article.querySelector('.summary');
-            const summary = summaryElement != null ? summaryElement.innerHTML : '';
-
-            const urlElement = article.querySelector('a');
-            const url = urlElement != null ? ('https://www.cogedim.com' + urlElement.getAttribute('href')) : '#';
-
-            const bigMapPinDetail = {
-              lat: pin.lat,
-              lng: pin.lng,
-              nid: pin.nid,
-              hid: pin.hid,
-              imgUrl,
-              programName,
-              postalCode,
-              addressLocality,
-              summary,
-              url,
-              deliveryInfo: null
-            };
-            this.bigMapPinDetailCache.set(pin.nid, bigMapPinDetail);
-
-            return bigMapPinDetail;
-          }
-        ),
-        switchMap(
-          pinDetail => this.getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail)
-        )
-      );
-  }
-
-  private getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail: BigMapPinDetail): Observable<BigMapPinDetail> {
-    return this.getProgramPageDeliveryInfo(pinDetail.url).pipe(
-      map(
-        safeHtml => {
-          pinDetail.deliveryInfo = safeHtml;
-          return pinDetail;
-        }
-      )
-    );
-  }
-
   public getBigmapPins(): Observable<BigMapPin[]> {
     if (this.bigMapPinsCache) {
       return of(this.bigMapPinsCache);
@@ -138,63 +74,12 @@ export class ProgramService extends BaseService {
     }
   }
 
-  private fetchBigmapPins(): Observable<BigMapPin[]> {
-    const url = 'https://www.cogedim.com/programme-immobilier-neuf/PgX6/';
-    return this.http.get<string>(
-      this.baseurl + '/program?url=' + url,
-      {responseType: 'text' as 'json'})
-      .pipe(
-        map(
-          str => {
-            const doc = new DOMParser().parseFromString(str, 'text/html');
-            const script = doc.querySelector('script[data-drupal-selector="drupal-settings-json"]');
-            const json: any = JSON.parse(script.innerHTML);
-            this.bigMapPinsCache = json.nearbyPrograms;
-            return this.bigMapPinsCache;
-          }
-        )
-      );
-  }
-
   public getProgramDateLots(): Observable<ProgramDateLot[]> {
     if (this.programDateLotCache) {
       return of(this.programDateLotCache);
     } else {
       return this.fetchProgramDateLots();
     }
-  }
-
-  private fetchProgramDateLots(): Observable<ProgramDateLot[]> {
-    return this.http.get<ProgramDateLot[]>(
-      this.baseurl + '/programs')
-      .pipe(
-        tap(res => this.programDateLotCache = res),
-        map(res => {
-          res.forEach(p => {
-            // convert the object to a map
-            p.dateMap = new Map(Object.entries(p.dateMap));
-            p.program.imgUrl = this.convertUrlToBackendResourceUrl(p.program.imgUrl, false);
-
-            // set the last day lot count prop
-            const values = Array.from(p.dateMap.values());
-            p.lastDayLotCount = values[values.length - 1].length;
-            const lastDaySortedLots = values[values.length - 1]
-              .filter(l => l.price.indexOf('€') >= 0)
-              .sort(
-                (a, b) =>
-                  +a.price.replace('/ /g', '').replace('€', '')
-                  <
-                  +b.price.replace('/ /g', '').replace('€', '')
-                    ?
-                    -1 : 1
-              );
-            if (lastDaySortedLots.length) {
-              p.lastDayMinPrice = lastDaySortedLots[0].price;
-            }
-          });
-          return res;
-        })
-      );
   }
 
   public getProgramPageDeliveryInfo(url: string): Observable<SafeHtml> {
@@ -317,6 +202,121 @@ export class ProgramService extends BaseService {
       this.baseurl + '/flush?url=' + url,
       {},
       {responseType: 'text' as 'json'});
+  }
+
+  private fetchBigmapPinDetail(pin: BigMapPin): Observable<BigMapPinDetail> {
+    return this.http.get<string>(
+      this.convertUrlToBackendResourceUrl('/marker/' + pin.nid + '/', true),
+      {responseType: 'text' as 'json'})
+      .pipe(
+        map(
+          str => {
+            const json: any = JSON.parse(str);
+            const htmlStr = json.markup;
+            const article = new DOMParser().parseFromString(htmlStr, 'text/html');
+
+            let imgUrl = article.querySelector('img[src^="/sites"]').getAttribute('src').split('?')[0];
+            imgUrl = this.convertUrlToBackendResourceUrl(imgUrl, true);
+
+            const programNameElement = article.querySelector('h2');
+            const programName = programNameElement != null ? programNameElement.textContent : '';
+
+            const postalCodeElement = article.querySelector('span[itemprop="postalCode"]');
+            const postalCode = postalCodeElement != null ? postalCodeElement.textContent : '';
+
+            const addressLocalityElement = article.querySelector('span[itemprop="addressLocality"]');
+            const addressLocality = addressLocalityElement != null ? addressLocalityElement.textContent : '';
+
+            const summaryElement = article.querySelector('.summary');
+            const summary = summaryElement != null ? summaryElement.innerHTML : '';
+
+            const urlElement = article.querySelector('a');
+            const url = urlElement != null ? ('https://www.cogedim.com' + urlElement.getAttribute('href')) : '#';
+
+            const bigMapPinDetail = {
+              lat: pin.lat,
+              lng: pin.lng,
+              nid: pin.nid,
+              hid: pin.hid,
+              imgUrl,
+              programName,
+              postalCode,
+              addressLocality,
+              summary,
+              url,
+              deliveryInfo: null
+            };
+            this.bigMapPinDetailCache.set(pin.nid, bigMapPinDetail);
+
+            return bigMapPinDetail;
+          }
+        ),
+        switchMap(
+          pinDetail => this.getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail)
+        )
+      );
+  }
+
+  private getProgramPageDeliveryInfoForBigMapPinDetail(pinDetail: BigMapPinDetail): Observable<BigMapPinDetail> {
+    return this.getProgramPageDeliveryInfo(pinDetail.url).pipe(
+      map(
+        safeHtml => {
+          pinDetail.deliveryInfo = safeHtml;
+          return pinDetail;
+        }
+      )
+    );
+  }
+
+  private fetchBigmapPins(): Observable<BigMapPin[]> {
+    const url = 'https://www.cogedim.com/programme-immobilier-neuf/PgX6/';
+    return this.http.get<string>(
+      this.baseurl + '/program?url=' + url,
+      {responseType: 'text' as 'json'})
+      .pipe(
+        map(
+          str => {
+            const doc = new DOMParser().parseFromString(str, 'text/html');
+            const script = doc.querySelector('script[data-drupal-selector="drupal-settings-json"]');
+            const json: any = JSON.parse(script.innerHTML);
+            this.bigMapPinsCache = json.nearbyPrograms;
+            return this.bigMapPinsCache;
+          }
+        )
+      );
+  }
+
+  private fetchProgramDateLots(): Observable<ProgramDateLot[]> {
+    return this.http.get<ProgramDateLot[]>(
+      this.baseurl + '/programs')
+      .pipe(
+        tap(res => this.programDateLotCache = res),
+        map(res => {
+          res.forEach(p => {
+            // convert the object to a map
+            p.dateMap = new Map(Object.entries(p.dateMap));
+            p.program.imgUrl = this.convertUrlToBackendResourceUrl(p.program.imgUrl, false);
+
+            // set the last day lot count prop
+            const values = Array.from(p.dateMap.values());
+            p.lastDayLotCount = values[values.length - 1].length;
+            const lastDaySortedLots = values[values.length - 1]
+              .filter(l => l.price.indexOf('€') >= 0)
+              .sort(
+                (a, b) =>
+                  +a.price.replace('/ /g', '').replace('€', '')
+                  <
+                  +b.price.replace('/ /g', '').replace('€', '')
+                    ?
+                    -1 : 1
+              );
+            if (lastDaySortedLots.length) {
+              p.lastDayMinPrice = lastDaySortedLots[0].price;
+            }
+          });
+          return res;
+        })
+      );
   }
 
   private fetchProgramPage(url: string): Observable<string> {

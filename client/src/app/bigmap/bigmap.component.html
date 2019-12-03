@@ -1,46 +1,46 @@
 <div id="bigmap">
   <google-map
-    height="100%"
-    width="100%"
     [center]="center"
     [options]="options"
-    [zoom]="zoom">
+    [zoom]="zoom"
+    height="100%"
+    width="100%">
     <map-marker
       #markerElem
+      (mapClick)="markerClick(markerElem)"
       *ngFor="let marker of markerConfigs"
-      [position]="marker.position"
       [label]="marker.label"
-      [title]="marker.title"
       [options]="marker.options"
-      (mapClick)="markerClick(markerElem)">
+      [position]="marker.position"
+      [title]="marker.title">
     </map-marker>
     <map-info-window [options]="infoWindowConfig">
-      <mat-card class="map-info px-0" *ngIf="infoWindowLoaded; else loadingTemplate">
+      <mat-card *ngIf="infoWindowLoaded; else loadingTemplate" class="map-info px-0">
         <mat-card-header>
           <mat-card-title>{{infoWindowBigMapPinDetail.programName}}</mat-card-title>
           <mat-card-subtitle>{{infoWindowBigMapPinDetail.addressLocality}} {{infoWindowBigMapPinDetail.postalCode}}</mat-card-subtitle>
         </mat-card-header>
         <a [href]="infoWindowBigMapPinDetail.url" target="_blank">
-          <img class="map-info-img"
+          <img [alt]="infoWindowBigMapPinDetail.programName"
                [lazyLoad]="infoWindowBigMapPinDetail.imgUrl"
-               src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"
-               [alt]="infoWindowBigMapPinDetail.programName"/>
+               class="map-info-img"
+               src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"/>
         </a>
         <mat-card-content>
-          <div class="p-2" [innerHTML]="infoWindowBigMapPinDetail.summary"></div>
-          <div class="p-2" [innerHTML]="infoWindowBigMapPinDetail.deliveryInfo"></div>
+          <div [innerHTML]="infoWindowBigMapPinDetail.summary" class="p-2"></div>
+          <div [innerHTML]="infoWindowBigMapPinDetail.deliveryInfo" class="p-2"></div>
         </mat-card-content>
         <mat-card-actions>
-          <a [href]="infoWindowBigMapPinDetail.url" target="_blank" mat-icon-button>
+          <a [href]="infoWindowBigMapPinDetail.url" mat-icon-button target="_blank">
             <mat-icon>web</mat-icon>
           </a>
-          <button *ngIf="!infoWindowBigMapPinDetail.hid"
-                  (click)="setPinHid(infoWindowBigMapPinDetail, true)"
+          <button (click)="setPinHid(infoWindowBigMapPinDetail, true)"
+                  *ngIf="!infoWindowBigMapPinDetail.hid"
                   mat-icon-button>
             <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
           </button>
-          <button *ngIf="infoWindowBigMapPinDetail.hid"
-                  (click)="setPinHid(infoWindowBigMapPinDetail, false)"
+          <button (click)="setPinHid(infoWindowBigMapPinDetail, false)"
+                  *ngIf="infoWindowBigMapPinDetail.hid"
                   mat-icon-button>
             <mat-icon>remove_red_eye</mat-icon>
           </button>
@@ -52,7 +52,7 @@
     </map-info-window>
   </google-map>
   <div #changeHideStateButton class="d-none">
-    <button (click)="changeHideState()" mat-flat-button class="change-state-button p-0">
+    <button (click)="changeHideState()" class="change-state-button p-0" mat-flat-button>
       <ng-container *ngIf="hideHidPins; else hideUnhidPins">
         <mat-icon>remove_red_eye</mat-icon>
       </ng-container>

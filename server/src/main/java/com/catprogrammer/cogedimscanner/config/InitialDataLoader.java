@@ -19,12 +19,11 @@ import java.util.Collections;
 @Component
 public class InitialDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
-    private boolean alreadySetup = false;
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
     private final PasswordEncoder passwordEncoder;
+    private boolean alreadySetup = false;
 
     public InitialDataLoader(UserRepository userRepository, RoleRepository roleRepository,
                              PrivilegeRepository privilegeRepository, PasswordEncoder passwordEncoder) {
