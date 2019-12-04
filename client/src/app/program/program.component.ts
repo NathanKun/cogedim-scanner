@@ -8,6 +8,7 @@ import {SafeHtml, Title} from '@angular/platform-browser';
 import {Sort} from '@angular/material/sort';
 import {Decision} from '../model/decision';
 import {LotService} from '../service/lot.service';
+import {RealEstateDeveloperName} from '../model/realestatedeveloper';
 
 @Component({
   selector: 'app-program',
@@ -37,6 +38,7 @@ export class ProgramComponent implements OnInit, AfterViewInit {
 
   // Store a reference to the enum
   Decision = Decision;
+  RealEstateDeveloperName = RealEstateDeveloperName;
 
   constructor(
     private route: ActivatedRoute,

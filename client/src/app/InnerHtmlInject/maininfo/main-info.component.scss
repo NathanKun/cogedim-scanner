@@ -1,0 +1,38 @@
+/*
+  injected div for program's main info
+ */
+.main-info {
+  margin-top: 1vh;
+
+  .icons {
+    display: inline-block;
+    vertical-align: middle;
+    color: #a1217d;
+    margin: 0 8px 0 0;
+  }
+
+  .icons + span,
+  .line {
+    vertical-align: middle;
+  }
+
+  .event-title {
+    color: #a1217d;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .informations-strengths,
+  .event,
+  .catchline-strengths-group {
+    margin-top: 1vh;
+  }
+
+  .program-infos {
+    margin-bottom: 3vh;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}

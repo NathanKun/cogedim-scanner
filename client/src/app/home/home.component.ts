@@ -60,7 +60,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     } else {
       return null;
     }
-
   }
 
   private static formatCookie(developer: RealEstateDeveloper, programNumber: string): string {

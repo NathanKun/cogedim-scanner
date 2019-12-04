@@ -12,7 +12,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {BigmapComponent} from './bigmap/bigmap.component';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
-import {MatRippleModule} from '@angular/material/core';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -38,9 +37,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    HomeComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     RouterModule.forRoot(routes),
@@ -49,8 +46,7 @@ const routes: Routes = [
     MatIconModule,
     MatProgressSpinnerModule,
     GoogleMapsModule,
-    LazyLoadImageModule,
-    MatRippleModule
+    LazyLoadImageModule
   ],
   providers: [],
   exports: [RouterModule]

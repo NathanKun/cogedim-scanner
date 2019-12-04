@@ -34,7 +34,7 @@
               </mat-card-title>
               <mat-card-subtitle>
                 <!-- {{p.program.address}} {{p.program.postalCode}} -->
-                <div [innerHTML]="p.deliveryInfoHtml" id="delivery-info"></div>
+                <app-delivery-info [html]="p.deliveryInfoHtml"></app-delivery-info>
               </mat-card-subtitle>
             </mat-card-header>
             <a [routerLink]="['/programs', p.program.programNumber]">

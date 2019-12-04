@@ -28,15 +28,24 @@ import {MatIconModule} from '@angular/material/icon';
 import {AuthInterceptor} from './interceptor/auth.interceptor';
 import {EditInputComponent} from './component/edit-input/edit-input.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MainInfoComponent} from './InnerHtmlInject/maininfo/maininfo';
+import {SalesInfoComponent} from './InnerHtmlInject/salesinfo/salesinfo';
+import {HomeComponent} from './home/home.component';
+import {DeliveryInfoComponent} from './InnerHtmlInject/deliveryinfo/deliveryinfo';
+import {MatRippleModule} from '@angular/material/core';
 
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
     LoginComponent,
     AlertComponent,
     ProgramComponent,
     BigmapComponent,
-    EditInputComponent
+    EditInputComponent,
+    MainInfoComponent,
+    SalesInfoComponent,
+    DeliveryInfoComponent
   ],
   imports: [
     BrowserModule,
@@ -60,7 +69,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     LazyLoadImageModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: true}),
     MatMenuModule,
-    MatIconModule
+    MatIconModule,
+    MatRippleModule
   ],
   providers: [AuthGuard,
     CookieService,

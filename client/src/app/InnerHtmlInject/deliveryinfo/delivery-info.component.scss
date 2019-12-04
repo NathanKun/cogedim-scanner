@@ -1,0 +1,15 @@
+/*
+  injected div for program's delivery info
+ */
+
+.delivery-info {
+  .icons {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .icons + span,
+  .line {
+    vertical-align: middle;
+  }
+}

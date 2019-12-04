@@ -1,0 +1,58 @@
+/*
+  injected div for program's sales info
+ */
+.sales-info {
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  .strate-title {
+    display: none;
+  }
+
+  .norms li {
+    display: inline-block;
+    height: 50px;
+    overflow: hidden;
+    text-indent: 100px;
+    white-space: nowrap;
+    width: 50px
+  }
+
+  .features {
+    align-items: flex-start;
+    display: flex;
+    flex-flow: row wrap;
+    list-style: none;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0 0 36px;
+
+    li {
+      color: #666;
+      display: inline-flex;
+      flex-flow: row wrap;
+      font-size: 12px;
+      align-items: flex-start;
+      margin: 0;
+      padding: 6px;
+      text-align: center;
+      width: 84px;
+
+      img {
+        display: block;
+        height: 48px;
+        margin: 0 auto 5px;
+        width: 48px;
+      }
+
+      span {
+        width: 100%;
+      }
+    }
+  }
+}
