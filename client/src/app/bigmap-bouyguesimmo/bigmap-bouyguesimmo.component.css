@@ -1,0 +1,22 @@
+#bigmap {
+  height: calc(100% - 64px);
+  width: 100%;
+  position: absolute;
+  top: 64px;
+}
+
+.map-info {
+  width: 280px;
+  box-shadow: none;
+}
+
+.map-info-img {
+  width: 100%;
+  margin-bottom: 1vh;
+}
+
+.change-state-button {
+  min-width: 1%;
+  width: 40px;
+  height: 40px;
+}

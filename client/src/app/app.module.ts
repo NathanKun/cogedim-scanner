@@ -33,6 +33,7 @@ import {SalesInfoComponent} from './InnerHtmlInject/salesinfo/salesinfo';
 import {HomeComponent} from './home/home.component';
 import {DeliveryInfoComponent} from './InnerHtmlInject/deliveryinfo/deliveryinfo';
 import {MatRippleModule} from '@angular/material/core';
+import {BigmapBouyguesimmoComponent} from './bigmap-bouyguesimmo/bigmap-bouyguesimmo.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import {MatRippleModule} from '@angular/material/core';
     EditInputComponent,
     MainInfoComponent,
     SalesInfoComponent,
-    DeliveryInfoComponent
+    DeliveryInfoComponent,
+    BigmapBouyguesimmoComponent
   ],
   imports: [
     BrowserModule,

@@ -39,12 +39,12 @@ export class BigmapComponent implements OnInit, AfterViewInit {
   bigMapPins: BigMapPin[];
   @ViewChild('changeHideStateButton') changeHideStateButton: ElementRef;
   hidPins: string[];
-  private hidPinsCookieName = 'hided_pins';
+  hidPinsCookieName = 'hided_pins';
 
-  constructor(private cookieService: CookieService,
-              private titleService: Title,
-              private programService: ProgramService,
-              private mapInitService: MapInitService) {
+  constructor(protected cookieService: CookieService,
+              protected titleService: Title,
+              protected programService: ProgramService,
+              protected mapInitService: MapInitService) {
   }
 
   ngOnInit() {
@@ -123,11 +123,11 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     this.showMarkers(this.hideHidPins, false);
   }
 
-  private isPinHid(nid: string) {
+  protected isPinHid(nid: string) {
     return this.hidPins.indexOf(nid) >= 0;
   }
 
-  private showMarkers(hideHid: boolean, animate: boolean) {
+  protected showMarkers(hideHid: boolean, animate: boolean) {
     this.markerConfigs.length = 0;
 
     this.bigMapPins.forEach(item => {
@@ -146,7 +146,7 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private readCookie() {
+  protected readCookie() {
     if (this.cookieService.check(this.hidPinsCookieName)) {
       const cookieStr = this.cookieService.get(this.hidPinsCookieName);
       this.hidPins = JSON.parse(cookieStr) as string[];

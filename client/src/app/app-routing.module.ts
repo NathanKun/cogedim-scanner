@@ -12,6 +12,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {BigmapComponent} from './bigmap/bigmap.component';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
+import {BigmapBouyguesimmoComponent} from './bigmap-bouyguesimmo/bigmap-bouyguesimmo.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -32,6 +33,11 @@ const routes: Routes = [
   {
     path: 'bigmap',
     component: BigmapComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'bigmap-bouyguesimmo',
+    component: BigmapBouyguesimmoComponent,
     canActivate: [AuthGuard]
   }
 ];

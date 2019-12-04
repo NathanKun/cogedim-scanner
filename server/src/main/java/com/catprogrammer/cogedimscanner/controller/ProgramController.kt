@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @CacheConfig(cacheNames = ["programCache"])
 @EnableScheduling
-open class ProgramController {
+open class ProgramController : BaseController() {
 
     private val logger = LoggerFactory.getLogger(ProgramController::class.java)
 
@@ -254,19 +254,5 @@ open class ProgramController {
                 .joinToString("/") {
                     URLEncoder.encode(it, "UTF-8")
                 }
-    }
-
-    private fun getDeveloperFromUrl(url: String): RealEstateDeveloper {
-        return when {
-            url.contains("cogedim.com", ignoreCase = true) -> {
-                RealEstateDeveloper.COGEDIM
-            }
-            url.contains("kaufmanbroad", ignoreCase = true) -> {
-                RealEstateDeveloper.KAUFMANBROAD
-            }
-            else -> {
-                throw Exception("url does not belongs to any developer. Url = $url")
-            }
-        }
     }
 }

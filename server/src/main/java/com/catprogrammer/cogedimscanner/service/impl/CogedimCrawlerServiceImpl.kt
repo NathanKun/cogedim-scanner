@@ -129,15 +129,18 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val selector1 = when (program.developer) {
             RealEstateDeveloper.COGEDIM -> "v-expansion-panel[class^=regulation-] > *"
             RealEstateDeveloper.KAUFMANBROAD -> "#tab-regulation-17 div.lot-items"
+            else -> throw Exception("RealEstateDeveloper ${program.developer} not supported")
         }
         val selector2 = when (program.developer) {
             RealEstateDeveloper.COGEDIM -> "v-expansion-panel v-expansion-panel-content[ripple]"
             RealEstateDeveloper.KAUFMANBROAD -> "div.lot-item"
+            else -> throw Exception("RealEstateDeveloper ${program.developer} not supported")
         }
 
         val blueprintSelector = when (program.developer) {
             RealEstateDeveloper.COGEDIM -> "div.lot-details div.buttons v-btn[@click.native*=blueprint]"
             RealEstateDeveloper.KAUFMANBROAD -> "v-btn[@click.native*=blueprint]"
+            else -> throw Exception("RealEstateDeveloper ${program.developer} not supported")
         }
 
         article.select(selector1).forEach { programTypeTag ->
@@ -205,6 +208,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         val programName = when (developer) {
             RealEstateDeveloper.COGEDIM -> article.select("div.info-box h2 span").text()
             RealEstateDeveloper.KAUFMANBROAD -> article.select("div.left-part h2 span").text()
+            else -> throw Exception("RealEstateDeveloper $developer not supported")
         }
         val programId = article.select("article[is^=program-card-]").attr("class")
                 .split(" ")
@@ -225,6 +229,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                 when (developer) {
                     RealEstateDeveloper.COGEDIM -> article.select("div.visual .gradient a.more-link").attr("href")
                     RealEstateDeveloper.KAUFMANBROAD -> article.select("a.program-link").attr("href")
+                    else -> throw Exception("RealEstateDeveloper $developer not supported")
                 }
         val imgUrl = developer.baseurl + article.select("div.visual img").attr("src")
                 .replace("/styles/visual_327x188/public", "") // remove resize cogedim
@@ -252,6 +257,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
         return when (developer) {
             RealEstateDeveloper.COGEDIM -> Jsoup.parse(result.form).select("div.confirmation a").attr("href")
             RealEstateDeveloper.KAUFMANBROAD -> Jsoup.parse(result.confirmation).select("div.download-btn v-btn").attr("href")
+            else -> throw Exception("RealEstateDeveloper $developer not supported")
         }
     }
 
@@ -290,6 +296,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                     "form_id=re_forms_blueprint&program_nid=$programNumber&lot_id=$lotNumber&$contactinfoK",
                     FormGetResult::class.javaObjectType
             )
+            else -> throw Exception("RealEstateDeveloper $developer not supported")
         }
     }
 
@@ -308,6 +315,7 @@ class CogedimCrawlerServiceImpl : CogedimCrawlerService {
                     "form_id=re_forms_booklet&program_nid=$programNumber&$contactinfoK",
                     FormGetResult::class.javaObjectType
             )
+            else -> throw Exception("RealEstateDeveloper $developer not supported")
         }
     }
 

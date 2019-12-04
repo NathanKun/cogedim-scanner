@@ -7,6 +7,9 @@
   <button (click)="router.navigate(['/bigmap'])" *ngIf="isAuthenticated" mat-icon-button>
     <mat-icon>map</mat-icon>
   </button>
+  <button (click)="router.navigate(['/bigmap-bouyguesimmo'])" *ngIf="isAuthenticated" mat-icon-button>
+    <mat-icon>map</mat-icon>
+  </button>
   <button (click)="authService.logout()" *ngIf="isAuthenticated" mat-icon-button>
     <mat-icon>exit_to_app</mat-icon>
   </button>
