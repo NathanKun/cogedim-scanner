@@ -1,15 +1,18 @@
 package com.catprogrammer.cogedimscanner.controller
 
 import com.catprogrammer.cogedimscanner.model.BouyguesImmoDatalayerResult
+import com.catprogrammer.cogedimscanner.model.BouyguesImmoGetDetailResult
 import com.catprogrammer.cogedimscanner.model.BouyguesImmoProgramModel
 import com.catprogrammer.cogedimscanner.model.BouyguesImmoSearchResult
 import com.catprogrammer.cogedimscanner.service.impl.CogedimCrawlerServiceImpl
 import com.google.gson.Gson
 import org.apache.commons.io.IOUtils
+import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
-import org.springframework.http.ResponseEntity
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,35 +35,41 @@ open class BouyguesImmoController : BaseController() {
     private val mapUrl = "https://www.bouygues-immobilier.com/bi-kelquartier/"
 
     private val gson = Gson()
-
     @PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
     @PostMapping("/bouygues-immo/search")
-    open fun search(): ResponseEntity<List<BouyguesImmoProgramModel>> {
+    @Cacheable(key = "'search'")
+    open fun search(): List<BouyguesImmoProgramModel> {
+        return internalSearch()
+    }
 
+    @CachePut(key = "'search'")
+    open fun internalSearch(): List<BouyguesImmoProgramModel> {
         val programs = mutableListOf<BouyguesImmoProgramModel>()
 
         gson.fromJson(sendRequest(searchUrl), BouyguesImmoSearchResult::class.javaObjectType)
                 .items
                 .forEach { nid ->
-                    /*val articleHtml = gson.fromJson(sendRequest(getDetailUrl + nid), BouyguesImmoGetDetailResult::class.javaObjectType).html
-                    val article = Jsoup.parse(articleHtml)
-                    val aTag = article.select("div.program-title > a")
-                    val programTitle = aTag.text()
-                    val programUrl = "https://www.bouygues-immobilier.com" + aTag.attr("href")
-                    val programPage = Jsoup.parse(sendRequest(programUrl))
-                    */
-
                     val dataLayer = getDatalayer(nid)
-                    val mapPageStr = sendRequest(mapUrl + dataLayer.programId)
-                    // search   "geoloc":{"lat":"48.9254119","lng":"2.28396629999997",
-                    val regex = Regex(""""geoloc":\{"lat":"(\d{1,2}.\d{1,99})","lng":"(\d{1,2}.\d{1,99})",""")
-                    val match = regex.find(mapPageStr) ?: throw Exception("latlng not found for url = $mapUrl")
+                    if (dataLayer.programId.isNotEmpty()) {
+                        val teaser = gson.fromJson(sendRequest(getDetailUrl + nid), BouyguesImmoGetDetailResult::class.javaObjectType).html
+                        val article = Jsoup.parse(teaser)
+                        val aTag = article.select(".program-title > a")
+                        val programUrl = "https://www.bouygues-immobilier.com" + aTag.attr("href")
 
-                    val lat = match.groups[1].toString()
-                    val lng = match.groups[2].toString()
+                        val mapPageStr = sendRequest(mapUrl + dataLayer.programId)
 
-                    val program = BouyguesImmoProgramModel(nid, dataLayer.programId, dataLayer.programName, lat, lng)
-                    programs.add(program)
+                        // search   "geoloc":{"lat":"48.9254119","lng":"2.28396629999997",
+                        val regex = Regex(""""geoloc":\{"lat":"(\d{1,2}.\d{1,99})","lng":"(\d{1,2}.\d{1,99})",""")
+                        val match = regex.find(mapPageStr) ?: throw Exception("latlng not found for url = $mapUrl")
+
+                        val lat = match.groups[1]?.value ?: ""
+                        val lng = match.groups[2]?.value ?: ""
+
+                        val program = BouyguesImmoProgramModel(nid, dataLayer.programId, dataLayer.programName, lat, lng, programUrl, teaser)
+                        programs.add(program)
+                    } else {
+                        logger.info("Skipped program: nid=$nid programName = ${dataLayer.programName} programId = ${dataLayer.programId}")
+                    }
                 }
 
         return programs
@@ -75,18 +84,25 @@ open class BouyguesImmoController : BaseController() {
             }
         }
         conn.inputStream.use {
-            val result = IOUtils.toString(GZIPInputStream(it), StandardCharsets.UTF_8)
+            val result = IOUtils.toString(it, StandardCharsets.UTF_8)
             return gson.fromJson(result, BouyguesImmoDatalayerResult::class.javaObjectType)
         }
     }
 
     private fun sendRequest(url: String): String {
+        logger.info("Requesting $url")
         val conn = CogedimCrawlerServiceImpl.applyRequestHeaders(getDeveloperFromUrl(url), URL(url).openConnection(), false) as HttpURLConnection
 
         return if (conn.responseCode >= 400) {
-            val resp = IOUtils.toString(conn.errorStream, StandardCharsets.UTF_8)
+            val errorStream = if (conn.contentEncoding == "gzip") {
+                GZIPInputStream(conn.errorStream)
+            } else {
+                conn.errorStream
+            }
+            val resp = IOUtils.toString(errorStream, StandardCharsets.UTF_8)
+            logger.warn("Request url = $url response code = ${conn.responseCode}")
             logger.warn(resp)
-            throw Exception(resp)
+            throw Exception("Request url = $url response code = ${conn.responseCode}")
         } else {
             val inputStream = if (conn.contentEncoding == "gzip") {
                 GZIPInputStream(conn.inputStream)

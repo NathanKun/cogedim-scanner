@@ -5,5 +5,7 @@ data class BouyguesImmoProgramModel(
         val programId: String,
         val title: String,
         val lat: String,
-        val lng: String
+        val lng: String,
+        val url: String,
+        val teaser: String
 )
