@@ -15,37 +15,19 @@
       [title]="marker.title">
     </map-marker>
     <map-info-window [options]="infoWindowConfig">
-      <mat-card *ngIf="infoWindowLoaded; else loadingTemplate" class="map-info px-0">
-        <mat-card-header>
-          <mat-card-title>{{infoWindowBigMapPinDetail.programName}}</mat-card-title>
-          <mat-card-subtitle>{{infoWindowBigMapPinDetail.addressLocality}} {{infoWindowBigMapPinDetail.postalCode}}</mat-card-subtitle>
-        </mat-card-header>
-        <a [href]="infoWindowBigMapPinDetail.url" target="_blank">
-          <img [alt]="infoWindowBigMapPinDetail.programName"
-               [lazyLoad]="infoWindowBigMapPinDetail.imgUrl"
-               class="map-info-img"
-               src="https://dummyimage.com/327x188/eeeeee/eeeeee.jpg"/>
-        </a>
-        <mat-card-content>
-          <div [innerHTML]="infoWindowBigMapPinDetail.summary" class="p-2"></div>
-          <div [innerHTML]="infoWindowBigMapPinDetail.deliveryInfo" class="p-2"></div>
-        </mat-card-content>
-        <mat-card-actions>
-          <a [href]="infoWindowBigMapPinDetail.url" mat-icon-button target="_blank">
-            <mat-icon>web</mat-icon>
-          </a>
-          <button (click)="setPinHid(infoWindowBigMapPinDetail, true)"
-                  *ngIf="!infoWindowBigMapPinDetail.hid"
-                  mat-icon-button>
-            <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
-          </button>
-          <button (click)="setPinHid(infoWindowBigMapPinDetail, false)"
-                  *ngIf="infoWindowBigMapPinDetail.hid"
-                  mat-icon-button>
-            <mat-icon>remove_red_eye</mat-icon>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+      <ng-container *ngIf="infoWindowLoaded; else loadingTemplate">
+      <app-bouyguesimmo-teaser [html]="mapInfoWindowInnerHtml"></app-bouyguesimmo-teaser>
+      <button (click)="setPinHidBouygues(infoWindowProgram, true)"
+              *ngIf="!infoWindowProgram.hid"
+              mat-icon-button>
+        <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
+      </button>
+      <button (click)="setPinHidBouygues(infoWindowProgram, false)"
+              *ngIf="infoWindowProgram.hid"
+              mat-icon-button>
+        <mat-icon>remove_red_eye</mat-icon>
+      </button>
+      </ng-container>
       <ng-template #loadingTemplate>
         loading...
       </ng-template>

@@ -1,14 +1,14 @@
-import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {Component, OnInit} from '@angular/core';
+import {MapMarker} from '@angular/google-maps';
 import {CookieService} from 'ngx-cookie-service';
-import {Title} from '@angular/platform-browser';
+import {DomSanitizer, SafeHtml, Title} from '@angular/platform-browser';
 import {environment} from '../../environments/environment';
 import {ProgramService} from '../service/program.service';
-import {BigMapPin} from '../model/bigmappin';
-import {BigMapPinDetail} from '../model/bigmappindetail';
 import {MapInitService} from '../service/mapinit.service';
 import {BigmapComponent} from '../bigmap/bigmap.component';
 import {BouyguesimmoService} from '../service/bouyguesimmo.service';
+import {BouyguesImmoProgram} from "../model/bouyguesimmoprogram";
+import {BigMapPin} from "../model/bigmappin";
 
 @Component({
   selector: 'app-bigmap-bouyguesimmo',
@@ -18,14 +18,16 @@ import {BouyguesimmoService} from '../service/bouyguesimmo.service';
 export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnInit {
 
   hidPinsCookieName = 'hided_pins_bouyguesimmo';
-
-  private nids: string[];
+  programs: BouyguesImmoProgram[];
+  infoWindowProgram: BouyguesImmoProgram;
+  mapInfoWindowInnerHtml: SafeHtml;
 
   constructor(protected cookieService: CookieService,
               protected titleService: Title,
               protected programService: ProgramService,
               protected bouyguesimmoService: BouyguesimmoService,
-              protected mapInitService: MapInitService) {
+              protected mapInitService: MapInitService,
+              private domSanitizer: DomSanitizer) {
     super(cookieService, titleService, programService, mapInitService);
   }
 
@@ -41,32 +43,90 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
     });
 
     this.bouyguesimmoService.fetchSearchResult().subscribe(
-      nids => {
-        this.nids = nids;
-
-        for (const nid of this.nids) {
-          this.bouyguesimmoService.fetchDetail(nid).subscribe(
-            html => {
-
-            }
-          );
+      programs => {
+        for (const p of programs) {
+          p.hid = this.isPinHid(p.nid);
+          this.markerConfigs.push({
+              position: {
+                lat: parseFloat(p.lat),
+                lng: parseFloat(p.lng)
+              },
+              title: p.nid,
+              options: {
+                animation: google.maps.Animation.DROP,
+                visible: !p.hid
+              }
+            } as MapMarker
+          )
         }
+
+        this.programs = programs;
       }
     );
   }
 
   markerClick(marker: MapMarker) {
     this.infoWindowLoaded = false;
+    const p = this.programs.find(p => p.nid === marker.getTitle());
+    this.infoWindowProgram = p;
+
+    const article = new DOMParser().parseFromString(p.teaser, 'text/html');
+    article.querySelectorAll("a")
+      .forEach(
+        a => {
+          a.setAttribute(
+            'href',
+            'https://www.bouygues-immobilier.com' + a.getAttribute('href'));
+          a.setAttribute('target', '_blank');
+        }
+      );
+    const domArticle = article.querySelector('article');
+    domArticle.setAttribute('class', domArticle.getAttribute('class') + ' row');
+
+    this.mapInfoWindowInnerHtml = this.domSanitizer.bypassSecurityTrustHtml(article.body.innerHTML);
+    this.infoWindowLoaded = true;
     this.infoWindow.open(marker);
-    const pin = this.bigMapPins.find(p => p.nid === marker.getTitle());
-    this.programService.getBigmapPinDetail(pin).subscribe(
-      obj => {
-        this.infoWindowBigMapPinDetail = obj;
-        this.infoWindowLoaded = true;
-        this.infoWindow.close();
-        this.infoWindow.open(marker);
+  }
+
+  setPinHidBouygues(pin: BouyguesImmoProgram, setHided: boolean) {
+    // this update the opened info window
+    pin.hid = !pin.hid;
+    this.showMarkers(this.hideHidPins, false);
+
+    // update cookie
+    if (setHided) {
+      // hide
+      if (this.hidPins.indexOf(pin.nid) === -1) {
+        this.hidPins.push(pin.nid);
       }
-    );
+    } else {
+      // unhide
+      const index = this.hidPins.indexOf(pin.nid);
+      if (index >= 0) {
+        this.hidPins.splice(index, 1);
+      }
+    }
+
+    this.cookieService.set(this.hidPinsCookieName, JSON.stringify(this.hidPins), 10 * 365, '/');
+  }
+
+  showMarkers(hideHid: boolean, animate: boolean) {
+    this.markerConfigs.length = 0;
+
+    this.programs.forEach(item => {
+      if (!hideHid || !item.hid) {
+        this.markerConfigs.push({
+          position: {
+            lat: parseFloat(item.lat),
+            lng: parseFloat(item.lng)
+          },
+          title: item.nid,
+          options: {
+            animation: animate ? google.maps.Animation.DROP : null,
+          },
+        } as MapMarker);
+      }
+    });
   }
 
   changeHideState() {

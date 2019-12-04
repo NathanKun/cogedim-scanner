@@ -34,6 +34,7 @@ import {HomeComponent} from './home/home.component';
 import {DeliveryInfoComponent} from './InnerHtmlInject/deliveryinfo/deliveryinfo';
 import {MatRippleModule} from '@angular/material/core';
 import {BigmapBouyguesimmoComponent} from './bigmap-bouyguesimmo/bigmap-bouyguesimmo.component';
+import {BouyguesImmoTeaserComponent} from "./InnerHtmlInject/bouyguesimmoteaser/bouyguesimmo-teaser";
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import {BigmapBouyguesimmoComponent} from './bigmap-bouyguesimmo/bigmap-bouygues
     MainInfoComponent,
     SalesInfoComponent,
     DeliveryInfoComponent,
-    BigmapBouyguesimmoComponent
+    BigmapBouyguesimmoComponent,
+    BouyguesImmoTeaserComponent
   ],
   imports: [
     BrowserModule,
