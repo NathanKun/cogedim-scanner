@@ -2,8 +2,8 @@
   <div class="row m-0">
     <div class="col-12 p-0">
       <mat-card *ngIf="programDateLot" class="my-sm-2">
-        <img class="hero-image" mat-card-image [src]="programDateLot.program.imgUrl"
-             [alt]="programDateLot.program.programName">
+        <img [alt]="programDateLot.program.programName" [src]="programDateLot.program.imgUrl" class="hero-image"
+             mat-card-image>
         <mat-card-header>
           <mat-card-title>
             <div class="vertical-align">
@@ -12,10 +12,10 @@
             </div>
 
             <div>
-              <a [href]="programDateLot.program.url" target="_blank" mat-icon-button>
+              <a [href]="programDateLot.program.url" mat-icon-button target="_blank">
                 <mat-icon>web</mat-icon>
               </a>
-              <a [href]="programDateLot.program.pdfUrl" target="_blank" mat-icon-button>
+              <a [href]="programDateLot.program.pdfUrl" mat-icon-button target="_blank">
                 <mat-icon>picture_as_pdf</mat-icon>
               </a>
             </div>
@@ -29,35 +29,35 @@
           <app-main-info [html]="injectMainInfo"></app-main-info>
 
           <div class="date-bar">
-            <button [disabled]="!hasPreviousDate" (click)="changeDate(false)" mat-button>
+            <button (click)="changeDate(false)" [disabled]="!hasPreviousDate" mat-button>
               <mat-icon>arrow_back_ios</mat-icon>
             </button>
             <div class="row">
               <div class="col-12 text-align-center"><span>{{selectedDate}}</span></div>
               <div class="col-12 text-align-center"><span>{{selectedDateLotCount}}</span></div>
             </div>
-            <button [disabled]="!hasNextDate" (click)="changeDate(true)" mat-button>
+            <button (click)="changeDate(true)" [disabled]="!hasNextDate" mat-button>
               <mat-icon>arrow_forward_ios</mat-icon>
             </button>
           </div>
 
-          <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
-                 class="mat-elevation-z8" multiTemplateDataRows>
+          <table (matSortChange)="sortData($event)" [dataSource]="dataSource" class="mat-elevation-z8" mat-table
+                 matSort multiTemplateDataRows>
 
             <!-- Cell Definition -->
 
             <!-- Lot Number & Blueprint -->
             <ng-container matColumnDef="lotNumber">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header><span
+              <th *matHeaderCellDef mat-header-cell mat-sort-header><span
                 class="px-0 px-sm-3 mr-3 mx-sm-0">Number</span></th>
-              <td mat-cell *matCellDef="let lot">
-                <a *ngIf="lot['pdfUrl'] else lotNumberTemplate" [href]="lot['pdfUrl']" target="_blank" mat-button
-                   class="px-0 px-sm-3 mr-3 mx-sm-0 a-tag-no-underline">
+              <td *matCellDef="let lot" mat-cell>
+                <a *ngIf="lot['pdfUrl'] else lotNumberTemplate" [href]="lot['pdfUrl']" class="px-0 px-sm-3 mr-3 mx-sm-0 a-tag-no-underline" mat-button
+                   target="_blank">
                   <mat-icon>picture_as_pdf</mat-icon>
                   {{lot['lotNumber']}}
                 </a>
                 <ng-template #lotNumberTemplate>
-                  <button mat-button class="px-0 px-sm-3 mr-3 mx-sm-0">
+                  <button class="px-0 px-sm-3 mr-3 mx-sm-0" mat-button>
                     <mat-icon>crop_din</mat-icon>
                     {{lot['lotNumber']}}
                   </button>
@@ -67,60 +67,60 @@
 
             <!-- Surface -->
             <ng-container matColumnDef="surface">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Surface</th>
-              <td mat-cell *matCellDef="let lot"> {{lot['surface']}} </td>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Surface</th>
+              <td *matCellDef="let lot" mat-cell> {{lot['surface']}} </td>
             </ng-container>
 
             <!-- Floor -->
             <ng-container matColumnDef="floor">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Floor</th>
-              <td mat-cell *matCellDef="let lot"> {{lot['floor']}} </td>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Floor</th>
+              <td *matCellDef="let lot" mat-cell> {{lot['floor']}} </td>
             </ng-container>
 
             <!-- Price -->
             <ng-container matColumnDef="price">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-              <td mat-cell *matCellDef="let lot"> {{lot['price']}} </td>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Price</th>
+              <td *matCellDef="let lot" mat-cell> {{lot['price']}} </td>
             </ng-container>
 
             <!-- Price m2 -->
             <ng-container matColumnDef="price_per_m2">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Price m2</th>
-              <td mat-cell *matCellDef="let lot"> {{calculatePricePerM2(lot)}} </td>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>Price m2</th>
+              <td *matCellDef="let lot" mat-cell> {{calculatePricePerM2(lot)}} </td>
             </ng-container>
 
             <!-- Decision -->
             <ng-container matColumnDef="decision">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header class="row-decision">Decision</th>
-              <td mat-cell *matCellDef="let lot" class="row-decision">
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.GOOD">
+              <th *matHeaderCellDef class="row-decision" mat-header-cell mat-sort-header>Decision</th>
+              <td *matCellDef="let lot" class="row-decision" mat-cell>
+                <button *ngIf="lot['decision'] === Decision.GOOD" [matMenuTriggerFor]="decisionMenu" mat-icon-button>
                   <mat-icon>sentiment_very_satisfied</mat-icon>
                 </button>
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu"
-                        *ngIf="lot['decision'] === Decision.SECONDARY">
+                <button *ngIf="lot['decision'] === Decision.SECONDARY" [matMenuTriggerFor]="decisionMenu"
+                        mat-icon-button>
                   <mat-icon>sentiment_satisfied</mat-icon>
                 </button>
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu" *ngIf="lot['decision'] === Decision.BAD">
+                <button *ngIf="lot['decision'] === Decision.BAD" [matMenuTriggerFor]="decisionMenu" mat-icon-button>
                   <mat-icon>sentiment_very_dissatisfied</mat-icon>
                 </button>
-                <button mat-icon-button [matMenuTriggerFor]="decisionMenu"
-                        *ngIf="lot['decision'] === Decision.NONE || !lot['decision']">
+                <button *ngIf="lot['decision'] === Decision.NONE || !lot['decision']" [matMenuTriggerFor]="decisionMenu"
+                        mat-icon-button>
                   <mat-icon>hourglass_empty</mat-icon>
                 </button>
                 <mat-menu #decisionMenu="matMenu">
-                  <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.GOOD)">
+                  <button (click)="decisionButtonOnClick(lot, Decision.GOOD)" mat-menu-item>
                     <mat-icon>sentiment_very_satisfied</mat-icon>
                     Good
                   </button>
-                  <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.SECONDARY)">
+                  <button (click)="decisionButtonOnClick(lot, Decision.SECONDARY)" mat-menu-item>
                     <mat-icon>sentiment_satisfied</mat-icon>
                     Secondary
                   </button>
-                  <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.BAD)">
+                  <button (click)="decisionButtonOnClick(lot, Decision.BAD)" mat-menu-item>
                     <mat-icon>sentiment_very_dissatisfied</mat-icon>
                     Bad
                   </button>
-                  <button mat-menu-item (click)="decisionButtonOnClick(lot, Decision.NONE)">
+                  <button (click)="decisionButtonOnClick(lot, Decision.NONE)" mat-menu-item>
                     <mat-icon>hourglass_empty</mat-icon>
                     Wait
                   </button>
@@ -131,31 +131,31 @@
             <!-- Remark -->
             <ng-container matColumnDef="remark">
               <ng-container *ngIf="!smallScreen">
-                <th mat-header-cell *matHeaderCellDef>Remark</th>
+                <th *matHeaderCellDef mat-header-cell>Remark</th>
               </ng-container>
-              <td mat-cell *matCellDef="let lot" [attr.colspan]="displayedColumns.length">
-                <app-edit-input [data]="lot['remark']" (focusOut)='remarkChanged(lot, $event)'></app-edit-input>
+              <td *matCellDef="let lot" [attr.colspan]="displayedColumns.length" mat-cell>
+                <app-edit-input (focusOut)='remarkChanged(lot, $event)' [data]="lot['remark']"></app-edit-input>
               </td>
             </ng-container>
 
 
             <!-- Header -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
 
 
             <!-- Row 1 -->
             <!--suppress JSUnusedGlobalSymbols -->
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
 
 
             <!-- Row 2 for small screen -->
             <ng-container *ngIf="smallScreen">
               <!--suppress JSUnusedGlobalSymbols -->
-              <tr mat-row *matRowDef="let row; columns: displayedColumnsSecondRow;"></tr>
+              <tr *matRowDef="let row; columns: displayedColumnsSecondRow;" mat-row></tr>
             </ng-container>
           </table>
 
-          <app-sales-info class="mt-5" [html]="injectSalesInfo"></app-sales-info>
+          <app-sales-info [html]="injectSalesInfo" class="mt-5"></app-sales-info>
 
         </mat-card-content>
       </mat-card>

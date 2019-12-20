@@ -7,8 +7,7 @@ import {ProgramService} from '../service/program.service';
 import {MapInitService} from '../service/mapinit.service';
 import {BigmapComponent} from '../bigmap/bigmap.component';
 import {BouyguesimmoService} from '../service/bouyguesimmo.service';
-import {BouyguesImmoProgram} from "../model/bouyguesimmoprogram";
-import {BigMapPin} from "../model/bigmappin";
+import {BouyguesImmoProgram} from '../model/bouyguesimmoprogram';
 
 @Component({
   selector: 'app-bigmap-bouyguesimmo',
@@ -57,7 +56,7 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
                 visible: !p.hid
               }
             } as MapMarker
-          )
+          );
         }
 
         this.programs = programs;
@@ -71,7 +70,7 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
     this.infoWindowProgram = p;
 
     const article = new DOMParser().parseFromString(p.teaser, 'text/html');
-    article.querySelectorAll("a")
+    article.querySelectorAll('a')
       .forEach(
         a => {
           a.setAttribute(

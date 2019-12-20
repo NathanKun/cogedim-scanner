@@ -16,17 +16,17 @@
     </map-marker>
     <map-info-window [options]="infoWindowConfig">
       <ng-container *ngIf="infoWindowLoaded; else loadingTemplate">
-      <app-bouyguesimmo-teaser [html]="mapInfoWindowInnerHtml"></app-bouyguesimmo-teaser>
-      <button (click)="setPinHidBouygues(infoWindowProgram, true)"
-              *ngIf="!infoWindowProgram.hid"
-              mat-icon-button>
-        <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
-      </button>
-      <button (click)="setPinHidBouygues(infoWindowProgram, false)"
-              *ngIf="infoWindowProgram.hid"
-              mat-icon-button>
-        <mat-icon>remove_red_eye</mat-icon>
-      </button>
+        <app-bouyguesimmo-teaser [html]="mapInfoWindowInnerHtml"></app-bouyguesimmo-teaser>
+        <button (click)="setPinHidBouygues(infoWindowProgram, true)"
+                *ngIf="!infoWindowProgram.hid"
+                mat-icon-button>
+          <mat-icon fontSet="material-icons-outlined">remove_red_eye</mat-icon>
+        </button>
+        <button (click)="setPinHidBouygues(infoWindowProgram, false)"
+                *ngIf="infoWindowProgram.hid"
+                mat-icon-button>
+          <mat-icon>remove_red_eye</mat-icon>
+        </button>
       </ng-container>
       <ng-template #loadingTemplate>
         loading...
