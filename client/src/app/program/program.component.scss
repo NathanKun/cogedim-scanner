@@ -34,6 +34,36 @@
   font-style: italic;
 }
 
+.small-screen-table {
+  th, td, a {
+    font-size: 10px;
+  }
+
+  tr.mat-row {
+    height: 38px;
+  }
+
+  tr.mat-header-row {
+    height: 46px;
+  }
+
+  mat-icon {
+    font-size: 18px;
+  }
+
+  td.mat-cell {
+    padding: 0 2px 0 2px;
+  }
+
+  td.mat-cell:first-of-type {
+    padding-left: 12px;
+  }
+
+  td.mat-cell:last-of-type {
+    padding-right: 12px;
+  }
+}
+
 mat-card {
   top: 64px;
   margin-top: 0;

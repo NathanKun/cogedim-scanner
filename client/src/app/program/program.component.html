@@ -41,8 +41,8 @@
             </button>
           </div>
 
-          <table (matSortChange)="sortData($event)" [dataSource]="dataSource" class="mat-elevation-z8" mat-table
-                 matSort multiTemplateDataRows>
+          <table (matSortChange)="sortData($event)" [dataSource]="dataSource" [ngClass]="smallScreen ? 'small-screen-table' : ''" class="mat-elevation-z8"
+                 mat-table matSort multiTemplateDataRows>
 
             <!-- Cell Definition -->
 
@@ -51,7 +51,8 @@
               <th *matHeaderCellDef mat-header-cell mat-sort-header><span
                 class="px-0 px-sm-3 mr-3 mx-sm-0">Number</span></th>
               <td *matCellDef="let lot" mat-cell>
-                <a *ngIf="lot['pdfUrl'] else lotNumberTemplate" [href]="lot['pdfUrl']" class="px-0 px-sm-3 mr-3 mx-sm-0 a-tag-no-underline" mat-button
+                <a *ngIf="lot['pdfUrl'] else lotNumberTemplate" [href]="lot['pdfUrl']"
+                   class="px-0 px-sm-3 mr-3 mx-sm-0 a-tag-no-underline" mat-button
                    target="_blank">
                   <mat-icon>picture_as_pdf</mat-icon>
                   {{lot['lotNumber']}}
