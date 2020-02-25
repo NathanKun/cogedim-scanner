@@ -79,9 +79,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit() {
-    // remove this in a few release
-    this.cookieUpgradeToMultipleDeveloper();
-
     this.titleService.setTitle(environment.title);
 
     this.programService.getProgramDateLots().subscribe(
@@ -267,24 +264,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     setTimeout(() => marker._marker.setAnimation(null), 1500);
   }
 
-  private cookieUpgradeToMultipleDeveloper() {
-    if (this.cookieService.check(this.hidProgramsCookieName)) {
-      const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
-      const hidPrograms = JSON.parse(cookieStr) as string[];
-
-      // if is old format of cookie
-      if (hidPrograms.length && hidPrograms[0].indexOf(':') === -1) {
-        const newCookie = [];
-
-        for (const p of hidPrograms) {
-          newCookie.push('C:' + p);
-        }
-
-        this.cookieService.set(this.hidProgramsCookieName, JSON.stringify(newCookie), 10 * 365, '/');
-      }
-    }
-  }
-
   private cookieIsProgramHided(program: Program) {
     const developer = program.developer;
     const programNumber = program.programNumber;
@@ -293,7 +272,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
       const hidePrograms = JSON.parse(cookieStr) as string[];
       const token = HomeComponent.formatCookie(developer, programNumber);
-
+fl
       return hidePrograms.indexOf(token) >= 0;
     } else {
       return false;

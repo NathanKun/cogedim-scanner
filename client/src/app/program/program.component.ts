@@ -48,7 +48,7 @@ export class ProgramComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    if (document.documentElement.clientWidth < 700) { // 768px portrait
+    if (document.documentElement.clientWidth < 800) {
       this.smallScreen = true;
       this.displayedColumns = this.displayedColumnsFirstRow;
     } else {
