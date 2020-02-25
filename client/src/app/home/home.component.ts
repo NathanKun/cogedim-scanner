@@ -272,7 +272,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       const cookieStr = this.cookieService.get(this.hidProgramsCookieName);
       const hidePrograms = JSON.parse(cookieStr) as string[];
       const token = HomeComponent.formatCookie(developer, programNumber);
-fl
+
       return hidePrograms.indexOf(token) >= 0;
     } else {
       return false;
