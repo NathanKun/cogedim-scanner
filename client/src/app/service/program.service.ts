@@ -111,11 +111,13 @@ export class ProgramService extends BaseService {
           if (url.indexOf('cogedim') !== -1) {
             div = doc.querySelector('#main_info');
 
-            // remove .hidden-xs, info may be duplicated with .hidden-xl
-            div.querySelectorAll('.hidden-xs').forEach(b => b.remove());
+            if (div) {
+              // remove .hidden-xs, info may be duplicated with .hidden-xl
+              div.querySelectorAll('.hidden-xs').forEach(b => b.remove());
 
-            // remove .anchors
-            div.querySelectorAll('.anchors').forEach(b => b.remove());
+              // remove .anchors
+              div.querySelectorAll('.anchors').forEach(b => b.remove());
+            }
           } else {
             div = document.createElement('div');
 
@@ -123,7 +125,7 @@ export class ProgramService extends BaseService {
             const deliveryDiv = doc.querySelector('.program-infos');
 
             // remove useless info
-            deliveryDiv.querySelectorAll('.with_button').forEach((item) => item.remove());
+            deliveryDiv.querySelectorAll('.with_button,.media-button').forEach((item) => item.remove());
 
             div.append(deliveryDiv);
             div.append(infoDiv);
