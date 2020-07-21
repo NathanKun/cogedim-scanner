@@ -147,10 +147,12 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/cdk@~9.1.0":
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-9.1.0.tgz#da88568aed9efc39b160a0ac18cfca25f4961441"
-  integrity sha512-qKpAudJx9z0MD+ADptS0OZViJBTA49+JCKym0hPQUkcB9Po4Al6gu6oZ1VSXV5Ln3T84z9aAw/AhUGP/YCFNSQ==
+"@angular/cdk@~10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-10.1.0.tgz#e01a48db1ff23b82ac718ed5b6d73139ad7911f8"
+  integrity sha512-zSZcpsfhRWdNAzNXnKZIlaX1uAWY+8W2zV7ktQNJoNypo9X02rY0YtmPBzlPjT0ITjM4EqohZ07nfd+5bLUw4A==
+  dependencies:
+    tslib "^2.0.0"
   optionalDependencies:
     parse5 "^5.0.0"
 
@@ -237,23 +239,25 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/google-maps@^9.0.2":
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/@angular/google-maps/-/google-maps-9.1.0.tgz#2e9eff34db858d031d32e24b132dfc4c962e7e84"
-  integrity sha512-0laZvjJNiZGiJoCmNT8o7Xc1QU+FFidXUbvZpoDhyLbNnzlXjLetYCdfijhcxyqxydKRbqT6unnOZZbo48QvsA==
+"@angular/google-maps@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/google-maps/-/google-maps-10.1.0.tgz#1329f1197ff3898722da0c15add5accef5ac26a8"
+  integrity sha512-YorWunBfJ32LhzBmSkVtTurTmwemzYfHEcUIXQRCL7S/aTgWXaouNCLxGGHcgmHi01UcFK2EDnWsZBvpHe4ujw==
   dependencies:
-    "@types/googlemaps" "^3.37.0"
-    tslib "^1.9.0"
+    "@types/googlemaps" "^3.39.3"
+    tslib "^2.0.0"
 
 "@angular/language-service@~10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-10.0.4.tgz#fe61e5a82c494a3aaabcca4997aff94fa891d12e"
   integrity sha512-m5dWL1Lg9M4kDA/kjpdyKsrx9arbIebrgsSzr/QG7cPon6SQMRs9ECZBM+3GalkQghrPO1mLgnrUwFBUH2QNPw==
 
-"@angular/material@^9.0.2":
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-9.1.0.tgz#550cbf7f6a9ce679b77435278faebfc4f2a3b2ed"
-  integrity sha512-KjA1ARoZ1vBg4jUH1y39muynxAFvkD8QZFGKH8Nh4zXW5pOP/7NyjokxXsNx5qSBCq/6ac2xBxCrCYJN7HmoDw==
+"@angular/material@^10.1.0":
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-10.1.0.tgz#f36f4c2a7b7199178e449c6b759a89203ac2c194"
+  integrity sha512-zHJxMHYAyfJbhXGhsWUFTABBBQVzWNexuJGWh19MQx0jQn7aLek5nYQ0oLG00+ArISVAg/XMOtnbdRaemFWVzw==
+  dependencies:
+    tslib "^2.0.0"
 
 "@angular/platform-browser-dynamic@~10.0.4":
   version "10.0.4"
@@ -1322,10 +1326,10 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/googlemaps@^3.37.0":
-  version "3.38.0"
-  resolved "https://registry.yarnpkg.com/@types/googlemaps/-/googlemaps-3.38.0.tgz#069c0303ec60706b2e32b14330634c1e1cd59e45"
-  integrity sha512-Rp7FnrwyYGnjoxM+/q/4DRqUzvV9JKK1SBRXx8APxU6NNMtYMsWmOMsQOV2U6z8aMFzlUbRv3EDixLcDep8t9w==
+"@types/googlemaps@^3.39.3":
+  version "3.39.9"
+  resolved "https://registry.yarnpkg.com/@types/googlemaps/-/googlemaps-3.39.9.tgz#641f5285527d2e2a36b042ac2b0d75b7563cec64"
+  integrity sha512-T6QSosejFkUxXLF4FpDAIjVCS9ptieCj8illG4k6abbB/oVaxwrD4+gx/grkv68cFLmEfH+xO510obIyNjL9Tw==
 
 "@types/jasmine@*", "@types/jasmine@~3.4.4":
   version "3.4.6"
@@ -4332,11 +4336,6 @@ graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.2.0, graceful-fs@^4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
-
-hammerjs@^2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/hammerjs/-/hammerjs-2.0.8.tgz#04ef77862cff2bb79d30f7692095930222bf60f1"
-  integrity sha1-BO93hiz/K7edMPdpIJWTAiK/YPE=
 
 handle-thing@^2.0.0:
   version "2.0.0"
@@ -7834,17 +7833,10 @@ rxjs@6.5.5:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^6.5.3:
+rxjs@^6.5.3, rxjs@~6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.0.tgz#af2901eedf02e3a83ffa7f886240ff9018bbec84"
   integrity sha512-3HMA8z/Oz61DUHe+SdOiQyzIf4tOx5oQHmMir7IZEu6TMqCLHT4LRcmNaUS0NwOz8VLvmmBduMsoaUvMaIiqzg==
-  dependencies:
-    tslib "^1.9.0"
-
-rxjs@~6.5.4:
-  version "6.5.4"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.4.tgz#e0777fe0d184cec7872df147f303572d414e211c"
-  integrity sha512-naMQXcgEo3csAEGvw/NydRA0fuS2nDZJiw1YUWFKU7aPPAPGZEsD4Iimit96qwCieH6y614MCLYwdkrWx7z/7Q==
   dependencies:
     tslib "^1.9.0"
 
