@@ -6073,12 +6073,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-lazyload-image@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/ng-lazyload-image/-/ng-lazyload-image-7.0.1.tgz#c50f7eb581388673189d826bf504c352a73cb19f"
-  integrity sha512-0aTsuqeoos8gNlr9q7LJtWdODOuE3w/CDQHNK7lERU34TXJyM3ud77ccbArg+vaCHfzSaMkh87h/wZK4ZJ9dxw==
-  dependencies:
-    tslib "^1.9.0"
+ng-lazyload-image@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/ng-lazyload-image/-/ng-lazyload-image-8.0.1.tgz#1654233d7a37af42be1b87614133d60f1b3d74b2"
+  integrity sha512-x4zV6BJn5+0FilS16aVkWYBefLOVYE4d5trbw3voe6p2VYPcKmBSvjkKYTghyMYY2segGjnIsKDEfG0WoSOIEA==
 
 ngx-cookie-service@^2.2.0:
   version "2.2.0"

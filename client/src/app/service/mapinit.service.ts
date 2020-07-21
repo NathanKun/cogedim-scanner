@@ -15,7 +15,7 @@ export class MapInitService {
   public initGoogleMap(map: GoogleMap) {
     // google maps mesure tool
     // tslint:disable-next-line:no-unused-expression
-    new MeasureTool(map._googleMap, {
+    new MeasureTool(map.googleMap, {
       contextMenu: true,
       showSegmentLength: true,
       tooltip: true,
@@ -23,13 +23,13 @@ export class MapInitService {
     });
 
     // MeasureTool init will setClickableIcons to false
-    map._googleMap.setClickableIcons(true);
+    map.googleMap.setClickableIcons(true);
 
     // show secure zones
     this.programService.getGoodCities().subscribe(
       (data) => {
-        map._googleMap.data.addGeoJson(data);
-        map._googleMap.data.setStyle({
+        map.googleMap.data.addGeoJson(data);
+        map.googleMap.data.setStyle({
           fillColor: '#66CCFF',
           strokeWeight: 1,
           strokeOpacity: 0.5,

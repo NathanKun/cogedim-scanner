@@ -149,7 +149,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     const transitLayer = new google.maps.TransitLayer();
-    transitLayer.setMap(this.map._googleMap);
+    transitLayer.setMap(this.map.googleMap);
 
     this.programcards.changes.subscribe(
       res => this.programcards = res
@@ -169,7 +169,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // init google map
     this.mapInitService.initGoogleMap(this.map);
 
-    this.map._googleMap.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.selectDeveloperButtons.nativeElement);
+    this.map.googleMap.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.selectDeveloperButtons.nativeElement);
     this.selectDeveloperButtons.nativeElement.setAttribute('class', ''); // remove the d-none class
   }
 
@@ -202,7 +202,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.animateMarker(this.markerElements.find(m => m.getTitle() === programName));
 
     // scroll to map if map is not in viewport
-    const mapDiv = this.map._googleMap.getDiv();
+    const mapDiv = this.map.googleMap.getDiv();
     const rect = mapDiv.getBoundingClientRect();
     if (rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight) {
       mapDiv.scrollIntoView({
@@ -244,13 +244,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
       (marker, index) => {
         const pdl = this.programDateLots[index];
         if (pdl.program.developer === RealEstateDeveloper.COGEDIM && this.cogedimProgramsHid) {
-          marker._marker.setVisible(false);
+          marker.marker.setVisible(false);
           pdl.programCardHid = true;
         } else if (pdl.program.developer === RealEstateDeveloper.KAUFMANBROAD && this.kaufmanbroadProgramsHid) {
-          marker._marker.setVisible(false);
+          marker.marker.setVisible(false);
           pdl.programCardHid = true;
         } else {
-          marker._marker.setVisible(!this.hideHidPrograms ? true : !pdl.hid);
+          marker.marker.setVisible(!this.hideHidPrograms ? true : !pdl.hid);
           pdl.programCardHid = !pdl.hid ? false : this.hideHidPrograms;
         }
       }
@@ -259,9 +259,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   private animateMarker(marker: MapMarker) {
     this.map.panTo(marker.getPosition());
-    this.map._googleMap.setZoom(13);
-    marker._marker.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(() => marker._marker.setAnimation(null), 1500);
+    this.map.googleMap.setZoom(13);
+    marker.marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(() => marker.marker.setAnimation(null), 1500);
   }
 
   private cookieIsProgramHided(program: Program) {

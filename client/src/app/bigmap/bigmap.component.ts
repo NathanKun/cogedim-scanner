@@ -68,11 +68,11 @@ export class BigmapComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.map._googleMap.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.changeHideStateButton.nativeElement);
+    this.map.googleMap.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.changeHideStateButton.nativeElement);
     this.changeHideStateButton.nativeElement.setAttribute('class', ''); // remove the d-none class
 
     const transitLayer = new google.maps.TransitLayer();
-    transitLayer.setMap(this.map._googleMap);
+    transitLayer.setMap(this.map.googleMap);
 
     // init google map
     this.mapInitService.initGoogleMap(this.map);
