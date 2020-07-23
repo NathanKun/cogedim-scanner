@@ -93,10 +93,6 @@ export class ProgramService extends BaseService {
             div = doc.querySelector('.informations');
           } else {
             div = doc.querySelector('.program-infos');
-            const surMesureDiv = div.querySelector('.sur-mesure');
-            if (surMesureDiv) {
-              surMesureDiv.remove();
-            }
           }
 
           return this.sanitizer.bypassSecurityTrustHtml(div ? div.innerHTML : '');
@@ -132,6 +128,14 @@ export class ProgramService extends BaseService {
 
             // remove useless info
             deliveryDiv.querySelectorAll('.with_button,.media-button').forEach((item) => item.remove());
+            const surMesure = div.querySelector('.sur-mesure');
+            if (surMesure) {
+              surMesure.remove();
+            }
+            const mediaContainerMobile = div.querySelector('.media-container-mobile');
+            if (mediaContainerMobile) {
+              mediaContainerMobile.remove();
+            }
 
             div.append(deliveryDiv);
             div.append(infoDiv);
