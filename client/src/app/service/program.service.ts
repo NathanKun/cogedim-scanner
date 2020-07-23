@@ -95,7 +95,7 @@ export class ProgramService extends BaseService {
             div = doc.querySelector('.program-infos');
           }
 
-          return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
+          return this.sanitizer.bypassSecurityTrustHtml(div ? div.innerHTML : '');
         }
       )
     );
@@ -117,6 +117,8 @@ export class ProgramService extends BaseService {
 
               // remove .anchors
               div.querySelectorAll('.anchors').forEach(b => b.remove());
+            } else {
+              div = document.createElement('div');
             }
           } else {
             div = document.createElement('div');
@@ -177,23 +179,27 @@ export class ProgramService extends BaseService {
           if (url.indexOf('cogedim') !== -1) {
             div = doc.querySelector('.paragraphs-sales_office');
 
-            // update images src, add cogedim's domain
-            div.querySelectorAll('img[src^="/"]').forEach(
-              e => e.setAttribute(
-                'src',
-                this.convertUrlToBackendResourceUrl(e.getAttribute('src'), true)
-              )
-            );
+            if (div) {
+              // update images src, add cogedim's domain
+              div.querySelectorAll('img[src^="/"]').forEach(
+                e => e.setAttribute(
+                  'src',
+                  this.convertUrlToBackendResourceUrl(e.getAttribute('src'), true)
+                )
+              );
 
-            // remove sales office section
-            div.querySelector('.sales-office').remove();
+              // remove sales office section
+              div.querySelector('.sales-office').remove();
+            }
           } else {
             div = doc.querySelector('.program-sections');
-            div.querySelector('div[v-if="commonUIState.viewPortIsLessThan768"]').remove();
+            if (div) {
+              div.querySelector('div[v-if="commonUIState.viewPortIsLessThan768"]').remove();
+            }
           }
 
           // sanitize html
-          return this.sanitizer.bypassSecurityTrustHtml(div.innerHTML);
+          return this.sanitizer.bypassSecurityTrustHtml(div ? div.innerHTML : '');
         }
       )
     );
