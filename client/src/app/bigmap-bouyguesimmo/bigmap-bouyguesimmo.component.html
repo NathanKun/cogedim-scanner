@@ -6,8 +6,7 @@
     height="100%"
     width="100%">
     <map-marker
-      #markerElem
-      (mapClick)="markerClick(markerElem)"
+      (mapClick)="markerClick(marker)"
       *ngFor="let marker of markerConfigs"
       [label]="marker.label"
       [options]="marker.options"

@@ -66,7 +66,7 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
 
   markerClick(marker: MapMarker) {
     this.infoWindowLoaded = false;
-    const p = this.programs.find(p => p.nid === marker.getTitle());
+    const p = this.programs.find(pr => pr.nid === marker.getTitle());
     this.infoWindowProgram = p;
 
     const article = new DOMParser().parseFromString(p.teaser, 'text/html');

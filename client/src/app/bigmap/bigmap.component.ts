@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {CookieService} from 'ngx-cookie-service';
 import {Title} from '@angular/platform-browser';
@@ -28,7 +28,6 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     maxZoom: 18,
     minZoom: 8,
   };
-  @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
   markerConfigs: MapMarker[] = [];
   @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
   infoWindowConfig: google.maps.InfoWindowOptions = {
