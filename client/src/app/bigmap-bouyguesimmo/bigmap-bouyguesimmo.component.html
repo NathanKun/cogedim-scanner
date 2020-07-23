@@ -6,12 +6,13 @@
     height="100%"
     width="100%">
     <map-marker
+      #marker="mapMarker"
       (mapClick)="markerClick(marker)"
-      *ngFor="let marker of markerConfigs"
-      [label]="marker.label"
-      [options]="marker.options"
-      [position]="marker.position"
-      [title]="marker.title">
+      *ngFor="let markerConfig of markerConfigs"
+      [label]="markerConfig.label"
+      [options]="markerConfig.options"
+      [position]="markerConfig.position"
+      [title]="markerConfig.title">
     </map-marker>
     <map-info-window [options]="infoWindowConfig">
       <ng-container *ngIf="infoWindowLoaded; else loadingTemplate">

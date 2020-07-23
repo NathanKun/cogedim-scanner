@@ -8,6 +8,7 @@ import {MapInitService} from '../service/mapinit.service';
 import {BigmapComponent} from '../bigmap/bigmap.component';
 import {BouyguesimmoService} from '../service/bouyguesimmo.service';
 import {BouyguesImmoProgram} from '../model/bouyguesimmoprogram';
+import {MarkerConfig} from '../model/markerconfig';
 
 @Component({
   selector: 'app-bigmap-bouyguesimmo',
@@ -55,7 +56,7 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
                 animation: google.maps.Animation.DROP,
                 visible: !p.hid
               }
-            } as MapMarker
+            } as MarkerConfig
           );
         }
 
@@ -123,7 +124,7 @@ export class BigmapBouyguesimmoComponent extends BigmapComponent implements OnIn
           options: {
             animation: animate ? google.maps.Animation.DROP : null,
           },
-        } as MapMarker);
+        } as MarkerConfig);
       }
     });
   }

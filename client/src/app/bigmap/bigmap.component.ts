@@ -7,6 +7,7 @@ import {ProgramService} from '../service/program.service';
 import {BigMapPin} from '../model/bigmappin';
 import {BigMapPinDetail} from '../model/bigmappindetail';
 import {MapInitService} from '../service/mapinit.service';
+import {MarkerConfig} from '../model/markerconfig';
 
 @Component({
   selector: 'app-bigmap',
@@ -28,7 +29,7 @@ export class BigmapComponent implements OnInit, AfterViewInit {
     maxZoom: 18,
     minZoom: 8,
   };
-  markerConfigs: MapMarker[] = [];
+  markerConfigs: MarkerConfig[] = [];
   @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow;
   infoWindowConfig: google.maps.InfoWindowOptions = {
     disableAutoPan: false
@@ -140,7 +141,7 @@ export class BigmapComponent implements OnInit, AfterViewInit {
           options: {
             animation: animate ? google.maps.Animation.DROP : null,
           },
-        } as MapMarker);
+        } as MarkerConfig);
       }
     });
   }
