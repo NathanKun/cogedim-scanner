@@ -11,6 +11,7 @@ import {MapInitService} from '../service/mapinit.service';
 import {MatRipple} from '@angular/material/core';
 import {RealEstateDeveloper} from '../model/realestatedeveloper';
 import {Program} from '../model/program';
+import {MarkerConfig} from '../model/markerconfig';
 
 
 @Component({
@@ -37,7 +38,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   };
   @ViewChild(GoogleMap) map: GoogleMap;
   @ViewChildren('markerElem') markerElements: QueryList<MapMarker>;
-  markerConfigs: MapMarker[] = [];
+  markerConfigs: MarkerConfig[] = [];
   @ViewChild('selectDeveloperButtons') selectDeveloperButtons: ElementRef;
   cogedimProgramsHid = false;
   kaufmanbroadProgramsHid = false;
@@ -115,7 +116,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
               visible: !p.hid,
               icon: HomeComponent.getMarkerIconUrlForDeveloper(p.program.developer)
             }
-          } as MapMarker);
+          } as MarkerConfig);
         }
 
         // request delivery info may take lots of time if the backend has no cache
