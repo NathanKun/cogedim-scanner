@@ -93,6 +93,10 @@ export class ProgramService extends BaseService {
             div = doc.querySelector('.informations');
           } else {
             div = doc.querySelector('.program-infos');
+            const surMesureDiv = div.querySelector('.sur-mesure');
+            if (surMesureDiv) {
+              surMesureDiv.remove();
+            }
           }
 
           return this.sanitizer.bypassSecurityTrustHtml(div ? div.innerHTML : '');
