@@ -128,11 +128,11 @@ export class ProgramService extends BaseService {
 
             // remove useless info
             deliveryDiv.querySelectorAll('.with_button,.media-button').forEach((item) => item.remove());
-            const surMesure = div.querySelector('.sur-mesure');
+            const surMesure = deliveryDiv.querySelector('.sur-mesure');
             if (surMesure) {
               surMesure.remove();
             }
-            const mediaContainerMobile = div.querySelector('.media-container-mobile');
+            const mediaContainerMobile = deliveryDiv.querySelector('.media-container-mobile');
             if (mediaContainerMobile) {
               mediaContainerMobile.remove();
             }
